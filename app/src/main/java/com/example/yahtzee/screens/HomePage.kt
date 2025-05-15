@@ -61,7 +61,10 @@ fun Homepage(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        // --- Sfondo ---
+        // Metti lo sfondo per primo in modo che sia disegnato sotto gli altri elementi.
 
+        // Esempio con un gradiente di colore:
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,15 +102,15 @@ fun Homepage(navController: NavController) {
         Icon(
             imageVector = Icons.Default.Settings,
             contentDescription = "Impostazioni",
-            tint = Color.Gray,
+            tint = Color.Gray, // Colore dell'icona
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
                 .size(32.dp)
-                .clickable { navController.navigate("settings") }
+                .clickable { navController.navigate("settings") } // Naviga alla schermata impostazioni
         )
 
-
+        // Contenuto centrale (pulsanti)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,7 +118,7 @@ fun Homepage(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            // Pulsante Gioca
             Button(
                 onClick = { navController.navigate("game") },
                 modifier = Modifier
@@ -134,7 +137,7 @@ fun Homepage(navController: NavController) {
                 }
             }
 
-            // qui aggiungiamo altri pulsanti se necessario
+            // Puoi aggiungere qui altri pulsanti se necessario
         }
     }
 }
