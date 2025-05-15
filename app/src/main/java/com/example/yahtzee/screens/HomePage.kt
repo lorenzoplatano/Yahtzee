@@ -26,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,9 +38,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun Homepage (navController: NavController) {
     val context = LocalContext.current
@@ -48,15 +51,59 @@ fun Homepage (navController: NavController) {
 
     val colors = MaterialTheme.colorScheme
 
-
-
-    BackHandler(enabled = true) {
+    BackHandler {
         showExitDialog = true
     }
+
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Exit App)},
+            title = { Text("Vuoi uscire?") },
+            text = { Text("Sei sicuro di voler chiudere l'app?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    (context as? Activity)?.finish()
+                }) {
+                    Text("Esci")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = { navController.navigate("Game") },
+            colors = ButtonDefaults.buttonColors()
+        ) {
+            Text("Gioca", color = Color.White)
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
