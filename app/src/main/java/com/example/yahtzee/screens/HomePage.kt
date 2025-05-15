@@ -2,7 +2,7 @@ package com.example.yahtzee.screens
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image // Potrebbe servire se usi un'immagine come sfondo
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,15 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale // Potrebbe servire per le immagini di sfondo
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource // Potrebbe servire per le immagini di sfondo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.yahtzee.R // Assicurati di importare il file R per le risorse, se usi immagini
+import com.example.yahtzee.R
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 
 @Composable
@@ -67,23 +67,22 @@ fun Homepage(navController: NavController) {
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9)), // Dal blu chiaro al blu
+                        colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9)), // Dal blu chiaro al bianchino
                         startY = 0f,
                         endY = Float.POSITIVE_INFINITY
                     )
                 )
-        )
-
+        ) {}
 
         Icon(
             imageVector = Icons.Default.Settings,
             contentDescription = "Impostazioni",
-            tint = Color.Gray, // Colore dell'icona
+            tint = Color.Gray,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp)
+                .padding(top = 40.dp, end = 16.dp)
                 .size(32.dp)
-                .clickable { navController.navigate("settings") } // Naviga alla schermata impostazioni
+                .clickable { navController.navigate("settings") }
         )
 
         // Contenuto centrale (pulsanti)

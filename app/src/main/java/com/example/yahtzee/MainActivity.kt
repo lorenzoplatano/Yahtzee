@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.screens.History
 import com.example.yahtzee.screens.Homepage
+import com.example.yahtzee.screens.Settings
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
         NavHost(navController = navController, startDestination = "homepage"){
             composable("homepage") { Homepage(navController) }
             composable("history"){History(navController)}
+            composable("settings"){Settings(navController)}
         }
     }
 }
