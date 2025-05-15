@@ -61,10 +61,7 @@ fun Homepage(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // --- Sfondo ---
-        // Metti lo sfondo per primo in modo che sia disegnato sotto gli altri elementi.
 
-        // Esempio con un gradiente di colore:
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,30 +72,9 @@ fun Homepage(navController: NavController) {
                         endY = Float.POSITIVE_INFINITY
                     )
                 )
-        ) {}
-
-        // Esempio con un colore solido:
-        /*
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray)
-        ) {}
-        */
-
-        // Esempio con un'immagine di sfondo (assicurati di avere un'immagine in res/drawable)
-        /*
-        Image(
-            painter = painterResource(id = R.drawable.your_background_image), // Sostituisci your_background_image
-            contentDescription = "Sfondo Homepage",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // O ContentScale.FillBounds a seconda delle necessità
         )
-        */
 
-        // --- Contenuto della pagina (sopra lo sfondo) ---
 
-        // Icona Impostazioni in alto a destra
         Icon(
             imageVector = Icons.Default.Settings,
             contentDescription = "Impostazioni",
