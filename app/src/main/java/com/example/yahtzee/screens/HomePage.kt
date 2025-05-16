@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -27,6 +29,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.R
 import com.example.yahtzee.ui.theme.YahtzeeTheme
+import androidx.compose.material3.Icon
+
+
 
 @Composable
 fun Homepage(navController: NavController) {
@@ -74,16 +79,32 @@ fun Homepage(navController: NavController) {
                 )
         ) {}
 
-        Icon(
-            imageVector = Icons.Default.Settings,
-            contentDescription = "Impostazioni",
-            tint = Color.Gray,
+        Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 40.dp, end = 16.dp)
-                .size(32.dp)
-                .clickable { navController.navigate("settings") }
-        )
+                .padding(end = 16.dp, top = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Impostazioni",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable { navController.navigate("settings") }
+            )
+
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Storico partite",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { navController.navigate("history") }
+            )
+        }
+
 
         // Contenuto centrale (pulsanti)
         Column(
@@ -108,7 +129,7 @@ fun Homepage(navController: NavController) {
                         tint = Color.White
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Gioca", color = Color.White, fontSize = 18.sp)
+                    Text("Play", color = Color.White, fontSize = 18.sp)
                 }
             }
 
