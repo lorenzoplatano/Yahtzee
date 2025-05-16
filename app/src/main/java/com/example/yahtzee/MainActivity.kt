@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     fun YahtzeeApp(){
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "homepage"){
-            composable("homepage") { Homepage(navController) }
+            composable("homepage") {Homepage(navController) }
             composable("history"){History(navController)}
             composable("settings"){Settings(navController)}
         }
