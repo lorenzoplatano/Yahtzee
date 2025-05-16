@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yahtzee.screens.GameScreenSinglePlayer
 import com.example.yahtzee.screens.History
 import com.example.yahtzee.screens.Homepage
 import com.example.yahtzee.screens.Settings
@@ -35,16 +36,17 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun YahtzeeApp(){
+    fun YahtzeeApp() {
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "homepage"){
-            composable("homepage") {Homepage(navController) }
-            composable("history"){History(navController)}
-            composable("settings"){Settings(navController)}
+        NavHost(navController = navController, startDestination = "homepage") {
+            composable("homepage") { Homepage(navController) }
+            composable("history") { History(navController) }
+            composable("settings") { Settings(navController) }
+            composable("game") { GameScreenSinglePlayer(navController) } // <--- AGGIUNTA QUI
         }
     }
-}
 
+}
 
 
 

@@ -147,7 +147,7 @@ fun Homepage(navController: NavController) {
                             Button(
                                 onClick = {
                                     showModeDialog = false
-                                    navController.navigate("game_1v1")
+                                    navController.navigate("game")
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -157,7 +157,7 @@ fun Homepage(navController: NavController) {
                             Button(
                                 onClick = {
                                     showModeDialog = false
-                                    navController.navigate("game_vs_cpu")
+                                    navController.navigate("game")
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
