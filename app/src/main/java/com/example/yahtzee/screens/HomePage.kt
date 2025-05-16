@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -28,8 +30,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.R
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 import androidx.compose.material3.Icon
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material.icons.filled.History
+
+
 
 @Composable
 fun Homepage(navController: NavController) {
@@ -94,7 +96,7 @@ fun Homepage(navController: NavController) {
             )
 
             Icon(
-                imageVector = Icons.Default.History,
+                imageVector = Icons.Default.Menu,
                 contentDescription = "Storico partite",
                 tint = Color.Gray,
                 modifier = Modifier
