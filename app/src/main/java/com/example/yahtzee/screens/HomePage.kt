@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 fun Homepage(navController: NavController) {
     val context = LocalContext.current
     var showExitDialog by remember { mutableStateOf(false) }
+    var showModeDialog by remember { mutableStateOf(false) }
 
     BackHandler {
         showExitDialog = true
@@ -116,7 +117,7 @@ fun Homepage(navController: NavController) {
         ) {
             // Pulsante Gioca
             Button(
-                onClick = { navController.navigate("game") },
+                onClick = { showModeDialog = true},
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .padding(bottom = 16.dp),
@@ -132,6 +133,47 @@ fun Homepage(navController: NavController) {
                     Text("Play", color = Color.White, fontSize = 18.sp)
                 }
             }
+            if (showModeDialog) {
+                AlertDialog(
+                    onDismissRequest = { showModeDialog = false },
+                    title = { Text("Scegli modalità di gioco") },
+                    text = {
+                        Column {
+                            Text("Seleziona contro chi vuoi giocare.")
+                        }
+                    },
+                    confirmButton = {
+                        Column {
+                            Button(
+                                onClick = {
+                                    showModeDialog = false
+                                    navController.navigate("game_1v1")
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("1 vs 1")
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    showModeDialog = false
+                                    navController.navigate("game_vs_cpu")
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Contro CPU")
+                            }
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showModeDialog = false }) {
+                            Text("Annulla")
+                        }
+                    }
+                )
+            }
+
+
 
             // Puoi aggiungere qui altri pulsanti se necessario
         }

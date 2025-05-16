@@ -2,20 +2,11 @@ package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -36,6 +27,9 @@ fun Settings(navController: NavController) {
 
 @Composable
 fun SettingsContent(onHomeClick: () -> Unit) {
+    var showThemeDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -65,17 +59,29 @@ fun SettingsContent(onHomeClick: () -> Unit) {
                 .padding(top = 100.dp, start = 24.dp, end = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SettingsRow("Tema (Chiaro/Scuro)")
-            SettingsRow("Lingua")
+            SettingsRow("Tema (Chiaro/Scuro)") {
+                showThemeDialog = true
+            }
+            SettingsRow("Lingua") {
+                showLanguageDialog = true
+            }
             SettingsRow("Regole del Gioco")
             SettingsRow("Notifiche")
             SettingsRow("Reset Impostazioni")
+        }
+
+        if (showThemeDialog) {
+            ThemeDialog(onDismiss = { showThemeDialog = false })
+        }
+
+        if (showLanguageDialog) {
+            LanguageDialog(onDismiss = { showLanguageDialog = false })
         }
     }
 }
 
 @Composable
-fun SettingsRow(label: String) {
+fun SettingsRow(label: String, onClick: (() -> Unit)? = null) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,11 +90,72 @@ fun SettingsRow(label: String) {
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
+            .clickable(enabled = onClick != null) {
+                onClick?.invoke()
+            }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Medium)
     }
+}
+
+@Composable
+fun ThemeDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Seleziona Tema") },
+        text = {
+            Column {
+                Text("Chiaro", modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: Applica tema chiaro
+                        onDismiss()
+                    }
+                    .padding(8.dp)
+                )
+                Text("Scuro", modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: Applica tema scuro
+                        onDismiss()
+                    }
+                    .padding(8.dp)
+                )
+            }
+        },
+        confirmButton = {}
+    )
+}
+
+@Composable
+fun LanguageDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Seleziona Lingua") },
+        text = {
+            Column {
+                Text("Italiano", modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: Imposta lingua italiana
+                        onDismiss()
+                    }
+                    .padding(8.dp)
+                )
+                Text("Inglese", modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: Imposta lingua inglese
+                        onDismiss()
+                    }
+                    .padding(8.dp)
+                )
+            }
+        },
+        confirmButton = {}
+    )
 }
 
 @Preview(showBackground = true)
@@ -98,3 +165,4 @@ fun SettingsPreview() {
         SettingsContent(onHomeClick = {})
     }
 }
+
