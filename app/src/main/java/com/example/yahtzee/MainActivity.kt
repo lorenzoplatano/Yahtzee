@@ -43,8 +43,8 @@ class MainActivity : ComponentActivity() {
             composable("homepage") { Homepage(navController) }
             composable("history") { History(navController) }
             composable("settings") { Settings(navController) }
-            composable("game_1vs1") { GameScreenSinglePlayer(navController) } // <--- AGGIUNTA QUI
-            composable("game") { GameScreenMultiplayer(navController) }
+            composable("game_1vs1") { GameScreenMultiplayer(navController) } // <--- AGGIUNTA QUI
+            composable("game") { GameScreenSinglePlayer(navController) }
         }
     }
 
