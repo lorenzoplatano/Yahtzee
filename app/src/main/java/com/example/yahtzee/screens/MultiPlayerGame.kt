@@ -158,7 +158,7 @@ fun PlayerScoreBoard(playerName: String) {
         )
         TableRow("COMBINATION", "SCORE", header = true)
         val combinations = listOf(
-            "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
+            "gay", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
             "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
             "Yahtzee"
         )
