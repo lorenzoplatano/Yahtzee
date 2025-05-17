@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,10 +17,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlin.random.Random
 
 @Composable
 fun GameScreenSinglePlayer(navController: NavController) {
     var diceValues by remember { mutableStateOf(List(5) { (1..6).random() }) }
+    var selectedDice by remember { mutableStateOf(List(5) { false }) }
     var scoreMap by remember { mutableStateOf(mutableMapOf<String, Int?>()) }
     var remainingRolls by remember { mutableStateOf(3) }
 
@@ -66,12 +68,20 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     .padding(bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                diceValues.forEach { value ->
+                diceValues.forEachIndexed { index, value ->
                     Box(
                         modifier = Modifier
                             .size(70.dp)
-                            .background(Color.White, shape = MaterialTheme.shapes.small)
-                            .border(1.dp, Color.Gray),
+                            .background(
+                                if (selectedDice[index]) Color(0xFF64B5F6) else Color.White,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .border(2.dp, if (selectedDice[index]) Color(0xFF1976D2) else Color.Gray)
+                            .clickable {
+                                val newSelection = selectedDice.toMutableList()
+                                newSelection[index] = !newSelection[index]
+                                selectedDice = newSelection
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(value.toString(), fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -99,10 +109,10 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         combination = combination,
                         currentScore = scoreMap[combination],
                         onClick = {
-                            val newMap = scoreMap.toMutableMap()
-                            newMap[combination] = calculateScore(combination, diceValues, newMap)
-                            scoreMap = newMap
+                            scoreMap[combination] = calculateScore(combination, diceValues, scoreMap)
                             remainingRolls = 3
+                            // Quando si assegna un punteggio, resetta la selezione dadi
+                            selectedDice = List(5) { false }
                         }
                     )
                 }
@@ -122,6 +132,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 Button(
                     onClick = {
                         diceValues = List(5) { (1..6).random() }
+                        selectedDice = List(5) { false }
                         scoreMap = mutableMapOf()
                         remainingRolls = 3
                     },
@@ -138,7 +149,9 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 Button(
                     onClick = {
                         if (remainingRolls > 0) {
-                            diceValues = List(5) { (1..6).random() }
+                            diceValues = diceValues.mapIndexed { index, value ->
+                                if (!selectedDice[index]) (1..6).random() else value
+                            }
                             remainingRolls--
                         }
                     },
@@ -239,5 +252,4 @@ fun calculateScore(combination: String, diceValues: List<Int>, upperScores: Map<
 
         else -> 0
     }
-
 }
