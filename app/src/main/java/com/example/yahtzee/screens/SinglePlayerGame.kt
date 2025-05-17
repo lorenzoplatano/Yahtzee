@@ -76,7 +76,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Dadi dummy
+            // Dadi dummy ciao anderea
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
