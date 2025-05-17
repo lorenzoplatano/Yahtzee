@@ -86,7 +86,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 repeat(5) {
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
+                            .size(70.dp)
                             .background(Color.White, shape = MaterialTheme.shapes.small)
                             .border(1.dp, Color.Gray)
                     )
