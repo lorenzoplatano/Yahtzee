@@ -18,7 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -107,10 +107,14 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     "Yahtzee"
                 )
                 combinations.forEach {
-                    Divider(color = Color(0xFF0D47A1), thickness = 1.dp)
+                    HorizontalDivider(thickness = 1.dp, color = Color(0xFF0D47A1))
                     TableRow(it, "—")
                 }
-                Divider(color = Color(0xFF0D47A1), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    thickness = 1.dp,
+                    color = Color(0xFF0D47A1)
+                )
                 TableRow("Total Score", "—", bold = true)
             }
 

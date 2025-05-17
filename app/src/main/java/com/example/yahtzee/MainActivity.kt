@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yahtzee.screens.GameScreenMultiplayer
 import com.example.yahtzee.screens.GameScreenSinglePlayer
 import com.example.yahtzee.screens.History
 import com.example.yahtzee.screens.Homepage
@@ -42,7 +43,8 @@ class MainActivity : ComponentActivity() {
             composable("homepage") { Homepage(navController) }
             composable("history") { History(navController) }
             composable("settings") { Settings(navController) }
-            composable("game") { GameScreenSinglePlayer(navController) } // <--- AGGIUNTA QUI
+            composable("game_1vs1") { GameScreenSinglePlayer(navController) } // <--- AGGIUNTA QUI
+            composable("game") { GameScreenMultiplayer(navController) }
         }
     }
 

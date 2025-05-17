@@ -32,7 +32,6 @@ import com.example.yahtzee.ui.theme.YahtzeeTheme
 import androidx.compose.material3.Icon
 
 
-
 @Composable
 fun Homepage(navController: NavController) {
     val context = LocalContext.current
@@ -147,7 +146,7 @@ fun Homepage(navController: NavController) {
                             Button(
                                 onClick = {
                                     showModeDialog = false
-                                    navController.navigate("game")
+                                    navController.navigate("game_1vs1")
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
