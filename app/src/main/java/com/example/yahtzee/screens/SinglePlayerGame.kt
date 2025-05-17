@@ -3,41 +3,27 @@ package com.example.yahtzee.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.yahtzee.ui.theme.YahtzeeTheme
 
 @Composable
 fun GameScreenSinglePlayer(navController: NavController) {
+    var diceValues by remember { mutableStateOf(List(5) { (1..6).random() }) }
+    var scoreMap by remember { mutableStateOf(mutableMapOf<String, Int?>()) }
+    var remainingRolls by remember { mutableStateOf(3) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +35,6 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 )
             )
     ) {
-        // Home icon
         Icon(
             imageVector = Icons.Default.Home,
             contentDescription = "Home",
@@ -67,7 +52,6 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 .padding(top = 96.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Titolo grande
             Text(
                 text = "YAHTZEE",
                 fontSize = 36.sp,
@@ -76,51 +60,59 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Dadi dummy ciao anderea
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                repeat(5) {
+                diceValues.forEach { value ->
                     Box(
                         modifier = Modifier
                             .size(70.dp)
                             .background(Color.White, shape = MaterialTheme.shapes.small)
-                            .border(1.dp, Color.Gray)
-                    )
+                            .border(1.dp, Color.Gray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(value.toString(), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
 
-            // Tabella punteggi
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
                     .padding(8.dp)
             ) {
-                TableRow("COMBINATION", "SCORE", header = true)
+                TableRow("COMBINATION", null, {}, header = true)
+
                 val combinations = listOf(
                     "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
                     "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
-                    "Yahtzee"
+                    "Yahtzee", "Chance"
                 )
-                combinations.forEach {
-                    HorizontalDivider(thickness = 1.dp, color = Color(0xFF0D47A1))
-                    TableRow(it, "—")
+
+                combinations.forEach { combination ->
+                    Divider(thickness = 1.dp, color = Color(0xFF0D47A1))
+                    TableRow(
+                        combination = combination,
+                        currentScore = scoreMap[combination],
+                        onClick = {
+                            val newMap = scoreMap.toMutableMap()
+                            newMap[combination] = calculateScore(combination, diceValues, newMap)
+                            scoreMap = newMap
+                            remainingRolls = 3
+                        }
+                    )
                 }
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    thickness = 1.dp,
-                    color = Color(0xFF0D47A1)
-                )
-                TableRow("Total Score", "—", bold = true)
+
+                Divider(thickness = 1.dp, color = Color(0xFF0D47A1), modifier = Modifier.padding(vertical = 4.dp))
+                TableRow("Total Score", scoreMap.values.filterNotNull().sum(), {}, bold = true)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Pulsanti in basso ingranditi e ravvicinati
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,7 +120,11 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { /* dummy */ },
+                    onClick = {
+                        diceValues = List(5) { (1..6).random() }
+                        scoreMap = mutableMapOf()
+                        remainingRolls = 3
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(72.dp),
@@ -140,13 +136,18 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
-                    onClick = { /* dummy */ },
+                    onClick = {
+                        if (remainingRolls > 0) {
+                            diceValues = List(5) { (1..6).random() }
+                            remainingRolls--
+                        }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(72.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
                 ) {
-                    Text("Roll Dice", fontSize = 22.sp)
+                    Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
                 }
             }
         }
@@ -154,7 +155,13 @@ fun GameScreenSinglePlayer(navController: NavController) {
 }
 
 @Composable
-fun TableRow(left: String, right: String, header: Boolean = false, bold: Boolean = false) {
+fun TableRow(
+    combination: String,
+    currentScore: Int?,
+    onClick: () -> Unit,
+    header: Boolean = false,
+    bold: Boolean = false
+) {
     val textStyle = if (bold || header) {
         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
     } else {
@@ -168,25 +175,69 @@ fun TableRow(left: String, right: String, header: Boolean = false, bold: Boolean
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = left,
+            text = combination,
             style = textStyle,
             fontSize = 16.sp,
             modifier = Modifier.weight(1.5f)
         )
-        Text(
-            text = right,
-            style = textStyle,
-            fontSize = 16.sp,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.End
-        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(enabled = !header && currentScore == null) { onClick() },
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = currentScore?.toString() ?: "—",
+                style = textStyle,
+                fontSize = 16.sp,
+                textAlign = TextAlign.End
+            )
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GameScreenPreview() {
-    YahtzeeTheme {
-        GameScreenSinglePlayer(navController = rememberNavController())
+fun calculateScore(combination: String, diceValues: List<Int>, upperScores: Map<String, Int?>): Int {
+    val counts = diceValues.groupingBy { it }.eachCount()
+    val totalSum = diceValues.sum()
+
+    return when (combination) {
+        "Aces" -> diceValues.filter { it == 1 }.sum()
+        "Twos" -> diceValues.filter { it == 2 }.sum()
+        "Threes" -> diceValues.filter { it == 3 }.sum()
+        "Fours" -> diceValues.filter { it == 4 }.sum()
+        "Fives" -> diceValues.filter { it == 5 }.sum()
+        "Sixes" -> diceValues.filter { it == 6 }.sum()
+
+        "Bonus" -> {
+            val upperTotal = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+                .mapNotNull { upperScores[it] }
+                .sum()
+            if (upperTotal >= 63) 35 else 0
+        }
+
+        "3 of a Kind" -> if (counts.values.any { it >= 3 }) totalSum else 0
+        "4 of a Kind" -> if (counts.values.any { it >= 4 }) totalSum else 0
+        "Full House" -> if (counts.values.contains(3) && counts.values.contains(2)) 25 else 0
+        "Small Straight" -> {
+            val unique = diceValues.toSet()
+            val straights = listOf(
+                setOf(1, 2, 3, 4),
+                setOf(2, 3, 4, 5),
+                setOf(3, 4, 5, 6)
+            )
+            if (straights.any { it.all { num -> unique.contains(num) } }) 30 else 0
+        }
+
+        "Large Straight" -> {
+            val sorted = diceValues.toSortedSet()
+            if (sorted == setOf(1, 2, 3, 4, 5) || sorted == setOf(2, 3, 4, 5, 6)) 40 else 0
+        }
+
+        "Yahtzee" -> if (counts.values.any { it == 5 }) 50 else 0
+
+        "Chance" -> totalSum
+
+        else -> 0
     }
+
 }
