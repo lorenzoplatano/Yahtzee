@@ -160,7 +160,7 @@ fun Homepage(navController: NavController) {
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Contro CPU")
+                                Text("Singleplayer")
                             }
                         }
                     },

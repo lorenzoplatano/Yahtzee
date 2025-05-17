@@ -26,6 +26,16 @@ fun GameScreenSinglePlayer(navController: NavController) {
     var remainingRolls by remember { mutableStateOf(3) }
     var canSelectScore by remember { mutableStateOf(false) }
     var heldDice by remember { mutableStateOf(List(5) { false }) }
+    var gameEnded by remember { mutableStateOf(false) }
+
+    val combinations = listOf(
+        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
+        "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
+        "Yahtzee", "Chance"
+    )
+
+    // Controlla se la partita è finita (tutti i punteggi non nulli tranne Bonus)
+    gameEnded = combinations.filter { it != "Bonus" }.all { scoreMap[it] != null }
 
     Box(
         modifier = Modifier
@@ -63,101 +73,110 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                diceValues.forEachIndexed { index, value ->
-                    Box(
-                        modifier = Modifier
-                            .size(70.dp)
-                            .background(
-                                if (heldDice[index]) Color(0xFF1976D2) else Color.White,
-                                shape = MaterialTheme.shapes.small
+            if (gameEnded) {
+                Text(
+                    text = "Partita Terminata!",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    modifier = Modifier.padding(vertical = 24.dp)
+                )
+                Text(
+                    text = "Punteggio finale: ${scoreMap.values.filterNotNull().sum()}",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    diceValues.forEachIndexed { index, value ->
+                        Box(
+                            modifier = Modifier
+                                .size(70.dp)
+                                .background(
+                                    if (heldDice[index]) Color(0xFF1976D2) else Color.White,
+                                    shape = MaterialTheme.shapes.small
+                                )
+                                .border(1.dp, Color.Gray)
+                                .clickable(enabled = remainingRolls < 3) {
+                                    heldDice = heldDice.toMutableList().also {
+                                        it[index] = !it[index]
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                value.toString(),
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (heldDice[index]) Color.White else Color.Black
                             )
-                            .border(1.dp, Color.Gray)
-                            .clickable(enabled = remainingRolls < 3) {
-                                // Puoi tenere o rilasciare i dadi solo dopo il primo lancio
-                                heldDice = heldDice.toMutableList().also {
-                                    it[index] = !it[index]
-                                }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            value.toString(),
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (heldDice[index]) Color.White else Color.Black
-                        )
+                        }
                     }
                 }
-            }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
-                    .padding(8.dp)
-            ) {
-                TableRow("COMBINATION", null, {}, header = true)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
+                        .padding(8.dp)
+                ) {
+                    TableRow("COMBINATION", null, {}, header = true)
 
-                val combinations = listOf(
-                    "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
-                    "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
-                    "Yahtzee", "Chance"
-                )
+                    combinations.forEach { combination ->
+                        Divider(thickness = 1.dp, color = Color(0xFF0D47A1))
+                        TableRow(
+                            combination = combination,
+                            currentScore = scoreMap[combination],
+                            onClick = {
+                                scoreMap[combination] = calculateScore(combination, diceValues, scoreMap)
+                                remainingRolls = 3
+                                canSelectScore = false
+                                heldDice = List(5) { false }
+                            },
+                            enabled = canSelectScore && scoreMap[combination] == null
+                        )
+                    }
 
-                combinations.forEach { combination ->
-                    Divider(thickness = 1.dp, color = Color(0xFF0D47A1))
-                    TableRow(
-                        combination = combination,
-                        currentScore = scoreMap[combination],
-                        onClick = {
-                            scoreMap[combination] = calculateScore(combination, diceValues, scoreMap)
-                            remainingRolls = 3
-                            canSelectScore = false
-                            heldDice = List(5) { false }
-                        },
-                        enabled = canSelectScore && scoreMap[combination] == null
+                    Divider(
+                        thickness = 1.dp,
+                        color = Color(0xFF0D47A1),
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
+                    TableRow("Total Score", scoreMap.values.filterNotNull().sum(), {}, bold = true)
                 }
 
-                Divider(
-                    thickness = 1.dp,
-                    color = Color(0xFF0D47A1),
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                TableRow("Total Score", scoreMap.values.filterNotNull().sum(), {}, bold = true)
-            }
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = {
-                        if (remainingRolls > 0) {
-                            // Lancia solo i dadi non tenuti
-                            diceValues = diceValues.mapIndexed { index, value ->
-                                if (heldDice[index]) value else (1..6).random()
-                            }
-                            remainingRolls--
-                            canSelectScore = true
-                        }
-                    },
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(72.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
+                    Button(
+                        onClick = {
+                            if (remainingRolls > 0) {
+                                diceValues = diceValues.mapIndexed { index, value ->
+                                    if (heldDice[index]) value else (1..6).random()
+                                }
+                                remainingRolls--
+                                canSelectScore = true
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(72.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                        enabled = !gameEnded
+                    ) {
+                        Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
+                    }
                 }
             }
         }
@@ -194,7 +213,7 @@ fun TableRow(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .clickable(enabled = enabled && !header && currentScore == null) { onClick() },
+                .clickable(enabled = enabled) { onClick() },
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
@@ -202,7 +221,7 @@ fun TableRow(
                 style = textStyle,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
-                color = if (enabled) Color.Unspecified else Color.Gray.copy(alpha = 0.5f)
+                color = if (enabled) Color.Unspecified else Color.Gray
             )
         }
     }
