@@ -3,25 +3,10 @@ package com.example.yahtzee.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +22,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 
-
 @Composable
 fun GameScreenMultiplayer(navController: NavController) {
     Box(
@@ -51,6 +35,7 @@ fun GameScreenMultiplayer(navController: NavController) {
                 )
             )
     ) {
+        // Icona Home
         Icon(
             imageVector = Icons.Default.Home,
             contentDescription = "Home",
@@ -68,6 +53,7 @@ fun GameScreenMultiplayer(navController: NavController) {
                 .padding(top = 96.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Titolo
             Text(
                 text = "YAHTZEE - Multiplayer",
                 fontSize = 30.sp,
@@ -93,20 +79,33 @@ fun GameScreenMultiplayer(navController: NavController) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Due tabelle per due giocatori
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // Tabella punteggi 1vs1
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
+                    .padding(8.dp)
             ) {
-                PlayerScoreBoard("Player 1")
-                Spacer(modifier = Modifier.width(12.dp))
-                PlayerScoreBoard("Player 2")
+                MultiplayerTableRow("COMBINATION", "Player 1", "Player 2", header = true)
+
+                val combinations = listOf(
+                    "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
+                    "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
+                    "Yahtzee"
+                )
+
+                combinations.forEach {
+                    Divider(color = Color(0xFF0D47A1), thickness = 1.dp)
+                    MultiplayerTableRow(it, "—", "—")
+                }
+
+                Divider(color = Color(0xFF0D47A1), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                MultiplayerTableRow("Total Score", "—", "—", bold = true)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Pulsanti "Play" e "Roll Dice"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,19 +113,19 @@ fun GameScreenMultiplayer(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { /* handle play turn */ },
+                    onClick = { /* handle play */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(72.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6))
                 ) {
-                    Text("Play Turn", fontSize = 22.sp)
+                    Text("Play", fontSize = 22.sp)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
-                    onClick = { /* handle roll */ },
+                    onClick = { /* handle roll dice */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(72.dp),
@@ -140,34 +139,47 @@ fun GameScreenMultiplayer(navController: NavController) {
 }
 
 @Composable
-fun PlayerScoreBoard(playerName: String) {
-    Column(
+fun MultiplayerTableRow(left: String, middle: String, right: String, header: Boolean = false, bold: Boolean = false) {
+    val textStyle = if (bold || header) {
+        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+    } else {
+        MaterialTheme.typography.bodyLarge
+    }
+
+    Row(
         modifier = Modifier
-            .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
-            .padding(8.dp)
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = playerName,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF0D47A1),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
+            text = left,
+            style = textStyle,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(1.5f)
+        )
+        Text(
+            text = middle,
+            style = textStyle,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
-        TableRow("COMBINATION", "SCORE", header = true)
-        val combinations = listOf(
-            "gay", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
-            "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
-            "Yahtzee"
+        Text(
+            text = right,
+            style = textStyle,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
         )
-        combinations.forEach {
-            Divider(color = Color(0xFF0D47A1), thickness = 1.dp)
-            TableRow(it, "—")
-        }
-        Divider(color = Color(0xFF0D47A1), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
-        TableRow("Total Score", "—", bold = true)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GameScreenMultiplayerPreview() {
+    YahtzeeTheme {
+        GameScreenMultiplayer(navController = rememberNavController())
     }
 }
 
