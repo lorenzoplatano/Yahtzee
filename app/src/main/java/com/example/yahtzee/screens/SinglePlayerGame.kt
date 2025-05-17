@@ -129,20 +129,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
-                    onClick = {
-                        diceValues = List(5) { (1..6).random() }
-                        selectedDice = List(5) { false }
-                        scoreMap = mutableMapOf()
-                        remainingRolls = 3
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(72.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6))
-                ) {
-                    Text("Play", fontSize = 22.sp)
-                }
+
 
                 Spacer(modifier = Modifier.width(16.dp))
 
