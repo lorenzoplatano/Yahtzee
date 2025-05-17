@@ -22,9 +22,10 @@ import kotlin.random.Random
 @Composable
 fun GameScreenSinglePlayer(navController: NavController) {
     var diceValues by remember { mutableStateOf(List(5) { (1..6).random() }) }
-    var selectedDice by remember { mutableStateOf(List(5) { false }) }
     var scoreMap by remember { mutableStateOf(mutableMapOf<String, Int?>()) }
     var remainingRolls by remember { mutableStateOf(3) }
+    var canSelectScore by remember { mutableStateOf(false) }
+    var heldDice by remember { mutableStateOf(List(5) { false }) }
 
     Box(
         modifier = Modifier
@@ -73,18 +74,24 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         modifier = Modifier
                             .size(70.dp)
                             .background(
-                                if (selectedDice[index]) Color(0xFF64B5F6) else Color.White,
+                                if (heldDice[index]) Color(0xFF1976D2) else Color.White,
                                 shape = MaterialTheme.shapes.small
                             )
-                            .border(2.dp, if (selectedDice[index]) Color(0xFF1976D2) else Color.Gray)
-                            .clickable {
-                                val newSelection = selectedDice.toMutableList()
-                                newSelection[index] = !newSelection[index]
-                                selectedDice = newSelection
+                            .border(1.dp, Color.Gray)
+                            .clickable(enabled = remainingRolls < 3) {
+                                // Puoi tenere o rilasciare i dadi solo dopo il primo lancio
+                                heldDice = heldDice.toMutableList().also {
+                                    it[index] = !it[index]
+                                }
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(value.toString(), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            value.toString(),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (heldDice[index]) Color.White else Color.Black
+                        )
                     }
                 }
             }
@@ -111,13 +118,18 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         onClick = {
                             scoreMap[combination] = calculateScore(combination, diceValues, scoreMap)
                             remainingRolls = 3
-                            // Quando si assegna un punteggio, resetta la selezione dadi
-                            selectedDice = List(5) { false }
-                        }
+                            canSelectScore = false
+                            heldDice = List(5) { false }
+                        },
+                        enabled = canSelectScore && scoreMap[combination] == null
                     )
                 }
 
-                Divider(thickness = 1.dp, color = Color(0xFF0D47A1), modifier = Modifier.padding(vertical = 4.dp))
+                Divider(
+                    thickness = 1.dp,
+                    color = Color(0xFF0D47A1),
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
                 TableRow("Total Score", scoreMap.values.filterNotNull().sum(), {}, bold = true)
             }
 
@@ -129,17 +141,15 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-
-                Spacer(modifier = Modifier.width(16.dp))
-
                 Button(
                     onClick = {
                         if (remainingRolls > 0) {
+                            // Lancia solo i dadi non tenuti
                             diceValues = diceValues.mapIndexed { index, value ->
-                                if (!selectedDice[index]) (1..6).random() else value
+                                if (heldDice[index]) value else (1..6).random()
                             }
                             remainingRolls--
+                            canSelectScore = true
                         }
                     },
                     modifier = Modifier
@@ -160,7 +170,8 @@ fun TableRow(
     currentScore: Int?,
     onClick: () -> Unit,
     header: Boolean = false,
-    bold: Boolean = false
+    bold: Boolean = false,
+    enabled: Boolean = true
 ) {
     val textStyle = if (bold || header) {
         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
@@ -183,14 +194,15 @@ fun TableRow(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .clickable(enabled = !header && currentScore == null) { onClick() },
+                .clickable(enabled = enabled && !header && currentScore == null) { onClick() },
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
                 text = currentScore?.toString() ?: "—",
                 style = textStyle,
                 fontSize = 16.sp,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                color = if (enabled) Color.Unspecified else Color.Gray.copy(alpha = 0.5f)
             )
         }
     }
