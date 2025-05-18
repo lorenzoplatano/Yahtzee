@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -16,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import kotlin.random.Random
 
 @Composable
 fun GameScreenSinglePlayer(navController: NavController) {
@@ -27,24 +29,52 @@ fun GameScreenSinglePlayer(navController: NavController) {
     var canSelectScore by remember { mutableStateOf(false) }
     var heldDice by remember { mutableStateOf(List(5) { false }) }
     var gameEnded by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
+
+    fun resetGame() {
+        diceValues = List(5) { (1..6).random() }
+        scoreMap = mutableMapOf()
+        remainingRolls = 3
+        canSelectScore = false
+        heldDice = List(5) { false }
+        gameEnded = false
+    }
 
     val combinations = listOf(
-        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes", "Bonus",
+        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
         "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
         "Yahtzee", "Chance"
     )
 
-    // Controlla se la partita è finita (tutti i punteggi non nulli tranne Bonus)
     gameEnded = combinations.filter { it != "Bonus" }.all { scoreMap[it] != null }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Sei sicuro?") },
+            text = { Text("Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    resetGame()
+                    showResetDialog = false
+                }) {
+                    Text("Sì")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9)),
-                    startY = 0f,
-                    endY = Float.POSITIVE_INFINITY
+                    colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9))
                 )
             )
     ) {
@@ -56,12 +86,14 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 .align(Alignment.TopEnd)
                 .padding(top = 40.dp, end = 16.dp)
                 .size(32.dp)
+                .zIndex(1f)
                 .clickable { navController.navigate("homepage") }
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(top = 96.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -87,7 +119,17 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
+
+                Button(
+                    onClick = { showResetDialog = true },
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .height(56.dp)
+                ) {
+                    Text("Nuova Partita", fontSize = 18.sp)
+                }
             } else {
+                // Dadi
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,6 +162,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     }
                 }
 
+                // Tabella punteggi
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -127,7 +170,6 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         .padding(8.dp)
                 ) {
                     TableRow("COMBINATION", null, {}, header = true)
-
                     combinations.forEach { combination ->
                         Divider(thickness = 1.dp, color = Color(0xFF0D47A1))
                         TableRow(
@@ -139,16 +181,27 @@ fun GameScreenSinglePlayer(navController: NavController) {
                                 canSelectScore = false
                                 heldDice = List(5) { false }
                             },
-                            enabled = canSelectScore && scoreMap[combination] == null
+                            enabled = canSelectScore && scoreMap[combination] == null && combination != "Bonus"
                         )
                     }
+
+                    val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+                    val upperSum = upper.mapNotNull { scoreMap[it] }.sum()
+                    val bonus = if (upperSum >= 63) 35 else 0
+                    val totalScore = scoreMap.filterKeys { it != "Bonus" }.values.filterNotNull().sum() + bonus
 
                     Divider(
                         thickness = 1.dp,
                         color = Color(0xFF0D47A1),
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
-                    TableRow("Total Score", scoreMap.values.filterNotNull().sum(), {}, bold = true)
+                    TableRow("Bonus", bonus, {}, bold = true)
+                    Divider(
+                        thickness = 1.dp,
+                        color = Color(0xFF0D47A1),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    TableRow("Total Score", totalScore, {}, bold = true)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -177,6 +230,18 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     ) {
                         Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
                     }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = { showResetDialog = true },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(72.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C))
+                    ) {
+                        Text("Reset", fontSize = 22.sp)
+                    }
                 }
             }
         }
@@ -188,48 +253,54 @@ fun TableRow(
     combination: String,
     currentScore: Int?,
     onClick: () -> Unit,
+    enabled: Boolean = false,
     header: Boolean = false,
-    bold: Boolean = false,
-    enabled: Boolean = true
+    bold: Boolean = false
 ) {
-    val textStyle = if (bold || header) {
-        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-    } else {
-        MaterialTheme.typography.bodyLarge
+    val backgroundColor = when {
+        header -> Color(0xFF0D47A1)
+        enabled -> Color(0xFFE3F2FD)
+        else -> Color.Transparent
+    }
+
+    val textColor = when {
+        header -> Color.White
+        enabled -> Color.Black
+        else -> Color.DarkGray
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .background(backgroundColor)
+            .clickable(enabled = enabled) { onClick() }
+            .padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
         Text(
             text = combination,
-            style = textStyle,
-            fontSize = 16.sp,
-            modifier = Modifier.weight(1.5f)
+            modifier = Modifier.weight(1f),
+            fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
+            color = textColor,
+            fontSize = 16.sp
         )
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clickable(enabled = enabled) { onClick() },
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            Text(
-                text = currentScore?.toString() ?: "—",
-                style = textStyle,
-                fontSize = 16.sp,
-                textAlign = TextAlign.End,
-                color = if (enabled) Color.Unspecified else Color.Gray
-            )
-        }
+        Text(
+            text = currentScore?.toString() ?: if (header) "SCORE" else "",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+            fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
+            color = textColor,
+            fontSize = 16.sp
+        )
     }
 }
 
-fun calculateScore(combination: String, diceValues: List<Int>, upperScores: Map<String, Int?>): Int {
+fun calculateScore(
+    combination: String,
+    diceValues: List<Int>,
+    scoreMap: Map<String, Int?>
+): Int {
     val counts = diceValues.groupingBy { it }.eachCount()
-    val totalSum = diceValues.sum()
+    val total = diceValues.sum()
 
     return when (combination) {
         "Aces" -> diceValues.filter { it == 1 }.sum()
@@ -239,15 +310,10 @@ fun calculateScore(combination: String, diceValues: List<Int>, upperScores: Map<
         "Fives" -> diceValues.filter { it == 5 }.sum()
         "Sixes" -> diceValues.filter { it == 6 }.sum()
 
-        "Bonus" -> {
-            val upperTotal = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
-                .mapNotNull { upperScores[it] }
-                .sum()
-            if (upperTotal >= 63) 35 else 0
-        }
+        // Rimosso "Bonus" perché calcolato dinamicamente
 
-        "3 of a Kind" -> if (counts.values.any { it >= 3 }) totalSum else 0
-        "4 of a Kind" -> if (counts.values.any { it >= 4 }) totalSum else 0
+        "3 of a Kind" -> if (counts.values.any { it >= 3 }) total else 0
+        "4 of a Kind" -> if (counts.values.any { it >= 4 }) total else 0
         "Full House" -> if (counts.values.contains(3) && counts.values.contains(2)) 25 else 0
         "Small Straight" -> {
             val unique = diceValues.toSet()
@@ -256,17 +322,14 @@ fun calculateScore(combination: String, diceValues: List<Int>, upperScores: Map<
                 setOf(2, 3, 4, 5),
                 setOf(3, 4, 5, 6)
             )
-            if (straights.any { it.all { num -> unique.contains(num) } }) 30 else 0
+            if (straights.any { it.all { n -> unique.contains(n) } }) 30 else 0
         }
-
         "Large Straight" -> {
             val sorted = diceValues.toSortedSet()
             if (sorted == setOf(1, 2, 3, 4, 5) || sorted == setOf(2, 3, 4, 5, 6)) 40 else 0
         }
-
         "Yahtzee" -> if (counts.values.any { it == 5 }) 50 else 0
-
-        "Chance" -> totalSum
+        "Chance" -> total
 
         else -> 0
     }
