@@ -1,0 +1,42 @@
+package com.example.yahtzee.logic
+
+class GameLogic {
+    fun calculateScore(
+        combination: String,
+        diceValues: List<Int>,
+        scoreMap: Map<String, Int?>
+    ): Int {
+        val counts = diceValues.groupingBy { it }.eachCount()
+        val total = diceValues.sum()
+
+        return when (combination) {
+            "Aces" -> diceValues.filter { it == 1 }.sum()
+            "Twos" -> diceValues.filter { it == 2 }.sum()
+            "Threes" -> diceValues.filter { it == 3 }.sum()
+            "Fours" -> diceValues.filter { it == 4 }.sum()
+            "Fives" -> diceValues.filter { it == 5 }.sum()
+            "Sixes" -> diceValues.filter { it == 6 }.sum()
+
+            "3 of a Kind" -> if (counts.values.any { it >= 3 }) total else 0
+            "4 of a Kind" -> if (counts.values.any { it >= 4 }) total else 0
+            "Full House" -> if (counts.values.contains(3) && counts.values.contains(2)) 25 else 0
+            "Small Straight" -> {
+                val unique = diceValues.toSet()
+                val straights = listOf(
+                    setOf(1, 2, 3, 4),
+                    setOf(2, 3, 4, 5),
+                    setOf(3, 4, 5, 6)
+                )
+                if (straights.any { it.all { n -> unique.contains(n) } }) 30 else 0
+            }
+            "Large Straight" -> {
+                val sorted = diceValues.toSortedSet()
+                if (sorted == setOf(1, 2, 3, 4, 5) || sorted == setOf(2, 3, 4, 5, 6)) 40 else 0
+            }
+            "Yahtzee" -> if (counts.values.any { it == 5 }) 50 else 0
+            "Chance" -> total
+
+            else -> 0
+        }
+    }
+}
