@@ -107,8 +107,9 @@ fun GameScreenSinglePlayer(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = 100.dp) // spazio per i pulsanti fissi
                 .verticalScroll(rememberScrollState())
-                .padding(top = 96.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                .padding(top = 96.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -208,46 +209,46 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
                     TableRow("Total Score", totalScore, null, {}, bold = true)
                 }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = {
-                            if (remainingRolls > 0) {
-                                diceValues = diceValues.mapIndexed { index, value ->
-                                    if (heldDice[index]) value else (1..6).random()
-                                }
-                                remainingRolls--
-                                canSelectScore = true
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(2f)
-                            .height(72.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD81B60)),
-                        enabled = !gameEnded
-                    ) {
-                        Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
+        // 🔒 Pulsanti fissi in basso
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                onClick = {
+                    if (remainingRolls > 0) {
+                        diceValues = diceValues.mapIndexed { index, value ->
+                            if (heldDice[index]) value else (1..6).random()
+                        }
+                        remainingRolls--
+                        canSelectScore = true
                     }
+                },
+                modifier = Modifier
+                    .weight(2f)
+                    .height(72.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD81B60)),
+                enabled = !gameEnded
+            ) {
+                Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
+            }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-                    Button(
-                        onClick = { showResetDialog = true },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(72.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B))
-                    ) {
-                        Text("Reset", fontSize = 22.sp)
-                    }
-                }
+            Button(
+                onClick = { showResetDialog = true },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(72.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B))
+            ) {
+                Text("Reset", fontSize = 22.sp)
             }
         }
     }
