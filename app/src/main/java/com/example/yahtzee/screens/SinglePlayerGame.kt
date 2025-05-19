@@ -31,7 +31,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
     var heldDice by remember { mutableStateOf(List(5) { false }) }
     var gameEnded by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
-    var Logic = GameLogic()
+    val Logic = GameLogic()
 
     fun resetGame() {
         diceValues = List(5) { (1..6).random() }
@@ -47,6 +47,18 @@ fun GameScreenSinglePlayer(navController: NavController) {
         "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
         "Yahtzee", "Chance"
     )
+
+    val previewScores = remember(diceValues, canSelectScore, scoreMap) {
+        if (canSelectScore) {
+            combinations.associateWith { combination ->
+                if (scoreMap[combination] == null && combination != "Bonus") {
+                    Logic.calculateScore(combination, diceValues, scoreMap)
+                } else null
+            }
+        } else {
+            emptyMap()
+        }
+    }
 
     gameEnded = combinations.filter { it != "Bonus" }.all { scoreMap[it] != null }
 
@@ -76,7 +88,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9))
+                    colors = listOf(Color(0xFFFFEBEE), Color(0xFFF8BBD0))
                 )
             )
     ) {
@@ -103,7 +115,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 text = "YAHTZEE",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D47A1),
+                color = Color(0xFF880E4F),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -131,7 +143,6 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     Text("Nuova Partita", fontSize = 18.sp)
                 }
             } else {
-                // Dadi
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,7 +154,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                             modifier = Modifier
                                 .size(70.dp)
                                 .background(
-                                    if (heldDice[index]) Color(0xFF1976D2) else Color.White,
+                                    if (heldDice[index]) Color(0xFFD81B60) else Color.White,
                                     shape = MaterialTheme.shapes.small
                                 )
                                 .border(1.dp, Color.Gray)
@@ -164,19 +175,19 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     }
                 }
 
-                // Tabella punteggi
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, Color(0xFF0D47A1), shape = MaterialTheme.shapes.medium)
+                        .border(2.dp, Color(0xFF880E4F), shape = MaterialTheme.shapes.medium)
                         .padding(8.dp)
                 ) {
-                    TableRow("COMBINATION", null, {}, header = true)
+                    TableRow("COMBINATION", null, null, {}, header = true)
                     combinations.forEach { combination ->
-                        Divider(thickness = 1.dp, color = Color(0xFF0D47A1))
+                        HorizontalDivider(thickness = 1.dp, color = Color(0xFF880E4F))
                         TableRow(
                             combination = combination,
                             currentScore = scoreMap[combination],
+                            previewScore = previewScores[combination],
                             onClick = {
                                 scoreMap[combination] = Logic.calculateScore(combination, diceValues, scoreMap)
                                 remainingRolls = 3
@@ -192,18 +203,10 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     val bonus = if (upperSum >= 63) 35 else 0
                     val totalScore = scoreMap.filterKeys { it != "Bonus" }.values.filterNotNull().sum() + bonus
 
-                    Divider(
-                        thickness = 1.dp,
-                        color = Color(0xFF0D47A1),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                    TableRow("Bonus", bonus, {}, bold = true)
-                    Divider(
-                        thickness = 1.dp,
-                        color = Color(0xFF0D47A1),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                    TableRow("Total Score", totalScore, {}, bold = true)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
+                    TableRow("Bonus", bonus, null, {}, bold = true)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
+                    TableRow("Total Score", totalScore, null, {}, bold = true)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -225,9 +228,9 @@ fun GameScreenSinglePlayer(navController: NavController) {
                             }
                         },
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(2f)
                             .height(72.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD81B60)),
                         enabled = !gameEnded
                     ) {
                         Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
@@ -240,7 +243,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         modifier = Modifier
                             .weight(1f)
                             .height(72.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B))
                     ) {
                         Text("Reset", fontSize = 22.sp)
                     }
@@ -254,14 +257,15 @@ fun GameScreenSinglePlayer(navController: NavController) {
 fun TableRow(
     combination: String,
     currentScore: Int?,
+    previewScore: Int? = null,
     onClick: () -> Unit,
     enabled: Boolean = false,
     header: Boolean = false,
     bold: Boolean = false
 ) {
     val backgroundColor = when {
-        header -> Color(0xFF0D47A1)
-        enabled -> Color(0xFFE3F2FD)
+        header -> Color(0xFF880E4F)
+        enabled -> Color(0xFFF8BBD0)
         else -> Color.Transparent
     }
 
@@ -286,7 +290,9 @@ fun TableRow(
             fontSize = 16.sp
         )
         Text(
-            text = currentScore?.toString() ?: if (header) "SCORE" else "",
+            text = currentScore?.toString()
+                ?: previewScore?.toString()
+                ?: if (header) "SCORE" else "",
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
@@ -295,5 +301,3 @@ fun TableRow(
         )
     }
 }
-
-
