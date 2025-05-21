@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.yahtzee.logic.GameLogic
+import com.example.yahtzee.logic.GameController
 
 @Composable
 fun GameScreenMultiplayer(navController: NavController) {
@@ -36,7 +36,7 @@ fun GameScreenMultiplayer(navController: NavController) {
     var gameEnded by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
 
-    val logic = GameLogic()
+    val logic = GameController()
 
     val combinations = listOf(
         "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",

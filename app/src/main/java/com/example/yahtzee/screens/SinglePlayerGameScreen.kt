@@ -19,48 +19,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.yahtzee.logic.GameLogic
+import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
-fun GameScreenSinglePlayer(navController: NavController) {
-    var diceValues by remember { mutableStateOf(List(5) { (1..6).random() }) }
-    var scoreMap by remember { mutableStateOf(mutableMapOf<String, Int?>()) }
-    var remainingRolls by remember { mutableStateOf(3) }
-    var canSelectScore by remember { mutableStateOf(false) }
-    var heldDice by remember { mutableStateOf(List(5) { false }) }
-    var gameEnded by remember { mutableStateOf(false) }
+fun SinglePlayerGameScreen(navController: NavController, viewModel: SinglePlayerGameViewModel = viewModel()) {
+    val state = viewModel.state
     var showResetDialog by remember { mutableStateOf(false) }
-    val Logic = GameLogic()
-
-    fun resetGame() {
-        diceValues = List(5) { (1..6).random() }
-        scoreMap = mutableMapOf()
-        remainingRolls = 3
-        canSelectScore = false
-        heldDice = List(5) { false }
-        gameEnded = false
-    }
-
-    val combinations = listOf(
-        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
-        "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
-        "Yahtzee", "Chance"
-    )
-
-    val previewScores = remember(diceValues, canSelectScore, scoreMap) {
-        if (canSelectScore) {
-            combinations.associateWith { combination ->
-                if (scoreMap[combination] == null && combination != "Bonus") {
-                    Logic.calculateScore(combination, diceValues, scoreMap)
-                } else null
-            }
-        } else {
-            emptyMap()
-        }
-    }
-
-    gameEnded = combinations.filter { it != "Bonus" }.all { scoreMap[it] != null }
+    val previewScores = viewModel.previewScores()
 
     if (showResetDialog) {
         AlertDialog(
@@ -69,7 +36,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
             text = { Text("Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.") },
             confirmButton = {
                 TextButton(onClick = {
-                    resetGame()
+                    viewModel.resetGame()
                     showResetDialog = false
                 }) {
                     Text("Sì")
@@ -107,7 +74,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 100.dp) // spazio per i pulsanti fissi
+                .padding(bottom = 100.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(top = 96.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -120,7 +87,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            if (gameEnded) {
+            if (state.gameEnded) {
                 Text(
                     text = "Partita Terminata!",
                     fontSize = 28.sp,
@@ -128,8 +95,12 @@ fun GameScreenSinglePlayer(navController: NavController) {
                     color = Color.Red,
                     modifier = Modifier.padding(vertical = 24.dp)
                 )
+                val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+                val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
+                val bonus = if (upperSum >= 63) 35 else 0
+                val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
                 Text(
-                    text = "Punteggio finale: ${scoreMap.values.filterNotNull().sum()}",
+                    text = "Punteggio finale: $totalScore",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
@@ -150,19 +121,17 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         .padding(bottom = 24.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    diceValues.forEachIndexed { index, value ->
+                    state.diceValues.forEachIndexed { index, value ->
                         Box(
                             modifier = Modifier
                                 .size(70.dp)
                                 .background(
-                                    if (heldDice[index]) Color(0xFFD81B60) else Color.White,
+                                    if (state.heldDice[index]) Color(0xFFD81B60) else Color.White,
                                     shape = MaterialTheme.shapes.small
                                 )
                                 .border(1.dp, Color.Gray)
-                                .clickable(enabled = remainingRolls < 3) {
-                                    heldDice = heldDice.toMutableList().also {
-                                        it[index] = !it[index]
-                                    }
+                                .clickable(enabled = state.remainingRolls < 3) {
+                                    viewModel.toggleHold(index)
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -170,7 +139,7 @@ fun GameScreenSinglePlayer(navController: NavController) {
                                 value.toString(),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (heldDice[index]) Color.White else Color.Black
+                                color = if (state.heldDice[index]) Color.White else Color.Black
                             )
                         }
                     }
@@ -183,26 +152,21 @@ fun GameScreenSinglePlayer(navController: NavController) {
                         .padding(8.dp)
                 ) {
                     TableRow("COMBINATION", null, null, {}, header = true)
-                    combinations.forEach { combination ->
+                    viewModel.combinations.forEach { combination ->
                         HorizontalDivider(thickness = 1.dp, color = Color(0xFF880E4F))
                         TableRow(
                             combination = combination,
-                            currentScore = scoreMap[combination],
+                            currentScore = state.scoreMap[combination],
                             previewScore = previewScores[combination],
-                            onClick = {
-                                scoreMap[combination] = Logic.calculateScore(combination, diceValues, scoreMap)
-                                remainingRolls = 3
-                                canSelectScore = false
-                                heldDice = List(5) { false }
-                            },
-                            enabled = canSelectScore && scoreMap[combination] == null && combination != "Bonus"
+                            onClick = { viewModel.selectScore(combination) },
+                            enabled = state.canSelectScore && state.scoreMap[combination] == null
                         )
                     }
 
                     val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
-                    val upperSum = upper.mapNotNull { scoreMap[it] }.sum()
+                    val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
                     val bonus = if (upperSum >= 63) 35 else 0
-                    val totalScore = scoreMap.filterKeys { it != "Bonus" }.values.filterNotNull().sum() + bonus
+                    val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
                     TableRow("Bonus", bonus, null, {}, bold = true)
@@ -212,7 +176,6 @@ fun GameScreenSinglePlayer(navController: NavController) {
             }
         }
 
-        // 🔒 Pulsanti fissi in basso
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -221,22 +184,14 @@ fun GameScreenSinglePlayer(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = {
-                    if (remainingRolls > 0) {
-                        diceValues = diceValues.mapIndexed { index, value ->
-                            if (heldDice[index]) value else (1..6).random()
-                        }
-                        remainingRolls--
-                        canSelectScore = true
-                    }
-                },
+                onClick = { viewModel.rollDice() },
                 modifier = Modifier
                     .weight(2f)
                     .height(72.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD81B60)),
-                enabled = !gameEnded
+                enabled = !state.gameEnded
             ) {
-                Text("Roll Dice ($remainingRolls)", fontSize = 22.sp)
+                Text("Roll Dice (${state.remainingRolls})", fontSize = 22.sp)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
