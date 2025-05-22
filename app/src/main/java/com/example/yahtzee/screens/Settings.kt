@@ -18,15 +18,39 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 
+// Stato iniziale delle impostazioni
+private val initialSettings = SettingsState(
+    notificationsEnabled = true,
+    language = "Italiano"
+)
+
+data class SettingsState(
+    val notificationsEnabled: Boolean,
+    val language: String
+)
+
 @Composable
-fun Settings(navController: NavController) {
+fun Settings(
+    navController: NavController,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
+) {
     SettingsContent(
+        isDarkTheme = isDarkTheme,
+        onThemeChange = onThemeChange,
         onHomeClick = { navController.navigate("homepage") }
     )
 }
 
 @Composable
-fun SettingsContent(onHomeClick: () -> Unit) {
+fun SettingsContent(
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit,
+    onHomeClick: () -> Unit
+) {
+    // Stato delle impostazioni (eccetto il tema, che ora è gestito globalmente)
+    var settingsState by remember { mutableStateOf(initialSettings) }
+    // Stato dei dialog
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
 
@@ -59,23 +83,52 @@ fun SettingsContent(onHomeClick: () -> Unit) {
                 .padding(top = 100.dp, start = 24.dp, end = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SettingsRow("Tema (Chiaro/Scuro)") {
+            SettingsRow(
+                label = "Tema: ${if (isDarkTheme) "Scuro" else "Chiaro"}"
+            ) {
                 showThemeDialog = true
             }
-            SettingsRow("Lingua") {
+            SettingsRow(
+                label = "Lingua: ${settingsState.language}"
+            ) {
                 showLanguageDialog = true
             }
-            SettingsRow("Regole del Gioco")
-            SettingsRow("Notifiche")
-            SettingsRow("Reset Impostazioni")
+            // Notifiche: switch abilitazione/disabilitazione
+            NotificationRow(
+                enabled = settingsState.notificationsEnabled,
+                onToggle = {
+                    settingsState = settingsState.copy(notificationsEnabled = !settingsState.notificationsEnabled)
+                }
+            )
+            // Reset impostazioni
+            SettingsRow(
+                label = "Reset Impostazioni"
+            ) {
+                settingsState = initialSettings
+                onThemeChange(false) // Reset anche il tema a chiaro
+            }
         }
 
         if (showThemeDialog) {
-            ThemeDialog(onDismiss = { showThemeDialog = false })
+            ThemeDialog(
+                currentThemeDark = isDarkTheme,
+                onSelectTheme = { isDark ->
+                    onThemeChange(isDark) // Cambia il tema globale!
+                    showThemeDialog = false
+                },
+                onDismiss = { showThemeDialog = false }
+            )
         }
 
         if (showLanguageDialog) {
-            LanguageDialog(onDismiss = { showLanguageDialog = false })
+            LanguageDialog(
+                currentLanguage = settingsState.language,
+                onSelectLanguage = { lang ->
+                    settingsState = settingsState.copy(language = lang)
+                    showLanguageDialog = false
+                },
+                onDismiss = { showLanguageDialog = false }
+            )
         }
     }
 }
@@ -101,27 +154,61 @@ fun SettingsRow(label: String, onClick: (() -> Unit)? = null) {
 }
 
 @Composable
-fun ThemeDialog(onDismiss: () -> Unit) {
+fun NotificationRow(enabled: Boolean, onToggle: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Notifiche",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f)
+        )
+        Switch(
+            checked = enabled,
+            onCheckedChange = { onToggle() }
+        )
+    }
+}
+
+@Composable
+fun ThemeDialog(
+    currentThemeDark: Boolean,
+    onSelectTheme: (Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Seleziona Tema") },
         text = {
             Column {
-                Text("Chiaro", modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: Applica tema chiaro
-                        onDismiss()
-                    }
-                    .padding(8.dp)
+                Text(
+                    "Chiaro",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSelectTheme(false)
+                        }
+                        .padding(8.dp),
+                    fontWeight = if (!currentThemeDark) FontWeight.Bold else FontWeight.Normal
                 )
-                Text("Scuro", modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: Applica tema scuro
-                        onDismiss()
-                    }
-                    .padding(8.dp)
+                Text(
+                    "Scuro",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSelectTheme(true)
+                        }
+                        .padding(8.dp),
+                    fontWeight = if (currentThemeDark) FontWeight.Bold else FontWeight.Normal
                 )
             }
         },
@@ -130,27 +217,35 @@ fun ThemeDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun LanguageDialog(onDismiss: () -> Unit) {
+fun LanguageDialog(
+    currentLanguage: String,
+    onSelectLanguage: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Seleziona Lingua") },
         text = {
             Column {
-                Text("Italiano", modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: Imposta lingua italiana
-                        onDismiss()
-                    }
-                    .padding(8.dp)
+                Text(
+                    "Italiano",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSelectLanguage("Italiano")
+                        }
+                        .padding(8.dp),
+                    fontWeight = if (currentLanguage == "Italiano") FontWeight.Bold else FontWeight.Normal
                 )
-                Text("Inglese", modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: Imposta lingua inglese
-                        onDismiss()
-                    }
-                    .padding(8.dp)
+                Text(
+                    "Inglese",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSelectLanguage("Inglese")
+                        }
+                        .padding(8.dp),
+                    fontWeight = if (currentLanguage == "Inglese") FontWeight.Bold else FontWeight.Normal
                 )
             }
         },
@@ -162,8 +257,10 @@ fun LanguageDialog(onDismiss: () -> Unit) {
 @Composable
 fun SettingsPreview() {
     YahtzeeTheme {
-        SettingsContent(onHomeClick = {})
+        SettingsContent(
+            isDarkTheme = false,
+            onThemeChange = {},
+            onHomeClick = {}
+        )
     }
 }
-
-
