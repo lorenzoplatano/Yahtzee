@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.yahtzee.logic.GameController
 
 
-class SinglePlayerGameViewModel : ViewModel() {
+class    SinglePlayerGameViewModel : ViewModel() {
     private val controller = GameController()
 
     var state by mutableStateOf(controller.resetGame())
