@@ -115,62 +115,53 @@ fun Homepage(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Pulsante Gioca
-            Button(
-                onClick = { showModeDialog = true},
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Icona Play",
-                        tint = Color.White
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text("Play", color = Color.White, fontSize = 18.sp)
+            if (!showModeDialog) {
+                // Pulsante iniziale "Play"
+                Button(
+                    onClick = { showModeDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .padding(bottom = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Icona Play",
+                            tint = Color.White
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Play", color = Color.White, fontSize = 18.sp)
+                    }
+                }
+            } else {
+                // Pulsanti per scegliere la modalità
+                Column(
+                    modifier = Modifier.fillMaxWidth(0.6f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(
+                        onClick = {
+                            navController.navigate("game_1vs1")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("1 vs 1", color = Color.White, fontSize = 18.sp)
+                    }
+                    Button(
+                        onClick = {
+                            navController.navigate("game")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Singleplayer", color = Color.White, fontSize = 18.sp)
+                    }
                 }
             }
-            if (showModeDialog) {
-                AlertDialog(
-                    onDismissRequest = { showModeDialog = false },
-                    title = { Text("Scegli modalità di gioco") },
-                    text = {
-                        Column {
-                            Text("Seleziona contro chi vuoi giocare.")
-                        }
-                    },
-                    confirmButton = {
-                        Column {
-                            Button(
-                                onClick = {
-                                    showModeDialog = false
-                                    navController.navigate("game_1vs1")
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("1 vs 1")
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = {
-                                    showModeDialog = false
-                                    navController.navigate("game")
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Singleplayer")
-                            }
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showModeDialog = false }) {
-                            Text("Annulla")
-                        }
-                    }
-                )
-            }
+
 
 
 
