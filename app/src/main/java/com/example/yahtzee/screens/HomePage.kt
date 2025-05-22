@@ -135,7 +135,7 @@ fun Homepage(navController: NavController) {
                     }
                 }
             } else {
-                // Pulsanti per scegliere la modalità
+
                 Column(
                     modifier = Modifier.fillMaxWidth(0.6f),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -165,7 +165,7 @@ fun Homepage(navController: NavController) {
 
 
 
-            // Puoi aggiungere qui altri pulsanti se necessario
+
         }
     }
 }
