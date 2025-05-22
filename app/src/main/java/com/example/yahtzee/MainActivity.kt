@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yahtzee.screens.GameScreenMultiplayer
 import com.example.yahtzee.screens.HistoryScreen
 import com.example.yahtzee.screens.Homepage
+import com.example.yahtzee.screens.MultiplayerGameScreen
 import com.example.yahtzee.screens.Settings
 import com.example.yahtzee.screens.SinglePlayerGameScreen
 import com.example.yahtzee.ui.theme.YahtzeeTheme
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
             composable("homepage") { Homepage(navController) }
             composable("history") { HistoryScreen(navController) }
             composable("settings") { Settings(navController, isDarkTheme, onThemeChange) }
-            composable("game_1vs1") { GameScreenMultiplayer(navController) }
+            composable("game_1vs1") { MultiplayerGameScreen(navController) }
             composable("game") { SinglePlayerGameScreen(navController) }
         }
     }
