@@ -1,3 +1,4 @@
+
 package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
@@ -14,8 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,8 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.ui.theme.Purple40
-import com.example.yahtzee.ui.theme.Verde
+import com.example.yahtzee.ui.theme.Game1v1Theme // <-- Usa sempre il tema blu!
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
@@ -47,188 +45,183 @@ fun SinglePlayerGameScreen(navController: NavController) {
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
 
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("Sei sicuro?") },
-            text = { Text("Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.resetGame()
-                    showResetDialog = false
-                }) {
-                    Text("Sì")
+    Game1v1Theme { // <-- Tema blu fisso
+        if (showResetDialog) {
+            AlertDialog(
+                onDismissRequest = { showResetDialog = false },
+                title = { Text("Sei sicuro?") },
+                text = { Text("Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.resetGame()
+                        showResetDialog = false
+                    }) {
+                        Text("Sì")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showResetDialog = false }) {
+                        Text("Annulla")
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) {
-                    Text("Annulla")
-                }
-            }
-        )
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFFFFEBEE), Color(0xFFF8BBD0))
-                )
             )
-    ) {
-        Icon(
-            imageVector = Icons.Default.Home,
-            contentDescription = "Home",
-            tint = Color.Gray,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 40.dp, end = 16.dp)
-                .size(32.dp)
-                .zIndex(1f)
-                .clickable { navController.navigate("homepage") }
-        )
+        }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 100.dp)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 96.dp, start = 16.dp, end = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "YAHTZEE",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF880E4F),
-                modifier = Modifier.padding(bottom = 16.dp)
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Home",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 40.dp, end = 16.dp)
+                    .size(32.dp)
+                    .zIndex(1f)
+                    .clickable { navController.navigate("homepage") }
             )
 
-            if (state.gameEnded) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 100.dp)
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 96.dp, start = 16.dp, end = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = "Partita Terminata!",
-                    fontSize = 28.sp,
+                    text = "YAHTZEE",
+                    fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Red,
-                    modifier = Modifier.padding(vertical = 24.dp)
-                )
-                val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
-                val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
-                val bonus = if (upperSum >= 63) 35 else 0
-                val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
-                Text(
-                    text = "Punteggio finale: $totalScore",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                Button(
-                    onClick = { showResetDialog = true },
-                    modifier = Modifier
-                        .padding(top = 24.dp)
-                        .height(56.dp)
-                ) {
-                    Text("Nuova Partita", fontSize = 18.sp)
-                }
-            } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    state.diceValues.forEachIndexed { index, value ->
-                        Box(
-                            modifier = Modifier
-                                .size(70.dp)
-                                .background(
-                                    if (state.heldDice[index]) Color(0xFFD81B60) else Color.White,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .border(1.5.dp, Color.Gray, RoundedCornerShape(8.dp))
-                                .clickable(enabled = state.remainingRolls < 3) {
-                                    viewModel.toggleHold(index)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                value.toString(),
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (state.heldDice[index]) Color.White else Color.Black
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(2.dp, Color(0xFF880E4F), shape = MaterialTheme.shapes.medium)
-
-                ) {
-                    TableRow("COMBINATION", null, null, {}, header = true)
-                    viewModel.combinations.forEachIndexed { index, combination ->
-                        if (index != 0) {
-                            HorizontalDivider(thickness = 1.dp, color = Color(0xFF880E4F))
-                        }
-                        TableRow(
-                            combination = combination,
-                            currentScore = state.scoreMap[combination],
-                            previewScore = previewScores[combination],
-                            onClick = { viewModel.selectScore(combination) },
-                            enabled = state.canSelectScore && state.scoreMap[combination] == null
-                        )
-                    }
-
+                if (state.gameEnded) {
+                    Text(
+                        text = "Partita Terminata!",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(vertical = 24.dp)
+                    )
                     val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
                     val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
                     val bonus = if (upperSum >= 63) 35 else 0
                     val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
+                    Text(
+                        text = "Punteggio finale: $totalScore",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Verde)
-                    TableRow("Bonus", bonus, null, {}, bold = true)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Verde)
-                    TableRow("Total Score", totalScore, null, {}, bold = true)
+                    Button(
+                        onClick = { showResetDialog = true },
+                        modifier = Modifier
+                            .padding(top = 24.dp)
+                            .height(56.dp)
+                    ) {
+                        Text("Nuova Partita", fontSize = 18.sp)
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        state.diceValues.forEachIndexed { index, value ->
+                            Box(
+                                modifier = Modifier
+                                    .size(70.dp)
+                                    .background(
+                                        if (state.heldDice[index]) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .border(1.5.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(8.dp))
+                                    .clickable(enabled = state.remainingRolls < 3) {
+                                        viewModel.toggleHold(index)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    value.toString(),
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (state.heldDice[index]) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(2.dp, MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium)
+                    ) {
+                        TableRow("COMBINATION", null, null, {}, header = true)
+                        viewModel.combinations.forEachIndexed { index, combination ->
+                            if (index != 0) {
+                                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
+                            }
+                            TableRow(
+                                combination = combination,
+                                currentScore = state.scoreMap[combination],
+                                previewScore = previewScores[combination],
+                                onClick = { viewModel.selectScore(combination) },
+                                enabled = state.canSelectScore && state.scoreMap[combination] == null
+                            )
+                        }
+
+                        val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+                        val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
+                        val bonus = if (upperSum >= 63) 35 else 0
+                        val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.secondary)
+                        TableRow("Bonus", bonus, null, {}, bold = true)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.secondary)
+                        TableRow("Total Score", totalScore, null, {}, bold = true)
+                    }
                 }
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { viewModel.rollDice() },
+            Row(
                 modifier = Modifier
-                    .weight(2f)
-                    .height(72.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD81B60)),
-                enabled = !state.gameEnded
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Roll Dice (${state.remainingRolls})", fontSize = 22.sp)
-            }
+                Button(
+                    onClick = { viewModel.rollDice() },
+                    modifier = Modifier
+                        .weight(2f)
+                        .height(72.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    enabled = !state.gameEnded
+                ) {
+                    Text("Roll Dice (${state.remainingRolls})", fontSize = 22.sp)
+                }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-            Button(
-                onClick = { showResetDialog = true },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(72.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B))
-            ) {
-                Text("Reset", fontSize = 22.sp)
+                Button(
+                    onClick = { showResetDialog = true },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(72.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text("Reset", fontSize = 22.sp)
+                }
             }
         }
     }
 }
-
 
 @Composable
 fun TableRow(
@@ -241,15 +234,15 @@ fun TableRow(
     bold: Boolean = false
 ) {
     val backgroundColor = when {
-        header -> Color(0xFF880E4F)
-        enabled -> Color(0xFFF8BBD0)
-        else -> Color.Transparent
+        header -> MaterialTheme.colorScheme.primary
+        enabled -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.surface
     }
 
     val textColor = when {
-        header -> Color.White
-        enabled -> Color.Black
-        else -> Color.DarkGray
+        header -> MaterialTheme.colorScheme.onPrimary
+        enabled -> MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     Row(
