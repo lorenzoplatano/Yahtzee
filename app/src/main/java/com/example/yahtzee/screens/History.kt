@@ -1,3 +1,4 @@
+
 package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
@@ -14,8 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.model.*
 import com.example.yahtzee.viewmodel.HistoryViewModel
 import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.ui.theme.YahtzeeTheme
+import com.example.yahtzee.ui.theme.HistoryTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -48,73 +47,65 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFBBDEFB),
-                        Color(0xFF90CAF9)
-                    ),
-                    startY = 0f,
-                    endY = Float.POSITIVE_INFINITY
-                )
-            )
-    ) {
-        // Icona impostazioni in alto a destra
-        Icon(
-            imageVector = Icons.Default.Settings,
-            contentDescription = "Impostazioni",
-            tint = Color.Gray,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 40.dp, end = 16.dp)
-                .size(32.dp)
-                .clickable { navController.navigate("settings") }
-        )
-
-        // Icona home sotto impostazioni
-        Icon(
-            imageVector = Icons.Default.Home,
-            contentDescription = "Home",
-            tint = Color.Gray,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 80.dp, end = 16.dp)
-                .size(32.dp)
-                .clickable { navController.navigate("homepage") }
-        )
-
-        // Tabella storico
-        Column(
+    HistoryTheme {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 120.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
         ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                tonalElevation = 2.dp,
-                shadowElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+            // Icona impostazioni in alto a destra
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Impostazioni",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 40.dp, end = 16.dp)
+                    .size(32.dp)
+                    .clickable { navController.navigate("settings") }
+            )
+
+            // Icona home sotto impostazioni
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Home",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 80.dp, end = 16.dp)
+                    .size(32.dp)
+                    .clickable { navController.navigate("homepage") }
+            )
+
+            // Tabella storico
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 120.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(vertical = 4.dp)
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    tonalElevation = 2.dp,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    HistoryTableHeader(
-                        sortColumn = uiState.sortColumn,
-                        sortOrder = uiState.sortOrder,
-                        onSortChange = { viewModel.onSortChange(it) }
-                    )
-                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(vertical = 4.dp)
                     ) {
-                        items(uiState.history) { entry ->
-                            HistoryTableRow(entry)
-                            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                        HistoryTableHeader(
+                            sortColumn = uiState.sortColumn,
+                            sortOrder = uiState.sortOrder,
+                            onSortChange = { viewModel.onSortChange(it) }
+                        )
+                        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(uiState.history) { entry ->
+                                HistoryTableRow(entry)
+                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            }
                         }
                     }
                 }
@@ -226,7 +217,7 @@ fun HistoryTableRow(entry: GameHistoryEntry) {
 @Preview(showBackground = true)
 @Composable
 fun HistoryPreview() {
-    YahtzeeTheme {
+    HistoryTheme {
         val context = LocalContext.current
         HistoryScreen(navController = NavController(context))
     }
