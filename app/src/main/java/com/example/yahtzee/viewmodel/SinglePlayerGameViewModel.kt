@@ -4,10 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.yahtzee.logic.GameController
+import com.example.yahtzee.db.AppDatabase
+import com.example.yahtzee.db.GameHistoryEntity
+import kotlinx.coroutines.launch
 
-
-class    SinglePlayerGameViewModel : ViewModel() {
+class SinglePlayerGameViewModel(
+    private val db: AppDatabase
+) : ViewModel() {
     private val controller = GameController()
 
     var state by mutableStateOf(controller.resetGame())
@@ -44,6 +49,9 @@ class    SinglePlayerGameViewModel : ViewModel() {
                 heldDice = List(5) { false },
                 gameEnded = ended
             )
+            if (ended) {
+                saveGameResult()
+            }
         }
     }
 
@@ -59,5 +67,21 @@ class    SinglePlayerGameViewModel : ViewModel() {
                 } else null
             }
         } else emptyMap()
+    }
+
+    private fun saveGameResult() {
+        val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+        val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
+        val bonus = if (upperSum >= 63) 35 else 0
+        val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
+
+        viewModelScope.launch {
+            db.gameHistoryDao().insertGameHistory(
+                GameHistoryEntity(
+                    date = System.currentTimeMillis(),
+                    score = totalScore
+                )
+            )
+        }
     }
 }

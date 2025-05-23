@@ -14,17 +14,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
-fun SinglePlayerGameScreen(navController: NavController, viewModel: SinglePlayerGameViewModel = viewModel()) {
+fun SinglePlayerGameScreen(navController: NavController) {
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getDatabase(context) }
+    val viewModel: SinglePlayerGameViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return SinglePlayerGameViewModel(db) as T
+            }
+        }
+    )
+
     val state = viewModel.state
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
