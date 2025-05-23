@@ -20,20 +20,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.model.*
 import com.example.yahtzee.viewmodel.HistoryViewModel
+import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun HistoryScreen(
-    navController: NavController,
-    viewModel: HistoryViewModel = viewModel()
+    navController: NavController
 ) {
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getDatabase(context) }
+    val viewModel: HistoryViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return HistoryViewModel(db.gameHistoryDao()) as T
+            }
+        }
+    )
+
     val uiState by viewModel.uiState
 
     Box(

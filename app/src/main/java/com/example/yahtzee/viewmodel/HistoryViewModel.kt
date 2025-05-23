@@ -1,10 +1,16 @@
 package com.example.yahtzee.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.yahtzee.model.*
+import com.example.yahtzee.db.GameHistoryDao
+import com.example.yahtzee.db.GameHistoryEntity
+import kotlinx.coroutines.launch
 import java.util.*
 
-class HistoryViewModel : ViewModel() {
+class HistoryViewModel(
+    private val dao: GameHistoryDao
+) : ViewModel() {
     // Stato UI osservabile
     var uiState = androidx.compose.runtime.mutableStateOf(HistoryState())
         private set
@@ -14,15 +20,11 @@ class HistoryViewModel : ViewModel() {
     }
 
     private fun loadHistory() {
-        // Dummy data, in futuro da sostituire con dati dal DB
-        val dummyData = listOf(
-            GameHistoryEntry(Date(1719878400000), 250), // 2 luglio 2024
-            GameHistoryEntry(Date(1719792000000), 320), // 1 luglio 2024
-            GameHistoryEntry(Date(1719705600000), 180), // 30 giugno 2024
-            GameHistoryEntry(Date(1719619200000), 400), // 29 giugno 2024
-            GameHistoryEntry(Date(1719532800000), 290), // 28 giugno 2024
-        )
-        updateSortedHistory(dummyData, uiState.value.sortColumn, uiState.value.sortOrder)
+        viewModelScope.launch {
+            val entities = dao.getAllHistory()
+            val entries = entities.map { it.toGameHistoryEntry() }
+            updateSortedHistory(entries, uiState.value.sortColumn, uiState.value.sortOrder)
+        }
     }
 
     fun onSortChange(column: SortColumn) {
@@ -53,4 +55,12 @@ class HistoryViewModel : ViewModel() {
             sortOrder = sortOrder
         )
     }
+}
+
+// Funzione di estensione per convertire l'entity Room nel modello UI
+private fun GameHistoryEntity.toGameHistoryEntry(): GameHistoryEntry {
+    return GameHistoryEntry(
+        date = Date(this.date),
+        score = this.score
+    )
 }
