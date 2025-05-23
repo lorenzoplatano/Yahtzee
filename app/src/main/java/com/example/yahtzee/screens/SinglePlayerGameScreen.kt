@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -143,9 +145,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                 .size(70.dp)
                                 .background(
                                     if (state.heldDice[index]) Color(0xFFD81B60) else Color.White,
-                                    shape = MaterialTheme.shapes.small
+                                    shape = RoundedCornerShape(8.dp)
                                 )
-                                .border(1.dp, Color.Gray)
+                                .border(1.5.dp, Color.Gray, RoundedCornerShape(8.dp))
                                 .clickable(enabled = state.remainingRolls < 3) {
                                     viewModel.toggleHold(index)
                                 },
@@ -165,11 +167,13 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(2.dp, Color(0xFF880E4F), shape = MaterialTheme.shapes.medium)
-                        .padding(8.dp)
+
                 ) {
                     TableRow("COMBINATION", null, null, {}, header = true)
-                    viewModel.combinations.forEach { combination ->
-                        HorizontalDivider(thickness = 1.dp, color = Color(0xFF880E4F))
+                    viewModel.combinations.forEachIndexed { index, combination ->
+                        if (index != 0) {
+                            HorizontalDivider(thickness = 1.dp, color = Color(0xFF880E4F))
+                        }
                         TableRow(
                             combination = combination,
                             currentScore = state.scoreMap[combination],
@@ -225,6 +229,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
     }
 }
 
+
 @Composable
 fun TableRow(
     combination: String,
@@ -250,7 +255,14 @@ fun TableRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor)
+            .then(
+                if (header)
+                    Modifier
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(backgroundColor)
+                else
+                    Modifier.background(backgroundColor)
+            )
             .clickable(enabled = enabled) { onClick() }
             .padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
