@@ -1,5 +1,4 @@
 
-
 package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
@@ -28,12 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.yahtzee.ui.theme.SettingsTheme
 
 // Stato iniziale delle impostazioni
 private val initialSettings = SettingsState(
@@ -52,11 +50,13 @@ fun Settings(
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit
 ) {
-    SettingsContent(
-        isDarkTheme = isDarkTheme,
-        onThemeChange = onThemeChange,
-        onHomeClick = { navController.navigate("homepage") }
-    )
+    SettingsTheme {
+        SettingsContent(
+            isDarkTheme = isDarkTheme,
+            onThemeChange = onThemeChange,
+            onHomeClick = { navController.navigate("homepage") }
+        )
+    }
 }
 
 @Composable
@@ -65,28 +65,19 @@ fun SettingsContent(
     onThemeChange: (Boolean) -> Unit,
     onHomeClick: () -> Unit
 ) {
-    // Stato delle impostazioni (eccetto il tema, che ora è gestito globalmente)
     var settingsState by remember { mutableStateOf(initialSettings) }
-    // Stato dei dialog
     var showLanguageDialog by remember { mutableStateOf(false) }
-    var showRulesDialog by remember { mutableStateOf(false) } // Stato per dialog Regole
+    var showRulesDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFFBBDEFB), Color(0xFF90CAF9)),
-                    startY = 0f,
-                    endY = Float.POSITIVE_INFINITY
-                )
-            )
     ) {
         // Icona Home
         Icon(
             imageVector = Icons.Default.Home,
             contentDescription = "Home",
-            tint = Color.Gray,
+            tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 40.dp, end = 16.dp)
@@ -100,7 +91,6 @@ fun SettingsContent(
                 .padding(top = 100.dp, start = 24.dp, end = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // RIGHE IMPOSTAZIONI
             ThemeSwitchRow(
                 isDarkTheme = isDarkTheme,
                 onThemeChange = onThemeChange
@@ -116,18 +106,16 @@ fun SettingsContent(
                     settingsState = settingsState.copy(notificationsEnabled = !settingsState.notificationsEnabled)
                 }
             )
-            // Aggiunta riga Regole di Yahtzee
             SettingsRow(
                 label = "Regole"
             ) {
                 showRulesDialog = true
             }
-            // Reset impostazioni
             SettingsRow(
                 label = "Reset Impostazioni"
             ) {
                 settingsState = initialSettings
-                onThemeChange(false) // Reset anche il tema a chiaro
+                onThemeChange(false)
             }
         }
 
@@ -262,7 +250,6 @@ fun LanguageDialog(
     )
 }
 
-// Funzione che mostra il regolamento di Yahtzee in un dialog
 @Composable
 fun RulesDialog(onDismiss: () -> Unit) {
     AlertDialog(
@@ -286,4 +273,3 @@ fun RulesDialog(onDismiss: () -> Unit) {
         }
     )
 }
-
