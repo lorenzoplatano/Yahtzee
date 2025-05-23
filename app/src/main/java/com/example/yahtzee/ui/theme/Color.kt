@@ -11,3 +11,33 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val Orange = Color(0xFFFBA928)
+
+val Verde = Color(0xFF008000)
+
+
+
+
+// Sfumature di Blu
+val Blue50 = Color(0xFFE3F2FD)
+val Blue100 = Color(0xFFBBDEFB)
+val Blue200 = Color(0xFF90CAF9)
+val Blue300 = Color(0xFF64B5F6)
+val Blue400 = Color(0xFF42A5F5)
+val Blue500 = Color(0xFF2196F3)
+val Blue600 = Color(0xFF1E88E5)
+val Blue700 = Color(0xFF1976D2)
+val Blue800 = Color(0xFF1565C0)
+val Blue900 = Color(0xFF0D47A1)
+
+// Sfumature di Rosso
+val Red50 = Color(0xFFFFEBEE)
+val Red100 = Color(0xFFFFCDD2)
+val Red200 = Color(0xFFEF9A9A)
+val Red300 = Color(0xFFE57373)
+val Red400 = Color(0xFFEF5350)
+val Red500 = Color(0xFFF44336)
+val Red600 = Color(0xFFE53935)
+val Red700 = Color(0xFFD32F2F)
+val Red800 = Color(0xFFC62828)
+val Red900 = Color(0xFFB71C1C)
+

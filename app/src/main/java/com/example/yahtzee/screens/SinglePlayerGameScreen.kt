@@ -25,6 +25,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.db.AppDatabase
+import com.example.yahtzee.ui.theme.Purple40
+import com.example.yahtzee.ui.theme.Verde
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
@@ -182,9 +184,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     val bonus = if (upperSum >= 63) 35 else 0
                     val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Verde)
                     TableRow("Bonus", bonus, null, {}, bold = true)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Color(0xFF880E4F))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = Verde)
                     TableRow("Total Score", totalScore, null, {}, bold = true)
                 }
             }
