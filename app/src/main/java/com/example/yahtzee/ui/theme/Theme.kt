@@ -19,20 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 
 
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-)
-
-
 
 
 private val BlueColorScheme = lightColorScheme(
@@ -61,7 +47,7 @@ private val RedColorScheme = lightColorScheme(
     onSurface = Red900,
 )
 
-// --- Gradient background composable ---
+//  Gradient background composable serve a creare un box che riempie lo schermo e applica uno sfondo
 
 @Composable
 fun BlueGradientBackground(content: @Composable () -> Unit) {
@@ -78,7 +64,7 @@ fun BlueGradientBackground(content: @Composable () -> Unit) {
     }
 }
 
-// --- Temi specifici per schermata ---
+// Temi specifici per schermata
 
 @Composable
 fun Game1v1Theme(content: @Composable () -> Unit) {
@@ -137,8 +123,6 @@ fun HistoryTheme(content: @Composable () -> Unit) {
     }
 }
 
-// --- Tema generale (fallback, per retrocompatibilità) ---
-
 @Composable
 fun YahtzeeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -150,8 +134,8 @@ fun YahtzeeTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> BlueColorScheme
+        else -> RedColorScheme
     }
 
     MaterialTheme(
