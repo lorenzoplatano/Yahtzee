@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
-import com.example.yahtzee.ui.theme.SinglePlayerTheme // Per il tema dinamico blu/rosso
+import com.example.yahtzee.ui.theme.MultiPlayerTheme // Per il tema dinamico blu/rosso
 
 @Composable
 fun MultiplayerGameScreen(
@@ -35,7 +35,7 @@ fun MultiplayerGameScreen(
     val previewScores = viewModel.previewScores()
 
     // qui viene eseguito lo switch tra giocatore 1 (il blu) e giocatore 2 (il rosso) gay
-    SinglePlayerTheme(isPlayerOne = state.isPlayer1Turn) {
+    MultiPlayerTheme(isPlayerOne = state.isPlayer1Turn) {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },

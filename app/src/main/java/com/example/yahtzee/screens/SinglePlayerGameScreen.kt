@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.ui.theme.Game1v1Theme // <-- Usa sempre il tema blu!
+import com.example.yahtzee.ui.theme.SinglePlayerTheme// <-- Usa sempre il tema blu!
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
@@ -45,7 +45,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
 
-    Game1v1Theme { // <-- Tema blu fisso
+    SinglePlayerTheme { // <-- Tema blu fisso
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
