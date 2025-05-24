@@ -67,7 +67,7 @@ fun BlueGradientBackground(content: @Composable () -> Unit) {
 // Temi specifici per schermata
 
 @Composable
-fun Game1v1Theme(content: @Composable () -> Unit) {
+fun SinglePlayerTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = BlueColorScheme,
         typography = Typography,
@@ -76,7 +76,7 @@ fun Game1v1Theme(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun SinglePlayerTheme(
+fun MultiPlayerTheme(
     isPlayerOne: Boolean,
     content: @Composable () -> Unit
 ) {
