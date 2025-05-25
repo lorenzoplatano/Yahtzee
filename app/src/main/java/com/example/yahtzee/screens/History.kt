@@ -17,13 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.yahtzee.model.*
 import com.example.yahtzee.viewmodel.HistoryViewModel
 import com.example.yahtzee.db.AppDatabase
@@ -33,7 +31,8 @@ import java.util.*
 
 @Composable
 fun HistoryScreen(
-    navController: NavController
+    navController: NavController,
+    darkTheme: Boolean // <-- Passa qui la preferenza utente!
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
@@ -47,7 +46,7 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState
 
-    HistoryTheme(darkTheme = true) {
+    HistoryTheme(darkTheme = darkTheme) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -86,11 +85,11 @@ fun HistoryScreen(
                     shape = MaterialTheme.shapes.medium,
                     tonalElevation = 2.dp,
                     shadowElevation = 2.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f) // trasparente!
                 ) {
                     Column(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface)
                             .padding(vertical = 4.dp)
                     ) {
                         HistoryTableHeader(
@@ -123,7 +122,7 @@ fun HistoryTableHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f))
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -191,7 +190,7 @@ fun HistoryTableRow(entry: GameHistoryEntry) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f))
             .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -213,4 +212,3 @@ fun HistoryTableRow(entry: GameHistoryEntry) {
         )
     }
 }
-
