@@ -161,6 +161,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .border(2.dp, MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium)
+                            .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
                     ) {
                         TableRow("COMBINATION", null, null, {}, header = true)
                         viewModel.combinations.forEachIndexed { index, combination ->
@@ -191,32 +192,31 @@ fun SinglePlayerGameScreen(navController: NavController) {
 
             Row(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .height(70.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .align(Alignment.BottomCenter),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
                     onClick = { viewModel.rollDice() },
-                    modifier = Modifier
-                        .weight(2f)
-                        .height(72.dp),
+                    enabled = state.remainingRolls > 0 && !state.gameEnded,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    enabled = !state.gameEnded
-                ) {
-                    Text("Roll Dice (${state.remainingRolls})", fontSize = 22.sp)
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = { showResetDialog = true },
                     modifier = Modifier
                         .weight(1f)
-                        .height(72.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 8.dp, vertical = 10.dp)
                 ) {
-                    Text("Reset", fontSize = 22.sp)
+                    Text("Roll (${state.remainingRolls})", color = MaterialTheme.colorScheme.onSecondary)
+                }
+                Button(
+                    onClick = { showResetDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp, vertical = 10.dp)
+                ) {
+                    Text("Reset", color = MaterialTheme.colorScheme.onSecondary)
                 }
             }
         }

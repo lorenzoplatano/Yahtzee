@@ -34,7 +34,7 @@ fun MultiplayerGameScreen(
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
 
-    // qui viene eseguito lo switch tra giocatore 1 (il blu) e giocatore 2 (il rosso) gay
+    // qui viene eseguito lo switch tra giocatore 1 (il blu) e giocatore 2 (il rosso)
     MultiPlayerTheme(isPlayerOne = state.isPlayer1Turn) {
         if (showResetDialog) {
             AlertDialog(
@@ -130,7 +130,7 @@ fun MultiplayerGameScreen(
                         .fillMaxWidth()
                         .border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
-                        .padding(vertical = 8.dp)
+
                 ) {
                     MultiplayerTableRow(
                         "COMBINATION", "Player 1", "Player 2",
@@ -138,8 +138,10 @@ fun MultiplayerGameScreen(
                         isPlayer1Turn = state.isPlayer1Turn
                     )
 
-                    viewModel.combinations.forEach { combination ->
-                        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
+                    viewModel.combinations.forEachIndexed { index, combination ->
+                        if (index != 0) {
+                            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
+                        }
 
                         val player1Score = state.scoreMapPlayer1[combination]
                         val player2Score = state.scoreMapPlayer2[combination]
