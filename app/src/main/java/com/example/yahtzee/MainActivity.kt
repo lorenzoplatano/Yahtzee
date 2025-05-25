@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "homepage") {
             composable("homepage") { Homepage(navController) }
-            composable("history") { HistoryScreen(navController) }
+            composable("history") { HistoryScreen(navController, isDarkTheme) }
             composable("settings") { Settings(navController, isDarkTheme, onThemeChange) }
             composable("game_1vs1") { MultiplayerGameScreen(navController) }
             composable("game") { SinglePlayerGameScreen(navController) }
