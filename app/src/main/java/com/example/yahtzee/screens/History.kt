@@ -47,7 +47,7 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState
 
-    HistoryTheme {
+    HistoryTheme(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -214,11 +214,3 @@ fun HistoryTableRow(entry: GameHistoryEntry) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HistoryPreview() {
-    HistoryTheme {
-        val context = LocalContext.current
-        HistoryScreen(navController = NavController(context))
-    }
-}
