@@ -21,6 +21,19 @@ import androidx.compose.ui.platform.LocalContext
 
 
 
+private val DarkColorScheme = darkColorScheme(
+    primary = Blue200,
+    onPrimary = Blue900,
+    primaryContainer = Blue700,
+    onPrimaryContainer = Blue50,
+    secondary = Blue400,
+    onSecondary = Blue900,
+    background = Blue900,
+    onBackground = Color.White,
+    surface = Blue800,
+    onSurface = Color.White,
+)
+
 private val BlueColorScheme = lightColorScheme(
     primary = Blue500,
     onPrimary = Color.White,
@@ -48,6 +61,22 @@ private val RedColorScheme = lightColorScheme(
 )
 
 //  Gradient background composable serve a creare un box che riempie lo schermo e applica uno sfondo
+
+
+@Composable
+fun DarkGradientBackground(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Blue900, Blue800, Blue700)
+                )
+            )
+    ) {
+        content()
+    }
+}
 
 @Composable
 fun BlueGradientBackground(content: @Composable () -> Unit) {
@@ -88,41 +117,72 @@ fun MultiPlayerTheme(
 }
 
 @Composable
-fun SettingsTheme(content: @Composable () -> Unit) {
+fun SettingsTheme(
+    darkTheme: Boolean,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
     MaterialTheme(
-        colorScheme = BlueColorScheme,
+        colorScheme = colorScheme,
         typography = Typography
     ) {
-        BlueGradientBackground {
-            content()
+        if (darkTheme) {
+            DarkGradientBackground {
+                content()
+            }
+        } else {
+            BlueGradientBackground {
+                content()
+            }
         }
     }
 }
+
 
 @Composable
-fun HomeTheme(content: @Composable () -> Unit) {
+fun HomeTheme(
+    darkTheme: Boolean,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
     MaterialTheme(
-        colorScheme = BlueColorScheme,
+        colorScheme = colorScheme,
         typography = Typography
     ) {
-        BlueGradientBackground {
-            content()
+        if (darkTheme) {
+            DarkGradientBackground {
+                content()
+            }
+        } else {
+            BlueGradientBackground {
+                content()
+            }
         }
     }
 }
+
 
 @Composable
-fun HistoryTheme(content: @Composable () -> Unit) {
+fun HistoryTheme(
+    darkTheme: Boolean,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
     MaterialTheme(
-        colorScheme = BlueColorScheme,
+        colorScheme = colorScheme,
         typography = Typography
     ) {
-        BlueGradientBackground {
-            content()
+        if (darkTheme) {
+            DarkGradientBackground {
+                content()
+            }
+        } else {
+            BlueGradientBackground {
+                content()
+            }
         }
     }
 }
-
 @Composable
 fun YahtzeeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -134,8 +194,8 @@ fun YahtzeeTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> BlueColorScheme
-        else -> RedColorScheme
+        darkTheme -> DarkColorScheme // <-- CORRETTO QUI!
+        else -> BlueColorScheme
     }
 
     MaterialTheme(

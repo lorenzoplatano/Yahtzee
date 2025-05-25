@@ -50,7 +50,7 @@ fun Settings(
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit
 ) {
-    SettingsTheme {
+    SettingsTheme(darkTheme = isDarkTheme) {
         SettingsContent(
             isDarkTheme = isDarkTheme,
             onThemeChange = onThemeChange,
