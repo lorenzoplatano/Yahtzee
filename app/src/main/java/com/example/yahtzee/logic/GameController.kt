@@ -6,7 +6,7 @@ class GameController {
     companion object {
         val combinations = listOf(
             "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
-            "3 of a Kind", "4 of a Kind", "Full House", "Small Straight", "Large Straight",
+            "Three of a Kind", "Four of a Kind", "Full House", "Small Straight", "Large Straight",
             "Yahtzee", "Chance"
         )
     }
@@ -32,8 +32,8 @@ class GameController {
             "Fours" -> diceValues.filter { it == 4 }.sum()
             "Fives" -> diceValues.filter { it == 5 }.sum()
             "Sixes" -> diceValues.filter { it == 6 }.sum()
-            "3 of a Kind" -> if (counts.values.any { it >= 3 }) total else 0
-            "4 of a Kind" -> if (counts.values.any { it >= 4 }) total else 0
+            "Three of a Kind" -> if (counts.values.any { it >= 3 }) total else 0
+            "Four of a Kind" -> if (counts.values.any { it >= 4 }) total else 0
             "Full House" -> if (counts.values.contains(3) && counts.values.contains(2)) 25 else 0
             "Small Straight" -> {
                 val unique = diceValues.toSet()
@@ -61,7 +61,7 @@ class GameController {
     fun resetGame(): GameState {
         return GameState(
             diceValues = List(5) { 1 },
-            scoreMap = mutableMapOf(),
+            scoreMap = combinations.associateWith { null }.toMutableMap(),
             remainingRolls = 3,
             canSelectScore = false,
             heldDice = List(5) { false },
@@ -69,4 +69,3 @@ class GameController {
         )
     }
 }
-
