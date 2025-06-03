@@ -1,13 +1,10 @@
-
 package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -26,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.ui.theme.SinglePlayerTheme// <-- Usa sempre il tema blu!
+import com.example.yahtzee.ui.theme.SinglePlayerTheme
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 
 @Composable
@@ -45,7 +42,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
 
-    SinglePlayerTheme { // <-- Tema blu fisso
+    SinglePlayerTheme {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
@@ -71,6 +68,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
+            // Icona Home in alto a destra
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",
@@ -86,18 +84,63 @@ fun SinglePlayerGameScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 100.dp)
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 96.dp, start = 16.dp, end = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(
+                        top = 40.dp, // Più in alto!
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 120.dp
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
+                // Titolo YAHTZEE più in alto
                 Text(
                     text = "YAHTZEE",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
+
+                Spacer(modifier = Modifier.height(8.dp)) // Spazio tra titolo e dadi
+
+                // Dadi più in alto
+                if (!state.gameEnded) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        state.diceValues.forEachIndexed { index, value ->
+                            Box(
+                                modifier = Modifier
+                                    .size(70.dp)
+                                    .background(
+                                        if (state.heldDice[index]) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .border(1.5.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(8.dp))
+                                    .clickable(enabled = state.remainingRolls < 3) {
+                                        viewModel.toggleHold(index)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    value.toString(),
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (state.heldDice[index]) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Spazio tra dadi e tabella
+                Spacer(modifier = Modifier.height(8.dp))
 
                 if (state.gameEnded) {
                     Text(
@@ -127,36 +170,6 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         Text("Nuova Partita", fontSize = 18.sp)
                     }
                 } else {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        state.diceValues.forEachIndexed { index, value ->
-                            Box(
-                                modifier = Modifier
-                                    .size(70.dp)
-                                    .background(
-                                        if (state.heldDice[index]) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .border(1.5.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(8.dp))
-                                    .clickable(enabled = state.remainingRolls < 3) {
-                                        viewModel.toggleHold(index)
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    value.toString(),
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (state.heldDice[index]) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
-
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -190,9 +203,11 @@ fun SinglePlayerGameScreen(navController: NavController) {
                 }
             }
 
+            // Bottoni leggermente più in alto rispetto al fondo
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
                     .height(70.dp)
                     .background(MaterialTheme.colorScheme.primary)
                     .align(Alignment.BottomCenter),
@@ -257,14 +272,14 @@ fun TableRow(
                     Modifier.background(backgroundColor)
             )
             .clickable(enabled = enabled) { onClick() }
-            .padding(horizontal = 8.dp, vertical = 12.dp)
+            .padding(horizontal = 8.dp, vertical = if (header) 12.dp else 12.dp) // Dimensioni originali
     ) {
         Text(
             text = combination,
             modifier = Modifier.weight(1f),
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = 16.sp
+            fontSize = if (header) 16.sp else 16.sp // Dimensioni originali
         )
         Text(
             text = currentScore?.toString()
@@ -274,8 +289,7 @@ fun TableRow(
             textAlign = TextAlign.Center,
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = 16.sp
+            fontSize = if (header) 16.sp else 16.sp // Dimensioni originali
         )
     }
 }
-//ci
