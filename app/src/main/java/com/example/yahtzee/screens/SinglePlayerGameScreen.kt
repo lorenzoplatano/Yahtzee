@@ -153,7 +153,8 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                // Spacer tra dadi e tabella delle combinazioni: ridotto da 8.dp a 0.dp
+                Spacer(modifier = Modifier.height(0.dp))
 
                 // Header sticky della tabella
                 Row(
