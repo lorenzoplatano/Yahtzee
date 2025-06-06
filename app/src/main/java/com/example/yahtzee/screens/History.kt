@@ -32,7 +32,7 @@ import java.util.*
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    darkTheme: Boolean // <-- Passa qui la preferenza utente!
+    darkTheme: Boolean
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
