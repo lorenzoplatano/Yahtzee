@@ -108,13 +108,13 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         top = 0.dp,
                         start = 8.dp,
                         end = 8.dp,
-                        bottom = 96.dp // Aumentato per lasciare spazio ai bottoni più in alto
+                        bottom = 80.dp // Ridotto da 96dp a 80dp per guadagnare spazio in basso
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // Spacer per non sovrapporre i dadi all'icona Home (più spazio di prima)
-                Spacer(modifier = Modifier.height(72.dp))
+                // Spacer per non sovrapporre i dadi all'icona Home (3dp più in alto)
+                Spacer(modifier = Modifier.height(69.dp))
 
                 // Dadi
                 if (!state.gameEnded) {
@@ -153,8 +153,8 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     }
                 }
 
-                // Spacer tra dadi e tabella delle combinazioni: ridotto da 8.dp a 0.dp
-                Spacer(modifier = Modifier.height(0.dp))
+                // Spacer tra dadi e tabella delle combinazioni: 3dp più in alto
+                Spacer(modifier = Modifier.height(-3.dp))
 
                 // Header sticky della tabella
                 Row(
@@ -167,7 +167,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                         )
-                        .padding(horizontal = 10.dp, vertical = 12.dp)
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "COMBINATION",
@@ -223,6 +223,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     TableRow("Bonus", bonus, null, {}, bold = true)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 2.dp, color = MaterialTheme.colorScheme.secondary)
                     TableRow("Total Score", totalScore, null, {}, bold = true)
+
+                    // Spacer per evitare che l'ultima riga venga coperta dai bottoni
+                    Spacer(modifier = Modifier.height(20.dp)) // Altezza almeno uguale ai bottoni + padding
                 }
 
                 // Messaggio di fine partita e nuovo gioco
@@ -257,11 +260,11 @@ fun SinglePlayerGameScreen(navController: NavController) {
                 }
             }
 
-            // Bottoni in basso - padding bottom ulteriormente aumentato per alzarli ancora di più
+            // Bottoni in basso
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, bottom = 56.dp) // Era 32.dp, ora 56.dp ancora più in alto
+                    .padding(start = 8.dp, end = 8.dp, bottom = 46.dp)
                     .height(56.dp)
                     .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp))
                     .align(Alignment.BottomCenter),
@@ -333,7 +336,7 @@ fun TableRow(
                 if (enabled) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp)) else Modifier
             )
             .clickable(enabled = enabled) { onClick() }
-            .padding(horizontal = 10.dp, vertical = if (header) 12.dp else 14.dp)
+            .padding(horizontal = 10.dp, vertical = if (header) 2.dp else 4.dp)
     ) {
         Text(
             text = combination,
