@@ -93,6 +93,21 @@ fun BlueGradientBackground(content: @Composable () -> Unit) {
     }
 }
 
+@Composable
+fun RedGradientBackground(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Red100, Red500, Red700)
+                )
+            )
+    ) {
+        content()
+    }
+}
+
 // Temi specifici per schermata
 
 @Composable
