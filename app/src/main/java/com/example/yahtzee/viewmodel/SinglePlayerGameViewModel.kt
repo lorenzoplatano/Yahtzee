@@ -18,6 +18,10 @@ class SinglePlayerGameViewModel(
     var state by mutableStateOf(controller.resetGame())
         private set
 
+    // Stato per tenere traccia se è stato battuto il record
+    var isNewHighScore by mutableStateOf(false)
+        private set
+
     val combinations = GameController.combinations
 
     fun rollDice() {
@@ -31,7 +35,8 @@ class SinglePlayerGameViewModel(
     }
 
     fun toggleHold(index: Int) {
-        if (state.remainingRolls < 3 && !state.gameEnded) {
+        // Un dado può essere bloccato solo se ha un valore (non è null) e dopo almeno un lancio
+        if (state.remainingRolls < 3 && !state.gameEnded && state.diceValues[index] != null) {
             val newHeld = state.heldDice.toMutableList().also { it[index] = !it[index] }
             state = state.copy(heldDice = newHeld)
         }
@@ -57,6 +62,7 @@ class SinglePlayerGameViewModel(
 
     fun resetGame() {
         state = controller.resetGame()
+        isNewHighScore = false
     }
 
     fun previewScores(): Map<String, Int?> {
@@ -76,6 +82,13 @@ class SinglePlayerGameViewModel(
         val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
 
         viewModelScope.launch {
+            // Verifica se il punteggio attuale è un nuovo record
+            val highestScore = db.gameHistoryDao().getHighestScore() ?: 0
+            if (totalScore > highestScore) {
+                isNewHighScore = true
+            }
+
+            // Salva il punteggio nel database
             db.gameHistoryDao().insertGameHistory(
                 GameHistoryEntity(
                     date = System.currentTimeMillis(),
