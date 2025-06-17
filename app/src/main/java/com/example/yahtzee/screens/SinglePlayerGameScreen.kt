@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -45,22 +43,17 @@ fun SinglePlayerGameScreen(navController: NavController) {
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
 
-    // Lista completa delle combinazioni Yahtzee
     val allCombinations = listOf(
-        "Aces",
-        "Twos",
-        "Threes",
-        "Fours",
-        "Fives",
-        "Sixes",
-        "Three of a Kind",
-        "Four of a Kind",
-        "Full House",
-        "Small Straight",
-        "Large Straight",
-        "Yahtzee",
-        "Chance"
+        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
+        "Three of a Kind", "Four of a Kind", "Full House",
+        "Small Straight", "Large Straight", "Yahtzee", "Chance"
     )
+
+    // DICHIARAZIONE VARIABILI GLOBALI PER LA SCHERMATA
+    val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+    val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
+    val bonus = if (upperSum >= 63) 35 else 0
+    val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
 
     SinglePlayerTheme {
         if (showResetDialog) {
@@ -72,14 +65,10 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     TextButton(onClick = {
                         viewModel.resetGame()
                         showResetDialog = false
-                    }) {
-                        Text("Sì")
-                    }
+                    }) { Text("Sì") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) {
-                        Text("Annulla")
-                    }
+                    TextButton(onClick = { showResetDialog = false }) { Text("Annulla") }
                 }
             )
         }
@@ -88,14 +77,14 @@ fun SinglePlayerGameScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            // Icona Home in alto a destra - resta facilmente cliccabile
+            // Icona Home in alto a destra - ABBASSATA
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 32.dp, end = 16.dp)
+                    .padding(top = 38.dp, end = 12.dp) // <-- aumentato da 28.dp a 38.dp
                     .size(32.dp)
                     .zIndex(1f)
                     .clickable { navController.navigate("homepage") }
@@ -106,36 +95,35 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(
                         top = 0.dp,
-                        start = 8.dp,
-                        end = 8.dp,
-                        bottom = 80.dp // Ridotto da 96dp a 80dp per guadagnare spazio in basso
+                        start = 4.dp,
+                        end = 4.dp,
+                        bottom = 120.dp // Più spazio per bottoni grandi
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // Spacer per non sovrapporre i dadi all'icona Home (3dp più in alto)
-                Spacer(modifier = Modifier.height(69.dp))
+                Spacer(modifier = Modifier.height(74.dp)) // ABBASSA I DADI (prima era 54.dp)
 
-                // Dadi
+                // Dadi (più grandi)
                 if (!state.gameEnded) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp, top = 2.dp),
+                            .padding(bottom = 8.dp, top = 0.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         state.diceValues.forEachIndexed { index, value ->
                             Box(
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(72.dp) // Dadi più grandi
                                     .background(
                                         if (state.heldDice[index]) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
-                                        shape = RoundedCornerShape(12.dp)
+                                        shape = RoundedCornerShape(14.dp)
                                     )
                                     .border(
                                         width = if (state.heldDice[index]) 3.dp else 2.dp,
                                         color = if (state.heldDice[index]) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                        shape = RoundedCornerShape(12.dp)
+                                        shape = RoundedCornerShape(14.dp)
                                     )
                                     .clickable(enabled = state.remainingRolls < 3) {
                                         viewModel.toggleHold(index)
@@ -144,7 +132,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             ) {
                                 Text(
                                     value.toString(),
-                                    fontSize = 32.sp,
+                                    fontSize = 38.sp, // Testo più grande
                                     fontWeight = FontWeight.Bold,
                                     color = if (state.heldDice[index]) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
                                 )
@@ -153,82 +141,79 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     }
                 }
 
-                // Spacer tra dadi e tabella delle combinazioni: 3dp più in alto
-                Spacer(modifier = Modifier.height(-3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                // Header sticky della tabella
-                Row(
+                // Tabella punteggi racchiusa in una Box più larga e centrata
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                        .fillMaxWidth(0.98f) // TABELLA ANCORA PIÙ LARGA
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    Text(
-                        text = "COMBINATION",
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "SCORE",
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 18.sp
-                    )
-                }
-
-                // Tabella punteggi scrollabile (solo le righe)
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                        )
-                        .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    allCombinations.forEachIndexed { index, combination ->
-                        if (index != 0) {
-                            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                    Column {
+                        // Header sticky della tabella
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "COMBINATION",
+                                modifier = Modifier.weight(1f),
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 22.sp // Più grande
+                            )
+                            Text(
+                                text = "SCORE",
+                                modifier = Modifier.weight(1f),
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 22.sp // Più grande
+                            )
                         }
-                        TableRow(
-                            combination = combination,
-                            currentScore = state.scoreMap[combination],
-                            previewScore = previewScores[combination],
-                            onClick = { viewModel.selectScore(combination) },
-                            enabled = state.canSelectScore && state.scoreMap[combination] == null && !state.gameEnded,
-                            alternate = index % 2 == 1
-                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                                )
+                                .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            allCombinations.forEachIndexed { index, combination ->
+                                if (index != 0) {
+                                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                                }
+                                TableRow(
+                                    combination = combination,
+                                    currentScore = state.scoreMap[combination],
+                                    previewScore = previewScores[combination],
+                                    onClick = { viewModel.selectScore(combination) },
+                                    enabled = state.canSelectScore && state.scoreMap[combination] == null && !state.gameEnded,
+                                    alternate = index % 2 == 1,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 2.dp, color = MaterialTheme.colorScheme.secondary)
+                            TableRow("Bonus", bonus, null, {}, bold = true, modifier = Modifier.weight(1f))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 2.dp, color = MaterialTheme.colorScheme.secondary)
+                            TableRow("Total Score", totalScore, null, {}, bold = true, modifier = Modifier.weight(1f))
+                        }
                     }
-
-                    // Calcolo bonus e totale
-                    val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
-                    val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
-                    val bonus = if (upperSum >= 63) 35 else 0
-                    val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 2.dp, color = MaterialTheme.colorScheme.secondary)
-                    TableRow("Bonus", bonus, null, {}, bold = true)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 2.dp, color = MaterialTheme.colorScheme.secondary)
-                    TableRow("Total Score", totalScore, null, {}, bold = true)
-
-                    // Spacer per evitare che l'ultima riga venga coperta dai bottoni
-                    Spacer(modifier = Modifier.height(20.dp)) // Altezza almeno uguale ai bottoni + padding
                 }
 
-                // Messaggio di fine partita e nuovo gioco
                 if (state.gameEnded) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
@@ -238,10 +223,6 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
-                    val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
-                    val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
-                    val bonus = if (upperSum >= 63) 35 else 0
-                    val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
                     Text(
                         text = "Punteggio finale: $totalScore",
                         fontSize = 20.sp,
@@ -252,20 +233,20 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         onClick = { showResetDialog = true },
                         modifier = Modifier
                             .padding(top = 10.dp)
-                            .height(48.dp)
+                            .height(56.dp)
                             .fillMaxWidth(0.7f)
                     ) {
-                        Text("Nuova Partita", fontSize = 18.sp)
+                        Text("Nuova Partita", fontSize = 20.sp)
                     }
                 }
             }
 
-            // Bottoni in basso
+            // Bottoni in basso (più grandi e più in alto)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, bottom = 46.dp)
-                    .height(56.dp)
+                    .padding(start = 8.dp, end = 8.dp, bottom = 36.dp) // Più in alto
+                    .height(64.dp) // Più alto
                     .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp))
                     .align(Alignment.BottomCenter),
                 verticalAlignment = Alignment.CenterVertically,
@@ -277,20 +258,20 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
-                        .height(48.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .height(56.dp)
                 ) {
-                    Text("Roll (${state.remainingRolls})", color = MaterialTheme.colorScheme.onSecondary, fontSize = 18.sp)
+                    Text("Roll (${state.remainingRolls})", color = MaterialTheme.colorScheme.onSecondary, fontSize = 22.sp)
                 }
                 Button(
                     onClick = { showResetDialog = true },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
-                        .height(48.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .height(56.dp)
                 ) {
-                    Text("Reset", color = MaterialTheme.colorScheme.onSecondary, fontSize = 18.sp)
+                    Text("Reset", color = MaterialTheme.colorScheme.onSecondary, fontSize = 22.sp)
                 }
             }
         }
@@ -306,7 +287,8 @@ fun TableRow(
     enabled: Boolean = false,
     header: Boolean = false,
     bold: Boolean = false,
-    alternate: Boolean = false
+    alternate: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     val backgroundColor = when {
         header -> MaterialTheme.colorScheme.primary
@@ -322,7 +304,7 @@ fun TableRow(
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .then(
                 if (header)
@@ -336,14 +318,14 @@ fun TableRow(
                 if (enabled) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp)) else Modifier
             )
             .clickable(enabled = enabled) { onClick() }
-            .padding(horizontal = 10.dp, vertical = if (header) 2.dp else 4.dp)
+            .padding(horizontal = 10.dp, vertical = if (header) 8.dp else 10.dp)
     ) {
         Text(
             text = combination,
             modifier = Modifier.weight(1f),
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = if (header) 18.sp else 18.sp
+            fontSize = 22.sp // Più grande
         )
         Text(
             text = currentScore?.toString()
@@ -353,7 +335,7 @@ fun TableRow(
             textAlign = TextAlign.Center,
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = if (header) 18.sp else 18.sp
+            fontSize = 22.sp // Più grande
         )
     }
 }
