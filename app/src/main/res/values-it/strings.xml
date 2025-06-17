@@ -19,4 +19,35 @@
     
     <!-- Regole del gioco -->
     <string name="game_rules">Sono previste diverse combinazioni che ogni giocatore deve realizzare lanciando i dadi. Ottenuta la combinazione il giocatore guadagna il punteggio previsto per la combinazione. Una combinazione non può essere ripetuta quindi il gioco termina dopo 13 turni di lancio dei dadi, anche quando non sono state realizzate tutte le combinazioni.\n\nAd ogni turno il giocatore può lanciare i dadi tre volte. Al primo lancio il giocatore lancia tutti i dadi, mentre nei successivi due lanci il giocatore può scegliere di trattenere uno o più dadi favorevoli ad ottenere la combinazione cercata. Il giocatore può anche scegliere di non trattenere alcun dado o di non utilizzare successivi lanci, nel caso ad esempio si sia già realizzata una combinazione utile. Al termine dei tre lanci il giocatore deve segnare obbligatoriamente un punteggio in una delle caselle del segnapunti non ancora utilizzata. Se alla fine del turno di gioco non viene realizzata una delle possibili combinazioni ancora \"libera\" sul tabellone, il giocatore deve segnare \"0\" (zero) in una delle caselle ancora a sua disposizione.</string>
+
+    <!-- Dialog Home -->
+    <string name="dialog_home_title">Sei sicuro?</string>
+    <string name="dialog_home_text">Vuoi davvero tornare alla home? I progressi attuali andranno persi.</string>
+    <string name="confirm">Conferma</string>
+    <string name="cancel">Annulla</string>
+
+    <!-- Schermata di Gioco -->
+    <string name="combination">Combinazione</string>
+    <string name="score">Punteggio</string>
+    <string name="aces">Assi</string>
+    <string name="twos">Due</string>
+    <string name="threes">Tre</string>
+    <string name="fours">Quattro</string>
+    <string name="fives">Cinque</string>
+    <string name="sixes">Sei</string>
+    <string name="three_of_a_kind">Tris</string>
+    <string name="four_of_a_kind">Poker</string>
+    <string name="full_house">Full</string>
+    <string name="small_straight">Scala corta</string>
+    <string name="large_straight">Scala lunga</string>
+    <string name="yahtzee">Yahtzee</string>
+    <string name="chance">Chance</string>
+    <string name="bonus">Bonus</string>
+    <string name="total_score">Totale</string>
+    <string name="roll">Lancia</string>
+    <string name="reset">Reset</string>
+    <string name="game_ended">Partita Terminata!</string>
+    <string name="final_score">Punteggio finale: %1$d</string>
+    <string name="new_record">NUOVO RECORD!</string>
+    <string name="new_game">Nuova Partita</string>
 </resources>
