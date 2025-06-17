@@ -1,5 +1,6 @@
 package com.example.yahtzee.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,9 +12,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -26,7 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +48,7 @@ import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.localization.AppLanguage
 import com.example.yahtzee.localization.LocalLocalizationManager
+import com.example.yahtzee.screens.components.ModernGameButton
 import com.example.yahtzee.ui.theme.SettingsTheme
 
 // Stato iniziale delle impostazioni
@@ -53,75 +67,100 @@ fun Settings(
     onThemeChange: (Boolean) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit
 ) {
-    SettingsTheme(darkTheme = isDarkTheme) {
-        SettingsContent(
-            isDarkTheme = isDarkTheme,
-            onThemeChange = onThemeChange,
-            onHomeClick = { navController.navigate("homepage") },
-            onLanguageChange = onLanguageChange
-        )
-    }
-}
-
-@Composable
-fun SettingsContent(
-    isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit,
-    onHomeClick: () -> Unit,
-    onLanguageChange: (AppLanguage) -> Unit
-) {
     val localizationManager = LocalLocalizationManager.current
-    var settingsState by remember { 
-        mutableStateOf(SettingsState(language = localizationManager.getCurrentLanguage())) 
+    var settingsState by remember {
+        mutableStateOf(SettingsState(language = localizationManager.getCurrentLanguage()))
     }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showRulesDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        // Icona Home
-        Icon(
-            imageVector = Icons.Default.Home,
-            contentDescription = "Home",
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 40.dp, end = 16.dp)
-                .size(32.dp)
-                .clickable { onHomeClick() }
-        )
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+    val isCompactScreen = screenHeight < 600.dp
+    val buttonFontSize = if (isCompactScreen) 16.sp else 18.sp
 
-        Column(
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Sfondo
+        Image(
+            painter = painterResource(id = R.drawable.sfondo_generale),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        // Overlay scuro
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+
+        // Card contenente le impostazioni
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp, start = 24.dp, end = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+
+                .widthIn(max = 450.dp)
+                .fillMaxWidth(0.9f)
+                .padding(16.dp)
+                .align(Alignment.Center)
+                .shadow(8.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
         ) {
-            ThemeSwitchRow(
-                isDarkTheme = isDarkTheme,
-                onThemeChange = onThemeChange
-            )
-            SettingsRow(
-                label = "${stringResource(id = R.string.language)}: ${settingsState.language.displayName}"
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                showLanguageDialog = true
-            }
-            SettingsRow(
-                label = stringResource(id = R.string.rules)
-            ) {
-                showRulesDialog = true
-            }
-            SettingsRow(
-                label = stringResource(id = R.string.reset_settings)
-            ) {
-                // Reset lingua e tema
-                val defaultLanguage = initialSettings.language
-                settingsState = initialSettings
-                onThemeChange(false)
-                if (defaultLanguage != localizationManager.getCurrentLanguage()) {
-                    onLanguageChange(defaultLanguage)
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = buttonFontSize.times(1.1f),
+                    color = Color(0xFF1A1A1A)
+                )
+
+                ModernGameButton(
+                    text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
+                    icon = Icons.Default.Person,
+                    onClick = { showLanguageDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
+                )
+
+                ModernGameButton(
+                    text = stringResource(id = R.string.theme),
+                    icon = Icons.Default.Settings,
+                    onClick = { onThemeChange(!isDarkTheme) },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
+                )
+
+                ModernGameButton(
+                    text = stringResource(id = R.string.rules),
+                    icon = Icons.Default.History,
+                    onClick = { showRulesDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
+                )
+
+                ModernGameButton(
+                    text = stringResource(id = R.string.reset_settings),
+                    icon = Icons.Default.Settings,
+                    onClick = {
+                        settingsState = initialSettings
+                        onThemeChange(false)
+                        if (initialSettings.language != localizationManager.getCurrentLanguage()) {
+                            onLanguageChange(initialSettings.language)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
+                )
+
+                TextButton(
+                    onClick = { navController.navigate("homepage") }
+                ) {
+                    Text(text = stringResource(id = R.string.back), color = Color(0xFF764BA2))
                 }
             }
         }
@@ -131,7 +170,6 @@ fun SettingsContent(
                 currentLanguage = settingsState.language,
                 onSelectLanguage = { lang ->
                     settingsState = settingsState.copy(language = lang)
-                    // Informa l'attività principale del cambio lingua
                     onLanguageChange(lang)
                     showLanguageDialog = false
                 },
@@ -140,64 +178,8 @@ fun SettingsContent(
         }
 
         if (showRulesDialog) {
-            RulesDialog(
-                onDismiss = { showRulesDialog = false }
-            )
+            RulesDialog(onDismiss = { showRulesDialog = false })
         }
-    }
-}
-
-@Composable
-fun ThemeSwitchRow(
-    isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val themeText = if (isDarkTheme) 
-            stringResource(id = R.string.dark_theme)
-        else 
-            stringResource(id = R.string.light_theme)
-            
-        Text(
-            text = "${stringResource(id = R.string.theme)}: $themeText",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Switch(
-            checked = isDarkTheme,
-            onCheckedChange = { checked -> onThemeChange(checked) }
-        )
-    }
-}
-
-@Composable
-fun SettingsRow(label: String, onClick: (() -> Unit)? = null) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .clickable(enabled = onClick != null) {
-                onClick?.invoke()
-            }
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -216,9 +198,7 @@ fun LanguageDialog(
                     AppLanguage.ITALIAN.displayName,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            onSelectLanguage(AppLanguage.ITALIAN)
-                        }
+                        .clickable { onSelectLanguage(AppLanguage.ITALIAN) }
                         .padding(8.dp),
                     fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal
                 )
@@ -226,9 +206,7 @@ fun LanguageDialog(
                     AppLanguage.ENGLISH.displayName,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            onSelectLanguage(AppLanguage.ENGLISH)
-                        }
+                        .clickable { onSelectLanguage(AppLanguage.ENGLISH) }
                         .padding(8.dp),
                     fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal
                 )
@@ -246,7 +224,7 @@ fun RulesDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                stringResource(id = R.string.rules_title), 
+                stringResource(id = R.string.rules_title),
                 fontWeight = FontWeight.Bold
             )
         },
