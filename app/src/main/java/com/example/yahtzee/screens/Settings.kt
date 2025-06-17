@@ -1,4 +1,3 @@
-
 package com.example.yahtzee.screens
 
 import androidx.compose.foundation.background
@@ -27,34 +26,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.yahtzee.R
+import com.example.yahtzee.localization.AppLanguage
+import com.example.yahtzee.localization.LocalLocalizationManager
 import com.example.yahtzee.ui.theme.SettingsTheme
 
 // Stato iniziale delle impostazioni
 private val initialSettings = SettingsState(
-    notificationsEnabled = true,
-    language = "Italiano"
+    language = AppLanguage.ITALIAN
 )
 
 data class SettingsState(
-    val notificationsEnabled: Boolean,
-    val language: String
+    val language: AppLanguage
 )
 
 @Composable
 fun Settings(
     navController: NavController,
     isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit
+    onThemeChange: (Boolean) -> Unit,
+    onLanguageChange: (AppLanguage) -> Unit
 ) {
     SettingsTheme(darkTheme = isDarkTheme) {
         SettingsContent(
             isDarkTheme = isDarkTheme,
             onThemeChange = onThemeChange,
-            onHomeClick = { navController.navigate("homepage") }
+            onHomeClick = { navController.navigate("homepage") },
+            onLanguageChange = onLanguageChange
         )
     }
 }
@@ -63,9 +67,13 @@ fun Settings(
 fun SettingsContent(
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    onHomeClick: () -> Unit
+    onHomeClick: () -> Unit,
+    onLanguageChange: (AppLanguage) -> Unit
 ) {
-    var settingsState by remember { mutableStateOf(initialSettings) }
+    val localizationManager = LocalLocalizationManager.current
+    var settingsState by remember { 
+        mutableStateOf(SettingsState(language = localizationManager.getCurrentLanguage())) 
+    }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showRulesDialog by remember { mutableStateOf(false) }
 
@@ -96,26 +104,25 @@ fun SettingsContent(
                 onThemeChange = onThemeChange
             )
             SettingsRow(
-                label = "Lingua: ${settingsState.language}"
+                label = "${stringResource(id = R.string.language)}: ${settingsState.language.displayName}"
             ) {
                 showLanguageDialog = true
             }
-            NotificationRow(
-                enabled = settingsState.notificationsEnabled,
-                onToggle = {
-                    settingsState = settingsState.copy(notificationsEnabled = !settingsState.notificationsEnabled)
-                }
-            )
             SettingsRow(
-                label = "Regole"
+                label = stringResource(id = R.string.rules)
             ) {
                 showRulesDialog = true
             }
             SettingsRow(
-                label = "Reset Impostazioni"
+                label = stringResource(id = R.string.reset_settings)
             ) {
+                // Reset lingua e tema
+                val defaultLanguage = initialSettings.language
                 settingsState = initialSettings
                 onThemeChange(false)
+                if (defaultLanguage != localizationManager.getCurrentLanguage()) {
+                    onLanguageChange(defaultLanguage)
+                }
             }
         }
 
@@ -124,6 +131,8 @@ fun SettingsContent(
                 currentLanguage = settingsState.language,
                 onSelectLanguage = { lang ->
                     settingsState = settingsState.copy(language = lang)
+                    // Informa l'attività principale del cambio lingua
+                    onLanguageChange(lang)
                     showLanguageDialog = false
                 },
                 onDismiss = { showLanguageDialog = false }
@@ -154,8 +163,13 @@ fun ThemeSwitchRow(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val themeText = if (isDarkTheme) 
+            stringResource(id = R.string.dark_theme)
+        else 
+            stringResource(id = R.string.light_theme)
+            
         Text(
-            text = "Tema: ${if (isDarkTheme) "Scuro" else "Chiaro"}",
+            text = "${stringResource(id = R.string.theme)}: $themeText",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
@@ -188,61 +202,35 @@ fun SettingsRow(label: String, onClick: (() -> Unit)? = null) {
 }
 
 @Composable
-fun NotificationRow(enabled: Boolean, onToggle: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Notifiche",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Switch(
-            checked = enabled,
-            onCheckedChange = { onToggle() }
-        )
-    }
-}
-
-@Composable
 fun LanguageDialog(
-    currentLanguage: String,
-    onSelectLanguage: (String) -> Unit,
+    currentLanguage: AppLanguage,
+    onSelectLanguage: (AppLanguage) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Seleziona Lingua") },
+        title = { Text(stringResource(id = R.string.select_language)) },
         text = {
             Column {
                 Text(
-                    "Italiano",
+                    AppLanguage.ITALIAN.displayName,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onSelectLanguage("Italiano")
+                            onSelectLanguage(AppLanguage.ITALIAN)
                         }
                         .padding(8.dp),
-                    fontWeight = if (currentLanguage == "Italiano") FontWeight.Bold else FontWeight.Normal
+                    fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal
                 )
                 Text(
-                    "Inglese",
+                    AppLanguage.ENGLISH.displayName,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onSelectLanguage("Inglese")
+                            onSelectLanguage(AppLanguage.ENGLISH)
                         }
                         .padding(8.dp),
-                    fontWeight = if (currentLanguage == "Inglese") FontWeight.Bold else FontWeight.Normal
+                    fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal
                 )
             }
         },
@@ -251,24 +239,28 @@ fun LanguageDialog(
 }
 
 @Composable
-fun RulesDialog(onDismiss: () -> Unit) {
+fun RulesDialog(
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Regolamento Yahtzee", fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(id = R.string.rules_title), 
+                fontWeight = FontWeight.Bold
+            )
         },
         text = {
             Column {
                 Text(
-                    "Sono previste diverse combinazioni che ogni giocatore deve realizzare lanciando i dadi. Ottenuta la combinazione il giocatore guadagna il punteggio previsto per la combinazione. Una combinazione non può essere ripetuta quindi il gioco termina dopo 13 turni di lancio dei dadi, anche quando non sono state realizzate tutte le combinazioni.\n\n" +
-                            "Ad ogni turno il giocatore può lanciare i dadi tre volte. Al primo lancio il giocatore lancia tutti i dadi, mentre nei successivi due lanci il giocatore può scegliere di trattenere uno o più dadi favorevoli ad ottenere la combinazione cercata. Il giocatore può anche scegliere di non trattenere alcun dado o di non utilizzare successivi lanci, nel caso ad esempio si sia già realizzata una combinazione utile. Al termine dei tre lanci il giocatore deve segnare obbligatoriamente un punteggio in una delle caselle del segnapunti non ancora utilizzata. Se alla fine del turno di gioco non viene realizzata una delle possibili combinazioni ancora \"libera\" sul tabellone, il giocatore deve segnare \"0\" (zero) in una delle caselle ancora a sua disposizione.\n\n",
+                    stringResource(id = R.string.game_rules),
                     fontSize = 15.sp
                 )
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("OK")
+                Text(stringResource(id = R.string.ok_button))
             }
         }
     )
