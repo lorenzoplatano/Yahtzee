@@ -5,6 +5,7 @@
     <string name="settings_title">Settings</string>
     <string name="select_language">Select Language</string>
     <string name="rules_title">Yahtzee Rules</string>
+    <string name="history">Game History</string>
     
     <!-- Impostazioni -->
     <string name="theme">Theme</string>
@@ -50,4 +51,11 @@
     <string name="final_score">Final score: %1$d</string>
     <string name="new_record">NEW RECORD!</string>
     <string name="new_game">New Game</string>
+
+    <!-- Homepage -->
+    <string name="touch_to_continue">Touch to continue</string>
+    <string name="select_mode">Select Mode</string>
+    <string name="singleplayer">SINGLEPLAYER</string>
+    <string name="multiplayer">MULTIPLAYER</string>
+    <string name="back">Back</string>
 </resources>

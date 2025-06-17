@@ -5,6 +5,7 @@
     <string name="settings_title">Impostazioni</string>
     <string name="select_language">Seleziona Lingua</string>
     <string name="rules_title">Regolamento Yahtzee</string>
+    <string name="history">Storico Partite</string>
     
     <!-- Impostazioni -->
     <string name="theme">Tema</string>
@@ -18,7 +19,7 @@
     <string name="ok_button">OK</string>
     
     <!-- Regole del gioco -->
-    <string name="game_rules">Sono previste diverse combinazioni che ogni giocatore deve realizzare lanciando i dadi. Ottenuta la combinazione il giocatore guadagna il punteggio previsto per la combinazione. Una combinazione non può essere ripetuta quindi il gioco termina dopo 13 turni di lancio dei dadi, anche quando non sono state realizzate tutte le combinazioni.\n\nAd ogni turno il giocatore può lanciare i dadi tre volte. Al primo lancio il giocatore lancia tutti i dadi, mentre nei successivi due lanci il giocatore può scegliere di trattenere uno o più dadi favorevoli ad ottenere la combinazione cercata. Il giocatore può anche scegliere di non trattenere alcun dado o di non utilizzare successivi lanci, nel caso ad esempio si sia già realizzata una combinazione utile. Al termine dei tre lanci il giocatore deve segnare obbligatoriamente un punteggio in una delle caselle del segnapunti non ancora utilizzata. Se alla fine del turno di gioco non viene realizzata una delle possibili combinazioni ancora \"libera\" sul tabellone, il giocatore deve segnare \"0\" (zero) in una delle caselle ancora a sua disposizione.</string>
+    <string name="game_rules">Sono previste diverse combinazioni che ogni giocatore deve realizzare lanciando i dadi. Ottenuta la combinazione il giocatore guadagna il punteggio previsto per la combinazione. Una combinazione non può essere ripetuta quindi il gioco termina dopo 13 turni di lancio dei dadi, anche quando non sono state realizzate tutte le combinazioni.\n\nAd ogni turno il giocatore può lanciare i dadi tre volte. Al primo lancio il giocatore lancia tutti i dadi, mentre nei successivi due lanci il giocatore può scegliere di trattenere uno o più dadi favorevoli ad ottenere la combinazione cercata. Il giocatore può anche scegliere di non trattenere alcun dado o di non utilizzare successivi lanci, nel caso ad esempio si sia già realizzata una combinazione utile. Al termine dei tre lanci il giocatore deve segnare obbligatoriamente un punteggio in una delle caselle del segnapunti non ancora utilizzata. Se alla fine del turno di gioco non viene realizzata una delle possibili combinazioni ancora "libera" sul tabellone, il giocatore deve segnare "0" (zero) in una delle caselle ancora a sua disposizione.</string>
 
     <!-- Dialog Home -->
     <string name="dialog_home_title">Sei sicuro?</string>
@@ -50,4 +51,11 @@
     <string name="final_score">Punteggio finale: %1$d</string>
     <string name="new_record">NUOVO RECORD!</string>
     <string name="new_game">Nuova Partita</string>
+
+    <!-- Homepage -->
+    <string name="touch_to_continue">Tocca per continuare</string>
+    <string name="select_mode">Seleziona Modalità</string>
+    <string name="singleplayer">GIOCATORE SINGOLO</string>
+    <string name="multiplayer">MULTIPLAYER</string>
+    <string name="back">Indietro</string>
 </resources>
