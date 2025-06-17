@@ -132,7 +132,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             ) {
                                 Text(
                                     value.toString(),
-                                    fontSize = 38.sp, // Testo più grande
+                                    fontSize = 36.sp, // Ridotto da 38.sp
                                     fontWeight = FontWeight.Bold,
                                     color = if (state.heldDice[index]) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
                                 )
@@ -168,7 +168,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                 modifier = Modifier.weight(1f),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 22.sp // Più grande
+                                fontSize = 20.sp // Ridotto da 22.sp
                             )
                             Text(
                                 text = "SCORE",
@@ -176,7 +176,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 22.sp // Più grande
+                                fontSize = 20.sp // Ridotto da 22.sp
                             )
                         }
 
@@ -218,14 +218,14 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "Partita Terminata!",
-                        fontSize = 22.sp,
+                        fontSize = 20.sp, // Ridotto da 22.sp
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     Text(
                         text = "Punteggio finale: $totalScore",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp, // Ridotto da 20.sp
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -236,7 +236,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             .height(56.dp)
                             .fillMaxWidth(0.7f)
                     ) {
-                        Text("Nuova Partita", fontSize = 20.sp)
+                        Text("Nuova Partita", fontSize = 18.sp) // Ridotto da 20.sp
                     }
                 }
             }
@@ -261,7 +261,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         .padding(horizontal = 8.dp, vertical = 8.dp)
                         .height(56.dp)
                 ) {
-                    Text("Roll (${state.remainingRolls})", color = MaterialTheme.colorScheme.onSecondary, fontSize = 22.sp)
+                    Text("Roll (${state.remainingRolls})", color = MaterialTheme.colorScheme.onSecondary, fontSize = 20.sp) // Ridotto da 22.sp
                 }
                 Button(
                     onClick = { showResetDialog = true },
@@ -271,7 +271,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         .padding(horizontal = 8.dp, vertical = 8.dp)
                         .height(56.dp)
                 ) {
-                    Text("Reset", color = MaterialTheme.colorScheme.onSecondary, fontSize = 22.sp)
+                    Text("Reset", color = MaterialTheme.colorScheme.onSecondary, fontSize = 20.sp) // Ridotto da 22.sp
                 }
             }
         }
@@ -325,7 +325,7 @@ fun TableRow(
             modifier = Modifier.weight(1f),
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = 22.sp // Più grande
+            fontSize = 20.sp // Ridotto da 22.sp
         )
         Text(
             text = currentScore?.toString()
@@ -335,7 +335,7 @@ fun TableRow(
             textAlign = TextAlign.Center,
             fontWeight = if (bold || header) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            fontSize = 22.sp // Più grande
+            fontSize = 20.sp // Ridotto da 22.sp
         )
     }
 }
