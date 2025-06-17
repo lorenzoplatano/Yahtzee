@@ -44,14 +44,14 @@ fun SinglePlayerGameScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
-    
+
     val isCompactScreen = screenHeight < 600.dp
-    
+
     // Calcola dimensioni responsive senza scrolling
     val diceSize = (screenWidth / 6).coerceAtLeast(40.dp).coerceAtMost(60.dp)
 
     val tableRowFontSize = if (isCompactScreen) 14.sp else 16.sp
-    
+
     val db = remember { AppDatabase.getDatabase(context) }
     val viewModel: SinglePlayerGameViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -64,23 +64,24 @@ fun SinglePlayerGameScreen(navController: NavController) {
     val state = viewModel.state
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()
-    
+
     // Stato per gestire la visibilità delle preview
     var showPreviews by remember { mutableStateOf(true) }
 
     // Verifica se tutti i dadi sono selezionati e non sono nulli
     val allDiceHeld = state.diceValues.filterNotNull().isNotEmpty() &&
-                     state.diceValues.filterIndexed { idx, value ->
-                        value != null && state.heldDice[idx]
-                     }.size == state.diceValues.filterNotNull().size
+            state.diceValues.filterIndexed { idx, value ->
+                value != null && state.heldDice[idx]
+            }.size == state.diceValues.filterNotNull().size
 
-    // Lista delle chiavi costanti per la logica
+    // Lista delle chiavi costanti per la logica (in inglese)
     val allCombinations = listOf(
         "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
         "Three of a Kind", "Four of a Kind", "Full House",
         "Small Straight", "Large Straight", "Yahtzee", "Chance"
     )
-    // Mappatura chiave -> stringa localizzata
+
+    // Mappatura per la visualizzazione (da inglese a localizzato)
     val combinationLabels = mapOf(
         "Aces" to stringResource(R.string.aces),
         "Twos" to stringResource(R.string.twos),
@@ -93,6 +94,8 @@ fun SinglePlayerGameScreen(navController: NavController) {
         "Full House" to stringResource(R.string.full_house),
         "Small Straight" to stringResource(R.string.small_straight),
         "Large Straight" to stringResource(R.string.large_straight),
+        "Yahtzee" to stringResource(R.string.yahtzee),
+        "Chance" to stringResource(R.string.chance)
     )
 
     // DICHIARAZIONE VARIABILI GLOBALI PER LA SCHERMATA
@@ -250,9 +253,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     .border(
                                         width = if (state.heldDice[index] && value != null) 2.dp else 1.dp,
                                         color = if (state.heldDice[index] && value != null)
-                                                  MaterialTheme.colorScheme.primary
-                                               else
-                                                  MaterialTheme.colorScheme.onSurface,
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurface,
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .clickable(
@@ -353,7 +356,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     )
                                 }
                                 TableRow(
-                                    combination = combination,
+                                    combination = combinationLabels[combination] ?: combination, // Usa la mappatura per il testo
                                     currentScore = state.scoreMap[combination],
                                     // Mostra le preview solo quando showPreviews è true
                                     previewScore = if (showPreviews) previewScores[combination] else null,
