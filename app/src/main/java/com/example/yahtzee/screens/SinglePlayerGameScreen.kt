@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
@@ -177,9 +179,11 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     .background(Color.Black.copy(alpha = 0.3f))
             )
 
+            // Scrollabile per sicurezza su schermi piccoli
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
@@ -188,7 +192,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 36.dp)
+                        .padding(top = 20.dp) // più in alto rispetto a prima
                 ) {
                     Card(
                         modifier = Modifier
@@ -224,16 +228,16 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // DADI UGUALI AL MULTIPLAYER
+                // DADI
                 if (!state.gameEnded) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .height(diceSize + 24.dp)
                             .padding(horizontal = 4.dp)
-                            .offset(y = 8.dp),
+                            .offset(y = 4.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White.copy(alpha = 0.95f)
                         ),
@@ -243,7 +247,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -313,15 +317,15 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // TABELLA UGUALE AL MULTIPLAYER MA CON UNA SOLA COLONNA "Score"
+                // TABELLA
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 520.dp, max = 700.dp) // <-- allungata
+                        .heightIn(min = 500.dp, max = 650.dp) // più compatta e più in alto
                         .padding(horizontal = 8.dp)
-                        .offset(y = 8.dp)
+                        .offset(y = 4.dp)
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape(14.dp)),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White.copy(alpha = 0.96f)
@@ -338,7 +342,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     ),
                                     shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp)
                                 )
-                                .padding(horizontal = 10.dp, vertical = 14.dp)
+                                .padding(horizontal = 10.dp, vertical = 12.dp)
                         ) {
                             Row {
                                 Text(
@@ -361,7 +365,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 4.dp, vertical = 4.dp)
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             allCombinations.forEachIndexed { index, combination ->
                                 if (index != 0) {
@@ -416,9 +420,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     }
                 }
 
-                // Bottoni subito dopo la tabella
+                // Bottoni subito dopo la tabella, più in alto
                 if (!state.gameEnded) {
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -602,6 +606,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         }
                     }
                 }
+
+                // Spacer finale per evitare che i bottoni tocchino la navigation bar
+                Spacer(modifier = Modifier.height(32.dp))
             }
 
             if (showHomeDialog) {
