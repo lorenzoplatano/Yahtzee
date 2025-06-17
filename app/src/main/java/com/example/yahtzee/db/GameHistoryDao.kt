@@ -11,4 +11,7 @@ interface GameHistoryDao {
 
     @Query("SELECT * FROM game_history ORDER BY date DESC")
     suspend fun getAllHistory(): List<GameHistoryEntity>
+
+    @Query("SELECT MAX(score) FROM game_history")
+    suspend fun getHighestScore(): Int?
 }
