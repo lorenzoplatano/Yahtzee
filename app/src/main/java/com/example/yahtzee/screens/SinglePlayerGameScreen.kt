@@ -141,14 +141,20 @@ fun SinglePlayerGameScreen(navController: NavController) {
     // Funzione per avviare l'animazione di lancio dei dadi
     fun rollDiceWithAnimation() {
         if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) {
+            // Disabilita completamente le preview durante tutta la sequenza di animazione
+            showPreviews = false
+
+            // Avvia la sequenza di animazione
             coroutineScope.launch {
                 isRolling = true
-                showPreviews = false // Nascondi le preview durante l'animazione
-                delay(550) // Durata dell'animazione
-                viewModel.rollDice() // Esegui il roll effettivo dopo che l'animazione ha avuto il tempo di eseguirsi
-                delay(100) // Piccolo delay aggiuntivo per far vedere il risultato
+
+                delay(550)
+
+                viewModel.rollDice()
                 isRolling = false
-                showPreviews = true // Mostra le preview solo dopo che l'animazione è terminata
+                delay(800)
+
+                showPreviews = true
             }
         }
     }
