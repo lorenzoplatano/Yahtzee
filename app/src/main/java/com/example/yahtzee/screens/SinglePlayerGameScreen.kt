@@ -74,20 +74,25 @@ fun SinglePlayerGameScreen(navController: NavController) {
                         value != null && state.heldDice[idx]
                      }.size == state.diceValues.filterNotNull().size
 
+    // Lista delle chiavi costanti per la logica
     val allCombinations = listOf(
-        stringResource(R.string.aces),
-        stringResource(R.string.twos),
-        stringResource(R.string.threes),
-        stringResource(R.string.fours),
-        stringResource(R.string.fives),
-        stringResource(R.string.sixes),
-        stringResource(R.string.three_of_a_kind),
-        stringResource(R.string.four_of_a_kind),
-        stringResource(R.string.full_house),
-        stringResource(R.string.small_straight),
-        stringResource(R.string.large_straight),
-        stringResource(R.string.yahtzee),
-        stringResource(R.string.chance)
+        "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
+        "Three of a Kind", "Four of a Kind", "Full House",
+        "Small Straight", "Large Straight", "Yahtzee", "Chance"
+    )
+    // Mappatura chiave -> stringa localizzata
+    val combinationLabels = mapOf(
+        "Aces" to stringResource(R.string.aces),
+        "Twos" to stringResource(R.string.twos),
+        "Threes" to stringResource(R.string.threes),
+        "Fours" to stringResource(R.string.fours),
+        "Fives" to stringResource(R.string.fives),
+        "Sixes" to stringResource(R.string.sixes),
+        "Three of a Kind" to stringResource(R.string.three_of_a_kind),
+        "Four of a Kind" to stringResource(R.string.four_of_a_kind),
+        "Full House" to stringResource(R.string.full_house),
+        "Small Straight" to stringResource(R.string.small_straight),
+        "Large Straight" to stringResource(R.string.large_straight),
     )
 
     // DICHIARAZIONE VARIABILI GLOBALI PER LA SCHERMATA
