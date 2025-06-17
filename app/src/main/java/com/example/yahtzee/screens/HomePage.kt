@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -146,13 +147,13 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Immagine di sfondo
         Image(
-            painter = painterResource(id = R.drawable.chunky), // Esempi di nomi validi:
+            painter = painterResource(id = R.drawable.chunky),
             // R.drawable.background_game
             // R.drawable.home_background
             // R.drawable.game_bg
             contentDescription = "Background",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // Puoi cambiare in ContentScale.FillBounds se necessario
+            contentScale = ContentScale.Crop
         )
 
         Column(
@@ -176,20 +177,11 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                 )
             } else {
                 Column(
-                    modifier = Modifier.fillMaxWidth(0.7f),
+                    modifier = Modifier.fillMaxWidth(0.85f),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ModernGameButton(
-                        text = "1 VS 1",
-                        icon = Icons.Default.Groups,
-                        onClick = { navController.navigate("game_1vs1") },
-                        modifier = Modifier.fillMaxWidth(),
-                        gradientColors = listOf(
-                            Color(0xFFFF6B6B), // Red gradient
-                            Color(0xFFFF8E53)  // Orange gradient
-                        )
-                    )
+                    // Pulsanti di gioco esistenti
                     ModernGameButton(
                         text = "SINGLEPLAYER",
                         icon = Icons.Default.Person,
@@ -200,37 +192,47 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             Color(0xFF44A08D)  // Green gradient
                         )
                     )
+
+                    ModernGameButton(
+                        text = "MULTIPLAYER",
+                        icon = Icons.Default.Groups,
+                        onClick = { navController.navigate("game_1vs1") },
+                        modifier = Modifier.fillMaxWidth(),
+                        gradientColors = listOf(
+                            Color(0xFFFF6B6B), // Red gradient
+                            Color(0xFFFF8E53)  // Orange gradient
+                        )
+                    )
+                    // Spazio tra i pulsanti di gioco e quelli di navigazione
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Nuovi pulsanti di navigazione
+                    ModernGameButton(
+                        text = "IMPOSTAZIONI",
+                        icon = Icons.Default.Settings,
+                        onClick = { navController.navigate("settings") },
+                        modifier = Modifier.fillMaxWidth(),
+                        gradientColors = listOf(
+                            Color(0xFF9C27B0), // Purple gradient
+                            Color(0xFF673AB7)  // Deep Purple gradient
+                        )
+                    )
+
+                    ModernGameButton(
+                        text = "STORICO",
+                        icon = Icons.Default.History,
+                        onClick = { navController.navigate("history") },
+                        modifier = Modifier.fillMaxWidth(),
+                        gradientColors = listOf(
+                            Color(0xFFFF9800), // Orange gradient
+                            Color(0xFFFF5722)  // Deep Orange gradient
+                        )
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.weight(0.38f)) // Occupa il 40% inferiore dello spazio
+            Spacer(modifier = Modifier.weight(0.15f))
         }
 
-        // Icone in alto a destra
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(end = 16.dp, top = 40.dp)
-                .wrapContentSize(Alignment.TopEnd),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Impostazioni",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable { navController.navigate("settings") }
-            )
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Storico partite",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .size(28.dp)
-                    .clickable { navController.navigate("history") }
-            )
-        }
     }
 }
