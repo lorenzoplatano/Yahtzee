@@ -298,7 +298,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 440.dp, max = 520.dp)
+                        .heightIn(min = 540.dp, max = 600.dp)
                         .padding(horizontal = 8.dp)
                         .offset(y = 8.dp) // aggiunto offset per abbassare la sezione punteggi
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape(14.dp)),
@@ -368,7 +368,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             bold = true,
                                             alternate = index % 2 == 1,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 11.sp, // leggermente più piccolo
+                                            fontSize = 14.sp, // leggermente più piccolo
                                             compactPadding = true
                                         )
                                     }
@@ -380,7 +380,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             bold = true,
                                             alternate = index % 2 == 1,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 11.sp,
+                                            fontSize = 16.sp,
                                             compactPadding = true
                                         )
                                     }
@@ -401,7 +401,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             bold = false,
                                             alternate = index % 2 == 1,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 11.sp,
+                                            fontSize = 13.sp,
                                             compactPadding = true
                                         )
                                     }
@@ -623,7 +623,7 @@ fun MultiplayerTableRowStyled(
     bold: Boolean = false,
     alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
-    fontSize: androidx.compose.ui.unit.TextUnit = 12.sp,
+    fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
     compactPadding: Boolean = false
 ) {
     val backgroundColor = when {
@@ -638,7 +638,7 @@ fun MultiplayerTableRowStyled(
         else -> Color(0xFF4A5568)
     }
 
-    val verticalPadding = if (compactPadding) 3.dp else 4.dp
+    val verticalPadding = if (compactPadding) 5.5.dp else 6.dp
 
     Card(
         modifier = Modifier
