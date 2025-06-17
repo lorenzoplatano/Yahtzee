@@ -18,5 +18,36 @@
     <string name="ok_button">OK</string>
     
     <!-- Regole del gioco -->
-    <string name="game_rules">There are different combinations that each player must achieve by rolling the dice. When a combination is obtained, the player earns the score for that combination. A combination cannot be repeated, so the game ends after 13 rounds of dice rolling, even when not all combinations have been achieved.\n\nDuring each turn, the player can roll the dice three times. On the first roll, the player rolls all dice, while in the subsequent two rolls, the player can choose to hold one or more favorable dice to achieve the desired combination. The player can also choose not to hold any dice or not to use subsequent rolls, for example if a useful combination has already been achieved. At the end of the three rolls, the player must record a score in one of the boxes on the scorecard not yet used. If at the end of the game turn, none of the possible combinations still \"free\" on the board is achieved, the player must mark \"0\" (zero) in one of the boxes still at their disposal.</string>
+    <string name="game_rules">There are different combinations that each player must achieve by rolling the dice. When a combination is obtained, the player earns the score for that combination. A combination cannot be repeated, so the game ends after 13 rounds of dice rolling, even when not all combinations have been achieved.\n\nDuring each turn, the player can roll the dice three times. On the first roll, the player rolls all dice, while in the subsequent two rolls, the player can choose to hold one or more favorable dice to achieve the desired combination. The player can also choose not to hold any dice or not to use subsequent rolls, for example if a useful combination has already been achieved. At the end of the three rolls, the player must record a score in one of the boxes on the scorecard not yet used. If at the end of the game turn, none of the possible combinations still "free" on the board is achieved, the player must mark "0" (zero) in one of the boxes still at their disposal.</string>
+
+    <!-- Dialog Home -->
+    <string name="dialog_home_title">Are you sure?</string>
+    <string name="dialog_home_text">Do you really want to return to the home? Current progress will be lost.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Schermata di gioco -->
+    <string name="combination">Combination</string>
+    <string name="score">Score</string>
+    <string name="aces">Aces</string>
+    <string name="twos">Twos</string>
+    <string name="threes">Threes</string>
+    <string name="fours">Fours</string>
+    <string name="fives">Fives</string>
+    <string name="sixes">Sixes</string>
+    <string name="three_of_a_kind">Three of a Kind</string>
+    <string name="four_of_a_kind">Four of a Kind</string>
+    <string name="full_house">Full House</string>
+    <string name="small_straight">Small Straight</string>
+    <string name="large_straight">Large Straight</string>
+    <string name="yahtzee">Yahtzee</string>
+    <string name="chance">Chance</string>
+    <string name="bonus">Bonus</string>
+    <string name="total_score">Total Score</string>
+    <string name="roll">Roll</string>
+    <string name="reset">Reset</string>
+    <string name="game_ended">Game Ended!</string>
+    <string name="final_score">Final score: %1$d</string>
+    <string name="new_record">NEW RECORD!</string>
+    <string name="new_game">New Game</string>
 </resources>
