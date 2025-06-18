@@ -46,6 +46,9 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
     val buttonWidth = (screenWidth * 0.8f).coerceAtMost(400.dp)
     val buttonTextSize = if (isCompactScreen) 16.sp else 18.sp
 
+    val cardBackground = if (isDarkTheme) CardDark else CardLight
+    val titleColor = mainTextColor(isDarkTheme)
+
     BackHandler {
         showExitDialog = true
     }
@@ -59,13 +62,14 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                 Text(
                     stringResource(R.string.dialog_home_title),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = HomeDialogTitle
+                    color = titleColor
                 )
             },
             text = {
                 Text(
                     stringResource(R.string.dialog_home_text),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = titleColor
                 )
             },
             confirmButton = {
@@ -75,7 +79,8 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                 }) {
                     Text(
                         stringResource(R.string.confirm),
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
+                        color = titleColor
                     )
                 }
             },
@@ -83,7 +88,8 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                 TextButton(onClick = { showExitDialog = false }) {
                     Text(
                         stringResource(R.string.cancel),
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
+                        color = titleColor
                     )
                 }
             }
@@ -138,7 +144,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                         .align(Alignment.Center)
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.9f)
+                        containerColor = cardBackground
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -151,7 +157,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             text = stringResource(R.string.select_mode),
                             style = MaterialTheme.typography.displayMedium,
                             modifier = Modifier.padding(bottom = 8.dp),
-                            color = HomeDialogTitle,
+                            color = titleColor,
                             textAlign = TextAlign.Center
                         )
 
@@ -205,7 +211,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             Text(
                                 stringResource(R.string.back),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = HomeBackText
+                                color = if (isDarkTheme) CardLight else CardDark
                             )
                         }
                     }
