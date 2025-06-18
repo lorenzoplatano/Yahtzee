@@ -90,8 +90,8 @@ class MainActivity : ComponentActivity() {
                     onLanguageChange = onLanguageChange
                 )
             }
-            composable("game_1vs1") { MultiplayerGameScreen(navController) }
-            composable("game") { SinglePlayerGameScreen(navController) }
+            composable("game_1vs1") { MultiplayerGameScreen(navController, isDarkTheme) }
+            composable("game") { SinglePlayerGameScreen(navController, isDarkTheme) }
         }
     }
 }
