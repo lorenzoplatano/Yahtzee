@@ -22,10 +22,11 @@
     <string name="game_rules">There are different combinations that each player must achieve by rolling the dice. When a combination is obtained, the player earns the score for that combination. A combination cannot be repeated, so the game ends after 13 rounds of dice rolling, even when not all combinations have been achieved.\n\nDuring each turn, the player can roll the dice three times. On the first roll, the player rolls all dice, while in the subsequent two rolls, the player can choose to hold one or more favorable dice to achieve the desired combination. The player can also choose not to hold any dice or not to use subsequent rolls, for example if a useful combination has already been achieved. At the end of the three rolls, the player must record a score in one of the boxes on the scorecard not yet used. If at the end of the game turn, none of the possible combinations still "free" on the board is achieved, the player must mark "0" (zero) in one of the boxes still at their disposal.</string>
 
     <!-- Dialog Home -->
-    <string name="dialog_home_title">Are you sure?</string>
+    <string name="dialog_title">Are you sure?</string>
     <string name="dialog_home_text">Do you really want to return to the home? Current progress will be lost.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="dialog_reset_text">Do you really want to restart the game? Current progress will be lost.</string>
 
     <!-- Schermata di gioco -->
     <string name="combination">Combination</string>
@@ -58,4 +59,10 @@
     <string name="singleplayer">SINGLEPLAYER</string>
     <string name="multiplayer">MULTIPLAYER</string>
     <string name="back">Back</string>
+
+    <!-- Multiplayer -->
+    <string name="win_message">%1$s wins %2$d-%3$d!</string>
+    <string name="pareggio">Draw! %1$d-%2$d</string>
+    <string name="player1">Player 1</string>
+    <string name="player2">Player 2</string>
 </resources>
