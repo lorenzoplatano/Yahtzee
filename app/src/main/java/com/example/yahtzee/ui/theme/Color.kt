@@ -46,3 +46,6 @@ val HistoryStart = Color(0xFFFF9800)
 val HistoryEnd = Color(0xFFFF5722)
 val HomeBackText = Color(0xFF764BA2)
 val HomeDialogTitle = Color(0xFF1A1A1A)
+
+val SettingsCardLight = Color(0xFFF5F5F5)
+val SettingsCardDark = Color(0xFF212121)

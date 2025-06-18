@@ -38,7 +38,7 @@ import java.util.*
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    darkTheme: Boolean
+    isDarkTheme: Boolean
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
@@ -52,96 +52,101 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState
 
-    // Usa il tema HistoryTheme per colori e Typography centralizzati
-    HistoryTheme(darkTheme = darkTheme) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Background image
-            Image(
-                painter = painterResource(id = R.drawable.sfondo_generale),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+    // Colori dinamici dal tema
+    val cardBackground = if (isDarkTheme) CardDark else CardLight
+    val overlayColor = if (isDarkTheme) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.3f)
+    val iconTint = Color.White
+    val titleColor = mainTextColor(isDarkTheme)
 
-            // Semi-transparent overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Background image
+        Image(
+            painter = painterResource(id = R.drawable.sfondo_generale),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
-            // History card
-            Card(
-                modifier = Modifier
-                    .widthIn(max = 450.dp)
-                    .fillMaxWidth(0.9f)
-                    .padding(16.dp)
-                    .align(Alignment.Center)
-                    .shadow(8.dp, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+        // Semi-transparent overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+        )
+
+        // History card
+        Card(
+            modifier = Modifier
+                .widthIn(max = 450.dp)
+                .fillMaxWidth(0.9f)
+                .padding(16.dp)
+                .align(Alignment.Center)
+                .shadow(8.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = cardBackground)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Text(
+                    text = "Storico Partite",
+                    style = MaterialTheme.typography.displaySmall,
+                    color = titleColor,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Storico Partite",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = HomeDialogTitle,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                    SortableColumnHeader(
+                        title = "Data",
+                        isSorted = uiState.sortColumn == SortColumn.DATE,
+                        ascending = uiState.sortOrder == SortOrder.ASC,
+                        onClick = { viewModel.onSortChange(SortColumn.DATE) },
+                        isDarkTheme = isDarkTheme
                     )
+                    SortableColumnHeader(
+                        title = "Punteggio",
+                        isSorted = uiState.sortColumn == SortColumn.SCORE,
+                        ascending = uiState.sortOrder == SortOrder.ASC,
+                        onClick = { viewModel.onSortChange(SortColumn.SCORE) },
+                        isDarkTheme = isDarkTheme
+                    )
+                }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        SortableColumnHeader(
-                            title = "Data",
-                            isSorted = uiState.sortColumn == SortColumn.DATE,
-                            ascending = uiState.sortOrder == SortOrder.ASC,
-                            onClick = { viewModel.onSortChange(SortColumn.DATE) }
-                        )
-                        SortableColumnHeader(
-                            title = "Punteggio",
-                            isSorted = uiState.sortColumn == SortColumn.SCORE,
-                            ascending = uiState.sortOrder == SortOrder.ASC,
-                            onClick = { viewModel.onSortChange(SortColumn.SCORE) }
-                        )
-                    }
-
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(uiState.history) { entry ->
-                            HistoryRow(entry)
-                        }
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(uiState.history) { entry ->
+                        HistoryRow(entry, isDarkTheme)
                     }
                 }
             }
-
-            // Navigation icons
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Impostazioni",
-                tint = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 40.dp, end = 16.dp)
-                    .size(32.dp)
-                    .clickable { navController.navigate("settings") }
-            )
-
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Home",
-                tint = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 80.dp, end = 16.dp)
-                    .size(32.dp)
-                    .clickable { navController.navigate("homepage") }
-            )
         }
+
+        // Navigation icons
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = "Impostazioni",
+            tint = iconTint,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 40.dp, end = 16.dp)
+                .size(32.dp)
+                .clickable { navController.navigate("settings") }
+        )
+
+        Icon(
+            imageVector = Icons.Default.Home,
+            contentDescription = "Home",
+            tint = iconTint,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 80.dp, end = 16.dp)
+                .size(32.dp)
+                .clickable { navController.navigate("homepage") }
+        )
     }
 }
 
@@ -150,8 +155,10 @@ fun SortableColumnHeader(
     title: String,
     isSorted: Boolean,
     ascending: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isDarkTheme: Boolean
 ) {
+    val titleColor = mainTextColor(isDarkTheme)
     Row(
         modifier = Modifier.clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
@@ -159,22 +166,23 @@ fun SortableColumnHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = HomeDialogTitle
+            color = titleColor
         )
         if (isSorted) {
             Icon(
                 imageVector = if (ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = HomeDialogTitle
+                tint = titleColor
             )
         }
     }
 }
 
 @Composable
-fun HistoryRow(entry: GameHistoryEntry) {
+fun HistoryRow(entry: GameHistoryEntry, isDarkTheme: Boolean) {
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val titleColor = mainTextColor(isDarkTheme)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,12 +192,12 @@ fun HistoryRow(entry: GameHistoryEntry) {
         Text(
             text = dateFormat.format(entry.date),
             style = MaterialTheme.typography.bodyMedium,
-            color = HomeDialogTitle
+            color = titleColor
         )
         Text(
             text = entry.score.toString(),
             style = MaterialTheme.typography.bodyMedium,
-            color = HomeDialogTitle
+            color = titleColor
         )
     }
 }
