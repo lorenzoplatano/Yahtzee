@@ -32,29 +32,30 @@ import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.*
 
 @Composable
-fun Homepage(navController: NavController, isDarkTheme: Boolean) {
+fun Homepage(
+    navController: NavController,
+    isDarkTheme: Boolean,
+    showModeSelection: Boolean = false,
+    onModeSelectionChanged: (Boolean) -> Unit = {}
+) {
     val context = LocalContext.current
     var showExitDialog by remember { mutableStateOf(false) }
-    var showModeDialog by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
     val isCompactScreen = screenHeight < 600.dp
-    val buttonWidth = (screenWidth * 0.8f).coerceAtMost(400.dp)
     val buttonTextSize = if (isCompactScreen) 16.sp else 18.sp
 
     val cardBackground = if (isDarkTheme) CardDark else CardLight
     val titleColor = mainTextColor(isDarkTheme)
 
-    val backgroundRes = if (!showModeDialog) R.drawable.chunky else R.drawable.sfondo_generale
-
+    val backgroundRes = if (!showModeSelection) R.drawable.chunky else R.drawable.sfondo_generale
 
     BackHandler {
         showExitDialog = true
     }
-
 
     if (showExitDialog) {
         AlertDialog(
@@ -97,7 +98,6 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
         )
     }
 
-
     Box(modifier = Modifier.fillMaxSize()) {
 
         Image(
@@ -117,7 +117,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (!showModeDialog) {
+            if (!showModeSelection) {
                 Column(
                     modifier = Modifier
                         .widthIn(max = 400.dp)
@@ -130,7 +130,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                     GenericButton(
                         text = stringResource(R.string.touch_to_continue),
                         icon = Icons.Default.PlayArrow,
-                        onClick = { showModeDialog = true },
+                        onClick = { onModeSelectionChanged(true) },
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = buttonTextSize,
                         gradientColors = HomeButtonGradient
@@ -206,7 +206,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                         }
 
                         TextButton(
-                            onClick = { showModeDialog = false },
+                            onClick = { onModeSelectionChanged(false) },
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
                             Text(
