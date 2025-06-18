@@ -41,7 +41,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
+fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, shakeTrigger: Int = 0) {
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -116,6 +116,12 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
                 animationDone = true
                 showPreviews = true
             }
+        }
+    }
+
+    LaunchedEffect(shakeTrigger) {
+        if (shakeTrigger > 0) {
+            rollDiceWithAnimation()
         }
     }
 
