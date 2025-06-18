@@ -150,7 +150,7 @@ fun Settings(
                     )
 
                     TextButton(
-                        onClick = { navController.navigate("homepage") }
+                        onClick = { navController.popBackStack() }
                     ) {
                         Text(
                             text = stringResource(id = R.string.back),
