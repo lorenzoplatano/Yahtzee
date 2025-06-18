@@ -94,7 +94,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         Image(
-            painter = painterResource(id = R.drawable.chunky),
+            painter = painterResource(id = backgroundRes),
             contentDescription = stringResource(R.string.app_name),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
