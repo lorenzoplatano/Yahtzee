@@ -81,7 +81,7 @@ fun Settings(
     val titleColor = mainTextColor(isDarkTheme)
     val cardBackground = if (isDarkTheme) CardDark else CardLight
 
-        Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
 
             Image(
                 painter = painterResource(id = R.drawable.sfondo_generale),
