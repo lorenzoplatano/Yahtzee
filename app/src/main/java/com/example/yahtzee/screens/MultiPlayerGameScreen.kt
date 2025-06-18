@@ -24,7 +24,9 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,10 +39,11 @@ import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import com.example.yahtzee.ui.theme.MultiPlayerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.compareTo
+import kotlin.text.compareTo
 
 @Composable
 fun MultiplayerGameScreen(navController: NavController) {
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
@@ -74,19 +77,19 @@ fun MultiplayerGameScreen(navController: NavController) {
         "Small Straight", "Large Straight", "Yahtzee", "Chance"
     )
     val combinationLabels = mapOf(
-        "Aces" to "Aces",
-        "Twos" to "Twos",
-        "Threes" to "Threes",
-        "Fours" to "Fours",
-        "Fives" to "Fives",
-        "Sixes" to "Sixes",
-        "Three of a Kind" to "Three of a Kind",
-        "Four of a Kind" to "Four of a Kind",
-        "Full House" to "Full House",
-        "Small Straight" to "Small Straight",
-        "Large Straight" to "Large Straight",
-        "Yahtzee" to "Yahtzee",
-        "Chance" to "Chance"
+        "Aces" to stringResource(id = R.string.aces),
+        "Twos" to stringResource(id = R.string.twos),
+        "Threes" to stringResource(id = R.string.threes),
+        "Fours" to stringResource(id = R.string.fours),
+        "Fives" to stringResource(id = R.string.fives),
+        "Sixes" to stringResource(id = R.string.sixes),
+        "Three of a Kind" to stringResource(id = R.string.three_of_a_kind),
+        "Four of a Kind" to stringResource(id = R.string.four_of_a_kind),
+        "Full House" to stringResource(id = R.string.full_house),
+        "Small Straight" to stringResource(id = R.string.small_straight),
+        "Large Straight" to stringResource(id = R.string.large_straight),
+        "Yahtzee" to stringResource(id = R.string.yahtzee),
+        "Chance" to stringResource(id = R.string.chance)
     )
 
     val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
@@ -100,6 +103,7 @@ fun MultiplayerGameScreen(navController: NavController) {
     val progressBonusText2 = "${upperSum2.coerceAtMost(63)}/63"
 
     var isRolling by remember { mutableStateOf(false) }
+    var showHomeDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     // Nuova variabile per sapere quando l'animazione è davvero finita
@@ -132,16 +136,39 @@ fun MultiplayerGameScreen(navController: NavController) {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
-                title = { Text("Sei sicuro?") },
-                text = { Text("Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.") },
+                title = { Text(stringResource(id = R.string.dialog_title)) },
+                text = { Text(stringResource(id = R.string.dialog_reset_text)) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.resetGame()
                         showResetDialog = false
-                    }) { Text("Sì") }
+                    }) { Text(stringResource(id = R.string.confirm)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) { Text("Annulla") }
+                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(id = R.string.cancel))  }
+                }
+            )
+        }
+
+        if (showHomeDialog) {
+            AlertDialog(
+                onDismissRequest = { showHomeDialog = false },
+                title = { Text(stringResource(id = R.string.dialog_title)) },
+                text = { Text(stringResource(id = R.string.dialog_home_text)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showHomeDialog = false
+                        navController.navigate("homepage") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }) {
+                        Text(stringResource(id = R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showHomeDialog = false }) {
+                        Text(stringResource(id = R.string.cancel))
+                    }
                 }
             )
         }
@@ -149,7 +176,7 @@ fun MultiplayerGameScreen(navController: NavController) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.chunky),
-                contentDescription = "Background",
+                contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -159,7 +186,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                     .background(Color.Black.copy(alpha = 0.3f))
             )
 
-            // Home button con posizionamento responsive
+            // Home button
             Card(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -173,7 +200,15 @@ fun MultiplayerGameScreen(navController: NavController) {
                         shape = RoundedCornerShape(10.dp)
                     )
                     .zIndex(1f)
-                    .clickable { navController.navigate("homepage") },
+                    .clickable {
+                        if (state.gameEnded) {
+                        // Se la partita è finita, torna direttamente alla home
+                        navController.navigate("homepage")
+                    } else {
+                        // Se la partita è ancora in corso, mostra il dialogo di conferma
+                        showHomeDialog = true
+                    }
+                               },
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -190,7 +225,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Home",
+                        contentDescription = stringResource(id = R.string.back),
                         tint = Color.White,
                         modifier = Modifier.size((22 * scaleFactor).dp)
                     )
@@ -279,7 +314,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                             ) {
                                 Row {
                                     Text(
-                                        text = "COMBINATION",
+                                        text = stringResource(id = R.string.back),
                                         modifier = Modifier.weight(2f),
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
@@ -306,7 +341,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             )
                                     ) {
                                         Text(
-                                            text = "Player 1",
+                                            text = stringResource(id = R.string.player1),
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = (2 * scaleFactor).dp),
@@ -337,7 +372,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             )
                                     ) {
                                         Text(
-                                            text = "Player 2",
+                                            text = stringResource(id = R.string.player2),
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = (2 * scaleFactor).dp),
@@ -365,7 +400,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     when (combination) {
                                         "Bonus" -> {
                                             MultiplayerTableRowStyled(
-                                                combination = "Bonus ($progressBonusText1 | $progressBonusText2)",
+                                                combination = stringResource(id = R.string.bonus) + " ($progressBonusText1 | $progressBonusText2)",
                                                 player1Score = bonus1,
                                                 player2Score = bonus2,
                                                 bold = true,
@@ -378,7 +413,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         }
                                         "Total" -> {
                                             MultiplayerTableRowStyled(
-                                                combination = "TOTAL",
+                                                combination = stringResource(id = R.string.total_score),
                                                 player1Score = totalScore1,
                                                 player2Score = totalScore2,
                                                 bold = true,
@@ -445,8 +480,8 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 val winner = when {
-                                    totalScore1 > totalScore2 -> "Player 1"
-                                    totalScore2 > totalScore1 -> "Player 2"
+                                    totalScore1 > totalScore2 -> stringResource(id = R.string.player1)
+                                    totalScore2 > totalScore1 -> stringResource(id = R.string.player2)
                                     else -> null
                                 }
                                 // Determina il colore in base al vincitore
@@ -457,7 +492,12 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 }
                                 if (winner != null) {
                                     Text(
-                                        text = "$winner vince $totalScore1 - $totalScore2!",
+                                        text = stringResource(
+                                            id = R.string.win_message,
+                                            winner,
+                                            totalScore1,
+                                            totalScore2
+                                        ),
                                         fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         color = winnerColor, // Usa il colore dinamico
@@ -466,7 +506,11 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     )
                                 } else {
                                     Text(
-                                        text = "Pareggio! $totalScore1 - $totalScore2",
+                                        text = stringResource(
+                                            id = R.string.pareggio,
+                                            totalScore1,
+                                            totalScore2
+                                        ),
                                         fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         color = winnerColor, // Usa il colore dinamico
@@ -516,13 +560,13 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Refresh,
-                                                    contentDescription = "Nuova Partita",
+                                                    contentDescription = null,
                                                     tint = Color.White,
                                                     modifier = Modifier.size((24 * scaleFactor).dp)
                                                 )
                                                 Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                                 Text(
-                                                    text = "Nuova Partita",
+                                                    text = stringResource(id = R.string.new_game),
                                                     fontSize = (16 * scaleFactor).sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
@@ -602,13 +646,13 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
-                                        contentDescription = "Roll",
+                                        contentDescription = null,
                                         tint = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
                                         modifier = Modifier.size((20 * scaleFactor).dp)
                                     )
                                     Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                     Text(
-                                        text = "Roll (${state.remainingRolls})",
+                                        text = stringResource(id = R.string.roll) + " (${state.remainingRolls})",
                                         color = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
                                         fontSize = (14 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
@@ -652,13 +696,13 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
-                                        contentDescription = "Reset",
+                                        contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size((20 * scaleFactor).dp)
                                     )
                                     Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                     Text(
-                                        text = "Reset",
+                                        text = stringResource(id = R.string.reset),
                                         color = Color.White,
                                         fontSize = (14 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,

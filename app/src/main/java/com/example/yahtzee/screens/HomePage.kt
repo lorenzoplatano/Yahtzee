@@ -60,7 +60,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
             onDismissRequest = { showExitDialog = false },
             title = {
                 Text(
-                    stringResource(R.string.dialog_home_title),
+                    stringResource(R.string.dialog_title),
                     style = MaterialTheme.typography.headlineMedium,
                     color = titleColor
                 )
