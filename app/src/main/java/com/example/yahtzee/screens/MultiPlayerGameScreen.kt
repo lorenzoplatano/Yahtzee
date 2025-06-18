@@ -31,12 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
-import com.example.yahtzee.ui.theme.MultiPlayerTheme
-import com.example.yahtzee.ui.theme.BothCardDark
-import com.example.yahtzee.ui.theme.BothCardLight
-import com.example.yahtzee.ui.theme.TableDark
-import com.example.yahtzee.ui.theme.TableLight
-import com.example.yahtzee.ui.theme.mainTextColor
+import com.example.yahtzee.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -129,22 +124,22 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
     val cardBackground = if (isDarkTheme) BothCardDark else BothCardLight
     val tableBackground = if (isDarkTheme) TableDark else TableLight
     val titleColor = mainTextColor(isDarkTheme)
-    val dividerColor = if (isDarkTheme) Color(0xFF353A40) else Color(0xFFE2E8F0)
+    val dividerColor = if (isDarkTheme) CardLight else CardDark
 
     MultiPlayerTheme(isPlayerOne = state.isPlayer1Turn) {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
-                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor) },
-                text = { Text(stringResource(id = R.string.dialog_reset_text), color = titleColor) },
+                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor, style = Typography.titleMedium) },
+                text = { Text(stringResource(id = R.string.dialog_reset_text), color = titleColor, style = Typography.bodyMedium) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.resetGame()
                         showResetDialog = false
-                    }) { Text(stringResource(id = R.string.confirm), color = titleColor) }
+                    }) { Text(stringResource(id = R.string.confirm), color = titleColor, style = Typography.labelLarge) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(id = R.string.cancel), color = titleColor) }
+                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(id = R.string.cancel), color = titleColor, style = Typography.labelLarge) }
                 },
                 containerColor = cardBackground
             )
@@ -153,8 +148,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
         if (showHomeDialog) {
             AlertDialog(
                 onDismissRequest = { showHomeDialog = false },
-                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor) },
-                text = { Text(stringResource(id = R.string.dialog_home_text), color = titleColor) },
+                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor, style = Typography.titleMedium) },
+                text = { Text(stringResource(id = R.string.dialog_home_text), color = titleColor, style = Typography.bodyMedium) },
                 confirmButton = {
                     TextButton(onClick = {
                         showHomeDialog = false
@@ -162,12 +157,12 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                             popUpTo(0) { inclusive = true }
                         }
                     }) {
-                        Text(stringResource(id = R.string.confirm), color = titleColor)
+                        Text(stringResource(id = R.string.confirm), color = titleColor, style = Typography.labelLarge)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showHomeDialog = false }) {
-                        Text(stringResource(id = R.string.cancel), color = titleColor)
+                        Text(stringResource(id = R.string.cancel), color = titleColor, style = Typography.labelLarge)
                     }
                 },
                 containerColor = cardBackground
@@ -293,7 +288,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                         modifier = Modifier.weight(2f),
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
-                                        fontSize = (13 * scaleFactor).sp
+                                        fontSize = (13 * scaleFactor).sp,
+                                        style = Typography.titleSmall
                                     )
                                     // Player 1 header
                                     Box(
@@ -323,7 +319,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                             textAlign = TextAlign.Center,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White,
-                                            fontSize = (13 * scaleFactor).sp
+                                            fontSize = (13 * scaleFactor).sp,
+                                            style = Typography.titleSmall
                                         )
                                     }
                                     // Player 2 header
@@ -354,7 +351,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                             textAlign = TextAlign.Center,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White,
-                                            fontSize = (13 * scaleFactor).sp
+                                            fontSize = (13 * scaleFactor).sp,
+                                            style = Typography.titleSmall
                                         )
                                     }
                                 }
@@ -461,8 +459,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                     else -> null
                                 }
                                 val winnerColor = when (winner) {
-                                    "Player 1" -> Color(0xFF4ECDC4)
-                                    "Player 2" -> Color(0xFFFF6B6B)
+                                    stringResource(id = R.string.player1) -> Color(0xFF4ECDC4)
+                                    stringResource(id = R.string.player2) -> Color(0xFFFF6B6B)
                                     else -> Color(0xFF764BA2)
                                 }
                                 if (winner != null) {
@@ -477,7 +475,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                         fontWeight = FontWeight.Bold,
                                         color = winnerColor,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = Typography.titleLarge
                                     )
                                 } else {
                                     Text(
@@ -490,7 +489,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                         fontWeight = FontWeight.Bold,
                                         color = winnerColor,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = Typography.titleLarge
                                     )
                                 }
                                 Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
@@ -517,8 +517,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                                 .background(
                                                     brush = Brush.horizontalGradient(
                                                         colors = when (winner) {
-                                                            "Player 1" -> listOf(Color(0xFF4ECDC4), Color(0xFF2AB7CA))
-                                                            "Player 2" -> listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                                            stringResource(id = R.string.player1) -> listOf(Color(0xFF4ECDC4), Color(0xFF2AB7CA))
+                                                            stringResource(id = R.string.player2) -> listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
                                                             else -> listOf(Color(0xFF667EEA), Color(0xFF764BA2))
                                                         },
                                                         startX = 0f,
@@ -542,7 +542,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                                 Text(
                                                     text = stringResource(id = R.string.new_game),
                                                     fontSize = (16 * scaleFactor).sp,
-                                                    fontWeight = FontWeight.Bold
+                                                    fontWeight = FontWeight.Bold,
+                                                    style = Typography.labelLarge
                                                 )
                                             }
                                         }
@@ -652,7 +653,8 @@ fun MultiplayerTableRow(
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = textColor,
-                fontSize = fontSize
+                fontSize = fontSize,
+                style = if (bold) Typography.titleMedium else Typography.bodyMedium
             )
             Text(
                 text = player1Score?.toString() ?: previewScore.takeIf { isPlayer1Turn }?.toString() ?: "",
@@ -660,7 +662,8 @@ fun MultiplayerTableRow(
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player1TextColor,
-                fontSize = fontSize
+                fontSize = fontSize,
+                style = Typography.bodyMedium
             )
             Text(
                 text = player2Score?.toString() ?: previewScore.takeIf { !isPlayer1Turn }?.toString() ?: "",
@@ -668,7 +671,8 @@ fun MultiplayerTableRow(
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player2TextColor,
-                fontSize = fontSize
+                fontSize = fontSize,
+                style = Typography.bodyMedium
             )
         }
     }
