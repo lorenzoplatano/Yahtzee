@@ -461,8 +461,8 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 }
                                 // Determina il colore in base al vincitore
                                 val winnerColor = when (winner) {
-                                    "Player 1" -> Color(0xFF4ECDC4) // Colore del bottone Roll
-                                    "Player 2" -> Color(0xFFFF6B6B) // Colore del bottone Reset
+                                    stringResource(id = R.string.player1) -> Color(0xFF4ECDC4) // Colore del bottone Roll
+                                    stringResource(id = R.string.player1) -> Color(0xFFFF6B6B) // Colore del bottone Reset
                                     else -> Color(0xFF764BA2) // Colore viola del bottone impostazioni (pareggio)
                                 }
                                 if (winner != null) {
