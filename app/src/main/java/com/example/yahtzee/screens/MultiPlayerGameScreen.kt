@@ -24,11 +24,11 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -39,7 +39,6 @@ import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import com.example.yahtzee.ui.theme.MultiPlayerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.text.compareTo
 
 @Composable
 fun MultiplayerGameScreen(navController: NavController) {
@@ -186,50 +185,24 @@ fun MultiplayerGameScreen(navController: NavController) {
                     .background(Color.Black.copy(alpha = 0.3f))
             )
 
-            // Home button
-            Card(
+            Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(
                         top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
                         end = (screenWidth * 0.04f).coerceAtLeast(12.dp)
                     )
-                    .size((44 * scaleFactor).dp)
-                    .shadow(
-                        elevation = 6.dp,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .zIndex(1f)
-                    .clickable {
-                        if (state.gameEnded) {
-                        // Se la partita è finita, torna direttamente alla home
-                        navController.navigate("homepage")
-                    } else {
-                        // Se la partita è ancora in corso, mostra il dialogo di conferma
-                        showHomeDialog = true
-                    }
-                               },
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(10.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                listOf(Color(0xFF667EEA), Color(0xFF764BA2))
-                            ),
-                            shape = RoundedCornerShape(10.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = stringResource(id = R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size((22 * scaleFactor).dp)
-                    )
-                }
+                HomeButton(
+                    onClick = {
+                        if (state.gameEnded) {
+                            navController.navigate("homepage")
+                        } else {
+                            showHomeDialog = true
+                        }
+                    },
+                    scaleFactor = scaleFactor
+                )
             }
 
             Column(
@@ -258,7 +231,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                         shape = RoundedCornerShape((12 * scaleFactor).dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
-                        MultiGameDiceRow(
+                        MultiDiceRow(
                             diceValues = state.diceValues,
                             heldDice = state.heldDice,
                             onDiceClick = { index ->
@@ -314,7 +287,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                             ) {
                                 Row {
                                     Text(
-                                        text = stringResource(id = R.string.back),
+                                        text = stringResource(id = R.string.combination),
                                         modifier = Modifier.weight(2f),
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
@@ -399,7 +372,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     }
                                     when (combination) {
                                         "Bonus" -> {
-                                            MultiplayerTableRowStyled(
+                                            MultiplayerTableRow(
                                                 combination = stringResource(id = R.string.bonus) + " ($progressBonusText1 | $progressBonusText2)",
                                                 player1Score = bonus1,
                                                 player2Score = bonus2,
@@ -412,7 +385,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             )
                                         }
                                         "Total" -> {
-                                            MultiplayerTableRowStyled(
+                                            MultiplayerTableRow(
                                                 combination = stringResource(id = R.string.total_score),
                                                 player1Score = totalScore1,
                                                 player2Score = totalScore2,
@@ -434,7 +407,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                                     state.hasRolledAtLeastOnce &&
                                                     showPreviews && animationDone &&
                                                     ((state.isPlayer1Turn && player1Score == null) || (!state.isPlayer1Turn && player2Score == null))
-                                            MultiplayerTableRowStyled(
+                                            MultiplayerTableRow(
                                                 combination = combinationLabels[combination] ?: combination,
                                                 player1Score = player1Score,
                                                 player2Score = player2Score,
@@ -580,139 +553,20 @@ fun MultiplayerGameScreen(navController: NavController) {
                 }
             }
 
-            if(!state.gameEnded){// Bottoni in basso con dimensioni responsive
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = (screenWidth * 0.03f).coerceAtLeast(12.dp),
-                        end = (screenWidth * 0.03f).coerceAtLeast(12.dp),
-                        bottom = (screenHeight * 0.03f).coerceAtLeast(56.dp)
-                    )
-                    .align(Alignment.BottomCenter)
-                    .shadow(elevation = 8.dp, shape = RoundedCornerShape((16 * scaleFactor).dp)),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape((16 * scaleFactor).dp)
-            ) {
+            if (!state.gameEnded) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height((68 * scaleFactor).dp)
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                listOf(Color(0xFF667EEA), Color(0xFF764BA2))
-                            ),
-                            shape = RoundedCornerShape((16 * scaleFactor).dp)
-                        )
-                        .padding(horizontal = (8 * scaleFactor).dp, vertical = (6 * scaleFactor).dp),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        // Pulsante "Roll" con dimensioni relative
-                        Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height((52 * scaleFactor).dp)
-                                .shadow(
-                                    elevation = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 8.dp else 4.dp,
-                                    shape = RoundedCornerShape((12 * scaleFactor).dp)
-                                )
-                                .clip(RoundedCornerShape((12 * scaleFactor).dp))
-                                .clickable(
-                                    enabled = state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld,
-                                    onClick = { rollDiceWithAnimation() }
-                                ),
-                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                            shape = RoundedCornerShape((12 * scaleFactor).dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        brush = Brush.horizontalGradient(
-                                            listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
-                                        ),
-                                        shape = RoundedCornerShape((12 * scaleFactor).dp)
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Refresh,
-                                        contentDescription = null,
-                                        tint = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
-                                        modifier = Modifier.size((20 * scaleFactor).dp)
-                                    )
-                                    Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
-                                    Text(
-                                        text = stringResource(id = R.string.roll) + " (${state.remainingRolls})",
-                                        color = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
-                                        fontSize = (14 * scaleFactor).sp,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
-
-                        // Pulsante "Reset" con dimensioni relative
-                        Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height((52 * scaleFactor).dp)
-                                .shadow(
-                                    elevation = 8.dp,
-                                    shape = RoundedCornerShape((12 * scaleFactor).dp)
-                                )
-                                .clip(RoundedCornerShape((12 * scaleFactor).dp))
-                                .clickable { showResetDialog = true },
-                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                            shape = RoundedCornerShape((12 * scaleFactor).dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        brush = Brush.horizontalGradient(
-                                            listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
-                                        ),
-                                        shape = RoundedCornerShape((12 * scaleFactor).dp)
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Refresh,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size((20 * scaleFactor).dp)
-                                    )
-                                    Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
-                                    Text(
-                                        text = stringResource(id = R.string.reset),
-                                        color = Color.White,
-                                        fontSize = (14 * scaleFactor).sp,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
-                                    )}
-                                }
-                            }
-                        }
-                    }
+                    GameControlButtons(
+                        onRollClick = { rollDiceWithAnimation() },
+                        onResetClick = { showResetDialog = true },
+                        remainingRolls = state.remainingRolls,
+                        allDiceHeld = allDiceHeld,
+                        isGameEnded = state.gameEnded,
+                        scaleFactor = scaleFactor,
+                        screenWidth = screenWidth,
+                        screenHeight = screenHeight
+                    )
                 }
             }
         }
@@ -720,14 +574,13 @@ fun MultiplayerGameScreen(navController: NavController) {
 }
 
 @Composable
-fun MultiplayerTableRowStyled(
+fun MultiplayerTableRow(
     combination: String,
     player1Score: Int?,
     player2Score: Int?,
     previewScore: Int? = null,
     enabled: Boolean = false,
     onClick: () -> Unit = {},
-    header: Boolean = false,
     bold: Boolean = false,
     alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
@@ -825,9 +678,9 @@ fun MultiplayerTableRowStyled(
 }
 
 @Composable
-fun MultiDiceWithDots(
+fun Dice(
     value: Int,
-    size: androidx.compose.ui.unit.Dp,
+    size: Dp,
     dotColor: Color = Color.Black
 ) {
     val dotSize = size / 5
@@ -986,14 +839,15 @@ fun MultiDiceWithDots(
 }
 
 @Composable
-fun MultiGameDiceRow(
+fun MultiDiceRow(
     diceValues: List<Int>,
     heldDice: List<Boolean>,
     onDiceClick: (Int) -> Unit,
     enabled: Boolean,
-    diceSize: androidx.compose.ui.unit.Dp = 50.dp,
+    diceSize: Dp = 50.dp,
     isRolling: Boolean = false,
-    isPlayer1Turn: Boolean = true
+    isPlayer1Turn: Boolean = true,
+    isSinglePlayer: Boolean = false
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -1074,20 +928,21 @@ fun MultiGameDiceRow(
                         .fillMaxSize()
                         .background(
                             brush = if (heldDice[index]) {
-                                if (isPlayer1Turn) {
-                                    // Colori per Player 1 (verde-acqua)
-                                    Brush.horizontalGradient(
+                                // In modalità giocatore singolo o se è il turno del giocatore 1 in multiplayer,
+                                // usa sempre il gradiente per il giocatore 1
+                                if (isSinglePlayer || isPlayer1Turn) {
+                                    Brush.linearGradient(
                                         listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
                                     )
                                 } else {
-                                    // Colori per Player 2 (rosso-arancio)
-                                    Brush.horizontalGradient(
+                                    // Solo in modalità multiplayer quando è il turno del giocatore 2
+                                    Brush.linearGradient(
                                         listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
                                     )
                                 }
                             } else {
-                                Brush.horizontalGradient(
-                                    listOf(Color(0xFFF7FAFC), Color(0xFFEDF2F7))
+                                Brush.linearGradient(
+                                    listOf(Color(0xFFF8F9FA), Color(0xFFE9ECEF))
                                 )
                             },
                             shape = RoundedCornerShape((8 * scaleFactor).dp)
@@ -1109,11 +964,197 @@ fun MultiGameDiceRow(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        MultiDiceWithDots(
+                        Dice(
                             value = value,
                             size = diceSize * 0.8f,
                             dotColor = if (heldDice[index]) Color.White else Color(0xFF2D3748)
                         )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun HomeButton(
+    onClick: () -> Unit,
+    scaleFactor: Float,
+) {
+    Card(
+        modifier = Modifier
+            .size((44 * scaleFactor).dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .zIndex(1f)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = stringResource(id = R.string.back),
+                tint = Color.White,
+                modifier = Modifier.size((22 * scaleFactor).dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun GameControlButtons(
+    onRollClick: () -> Unit,
+    onResetClick: () -> Unit,
+    remainingRolls: Int,
+    allDiceHeld: Boolean,
+    isGameEnded: Boolean,
+    scaleFactor: Float,
+    screenWidth: Dp,
+    screenHeight: Dp
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = (screenWidth * 0.03f).coerceAtLeast(12.dp),
+                end = (screenWidth * 0.03f).coerceAtLeast(12.dp),
+                bottom = (screenHeight * 0.03f).coerceAtLeast(56.dp)
+            )
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape((16 * scaleFactor).dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape((16 * scaleFactor).dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((68 * scaleFactor).dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                    ),
+                    shape = RoundedCornerShape((16 * scaleFactor).dp)
+                )
+                .padding(horizontal = (8 * scaleFactor).dp, vertical = (6 * scaleFactor).dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // Pulsante "Roll"
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height((52 * scaleFactor).dp)
+                        .shadow(
+                            elevation = if (remainingRolls > 0 && !allDiceHeld) 8.dp else 4.dp,
+                            shape = RoundedCornerShape((12 * scaleFactor).dp)
+                        )
+                        .clip(RoundedCornerShape((12 * scaleFactor).dp))
+                        .clickable(
+                            enabled = remainingRolls > 0 && !isGameEnded && !allDiceHeld,
+                            onClick = onRollClick
+                        ),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape((12 * scaleFactor).dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                ),
+                                shape = RoundedCornerShape((12 * scaleFactor).dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = if (remainingRolls > 0 && !allDiceHeld) 1f else 0.6f),
+                                modifier = Modifier.size((20 * scaleFactor).dp)
+                            )
+                            Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                            Text(
+                                text = stringResource(id = R.string.roll) + " (${remainingRolls})",
+                                color = Color.White.copy(alpha = if (remainingRolls > 0 && !allDiceHeld) 1f else 0.6f),
+                                fontSize = (14 * scaleFactor).sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
+
+                // Pulsante "Reset"
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height((52 * scaleFactor).dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape((12 * scaleFactor).dp)
+                        )
+                        .clip(RoundedCornerShape((12 * scaleFactor).dp))
+                        .clickable(onClick = onResetClick),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape((12 * scaleFactor).dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                ),
+                                shape = RoundedCornerShape((12 * scaleFactor).dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size((20 * scaleFactor).dp)
+                            )
+                            Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                            Text(
+                                text = stringResource(id = R.string.reset),
+                                color = Color.White,
+                                fontSize = (14 * scaleFactor).sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
+                            )
+                        }
                     }
                 }
             }
