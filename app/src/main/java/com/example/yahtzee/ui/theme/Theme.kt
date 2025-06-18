@@ -37,6 +37,7 @@ val TableLight = Color.White.copy(alpha = 0.96f)
 val TableDark = Color(0xFF23272E).copy(alpha = 0.96f)
 
 fun yahtzeeCardColor(isDarkTheme: Boolean): Color = if (isDarkTheme) BothCardDark else BothCardLight
+
 fun yahtzeeTableColor(isDarkTheme: Boolean): Color = if (isDarkTheme) TableDark else TableLight
 
 
@@ -93,40 +94,6 @@ private val RedColorScheme = lightColorScheme(
     surface = Red100,
     onSurface = Red900,
 )
-
-//  Gradient background composable serve a creare un box che riempie lo schermo e applica uno sfondo
-
-
-@Composable
-fun DarkGradientBackground(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Blue900, Blue800, Blue700)
-                )
-            )
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun BlueGradientBackground(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Blue100, Blue400, Blue700)
-                )
-            )
-    ) {
-        content()
-    }
-}
-
 
 @Composable
 fun SinglePlayerTheme(content: @Composable () -> Unit) {
