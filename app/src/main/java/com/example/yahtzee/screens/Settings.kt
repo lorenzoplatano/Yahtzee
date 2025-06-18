@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -50,6 +51,9 @@ import com.example.yahtzee.localization.AppLanguage
 import com.example.yahtzee.localization.LocalLocalizationManager
 import com.example.yahtzee.screens.components.ModernGameButton
 import com.example.yahtzee.ui.theme.SettingsTheme
+import com.example.yahtzee.ui.theme.SettingsButtonGradient
+import com.example.yahtzee.ui.theme.HomeDialogTitle
+import com.example.yahtzee.ui.theme.HomeBackText
 
 // Stato iniziale delle impostazioni
 private val initialSettings = SettingsState(
@@ -80,105 +84,111 @@ fun Settings(
     val isCompactScreen = screenHeight < 600.dp
     val buttonFontSize = if (isCompactScreen) 16.sp else 18.sp
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Sfondo
-        Image(
-            painter = painterResource(id = R.drawable.sfondo_generale),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        // Overlay scuro
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+    SettingsTheme(darkTheme = isDarkTheme) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Sfondo
+            Image(
+                painter = painterResource(id = R.drawable.sfondo_generale),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            // Overlay scuro
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
 
-        // Card contenente le impostazioni
-        Card(
-            modifier = Modifier
-
-                .widthIn(max = 450.dp)
-                .fillMaxWidth(0.9f)
-                .padding(16.dp)
-                .align(Alignment.Center)
-                .shadow(8.dp, RoundedCornerShape(16.dp)),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Card contenente le impostazioni
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 450.dp)
+                    .fillMaxWidth(0.9f)
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .shadow(8.dp, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
             ) {
-                Text(
-                    text = stringResource(R.string.settings_title),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = buttonFontSize.times(1.1f),
-                    color = Color(0xFF1A1A1A)
-                )
-
-                ModernGameButton(
-                    text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
-                    icon = Icons.Default.Person,
-                    onClick = { showLanguageDialog = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = buttonFontSize,
-                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
-                )
-
-                ModernGameButton(
-                    text = stringResource(id = R.string.theme),
-                    icon = Icons.Default.Settings,
-                    onClick = { onThemeChange(!isDarkTheme) },
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = buttonFontSize,
-                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
-                )
-
-                ModernGameButton(
-                    text = stringResource(id = R.string.rules),
-                    icon = Icons.Default.History,
-                    onClick = { showRulesDialog = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = buttonFontSize,
-                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
-                )
-
-                ModernGameButton(
-                    text = stringResource(id = R.string.reset_settings),
-                    icon = Icons.Default.Settings,
-                    onClick = {
-                        settingsState = initialSettings
-                        onThemeChange(false)
-                        if (initialSettings.language != localizationManager.getCurrentLanguage()) {
-                            onLanguageChange(initialSettings.language)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = buttonFontSize,
-                    gradientColors = listOf(Color(0xFF43CEA2), Color(0xFF185A9D))
-                )
-
-                TextButton(
-                    onClick = { navController.navigate("homepage") }
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = stringResource(id = R.string.back), color = Color(0xFF764BA2))
+                    Text(
+                        text = stringResource(R.string.settings_title),
+                        style = MaterialTheme.typography.displayMedium,
+                        color = HomeDialogTitle,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+
+                    ModernGameButton(
+                        text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
+                        icon = Icons.Default.Person,
+                        onClick = { showLanguageDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = buttonFontSize,
+                        gradientColors = SettingsButtonGradient
+                    )
+
+                    ModernGameButton(
+                        text = stringResource(id = R.string.theme),
+                        icon = Icons.Default.Settings,
+                        onClick = { onThemeChange(!isDarkTheme) },
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = buttonFontSize,
+                        gradientColors = SettingsButtonGradient
+                    )
+
+                    ModernGameButton(
+                        text = stringResource(id = R.string.rules),
+                        icon = Icons.Default.History,
+                        onClick = { showRulesDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = buttonFontSize,
+                        gradientColors = SettingsButtonGradient
+                    )
+
+                    ModernGameButton(
+                        text = stringResource(id = R.string.reset_settings),
+                        icon = Icons.Default.Settings,
+                        onClick = {
+                            settingsState = initialSettings
+                            onThemeChange(false)
+                            if (initialSettings.language != localizationManager.getCurrentLanguage()) {
+                                onLanguageChange(initialSettings.language)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = buttonFontSize,
+                        gradientColors = SettingsButtonGradient
+                    )
+
+                    TextButton(
+                        onClick = { navController.navigate("homepage") }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.back),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = HomeBackText
+                        )
+                    }
                 }
             }
-        }
 
-        if (showLanguageDialog) {
-            LanguageDialog(
-                currentLanguage = settingsState.language,
-                onSelectLanguage = { lang ->
-                    settingsState = settingsState.copy(language = lang)
-                    onLanguageChange(lang)
-                    showLanguageDialog = false
-                },
-                onDismiss = { showLanguageDialog = false }
-            )
-        }
+            if (showLanguageDialog) {
+                LanguageDialog(
+                    currentLanguage = settingsState.language,
+                    onSelectLanguage = { lang ->
+                        settingsState = settingsState.copy(language = lang)
+                        onLanguageChange(lang)
+                        showLanguageDialog = false
+                    },
+                    onDismiss = { showLanguageDialog = false }
+                )
+            }
 
-        if (showRulesDialog) {
-            RulesDialog(onDismiss = { showRulesDialog = false })
+            if (showRulesDialog) {
+                RulesDialog(onDismiss = { showRulesDialog = false })
+            }
         }
     }
 }
@@ -191,7 +201,13 @@ fun LanguageDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.select_language)) },
+        title = {
+            Text(
+                stringResource(id = R.string.select_language),
+                style = MaterialTheme.typography.headlineMedium,
+                color = HomeDialogTitle
+            )
+        },
         text = {
             Column {
                 Text(
@@ -200,7 +216,9 @@ fun LanguageDialog(
                         .fillMaxWidth()
                         .clickable { onSelectLanguage(AppLanguage.ITALIAN) }
                         .padding(8.dp),
-                    fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal,
+                    color = HomeDialogTitle
                 )
                 Text(
                     AppLanguage.ENGLISH.displayName,
@@ -208,7 +226,9 @@ fun LanguageDialog(
                         .fillMaxWidth()
                         .clickable { onSelectLanguage(AppLanguage.ENGLISH) }
                         .padding(8.dp),
-                    fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal,
+                    color = HomeDialogTitle
                 )
             }
         },
@@ -225,20 +245,24 @@ fun RulesDialog(
         title = {
             Text(
                 stringResource(id = R.string.rules_title),
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.headlineMedium,
+                color = HomeDialogTitle
             )
         },
         text = {
             Column {
                 Text(
                     stringResource(id = R.string.game_rules),
-                    fontSize = 15.sp
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(id = R.string.ok_button))
+                Text(
+                    stringResource(id = R.string.ok_button),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     )
