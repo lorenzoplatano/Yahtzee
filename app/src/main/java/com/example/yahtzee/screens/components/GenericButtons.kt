@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ModernGameButton(
+fun GenericButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,

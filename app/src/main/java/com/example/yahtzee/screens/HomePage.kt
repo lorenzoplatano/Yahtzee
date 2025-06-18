@@ -28,9 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yahtzee.R
-import com.example.yahtzee.screens.components.ModernGameButton
+import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.*
-import kotlin.times
 
 @Composable
 fun Homepage(navController: NavController, isDarkTheme: Boolean) {
@@ -48,6 +47,9 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
 
     val cardBackground = if (isDarkTheme) CardDark else CardLight
     val titleColor = mainTextColor(isDarkTheme)
+
+    val backgroundRes = if (!showModeDialog) R.drawable.chunky else R.drawable.sfondo_generale
+
 
     BackHandler {
         showExitDialog = true
@@ -95,7 +97,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
             }
         )
     }
-    val backgroundRes = if (!showModeDialog) R.drawable.chunky else R.drawable.sfondo_generale
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -126,7 +128,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                         .offset(y = (screenHeight * 0.20f)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ModernGameButton(
+                    GenericButton(
                         text = stringResource(R.string.touch_to_continue),
                         icon = Icons.Default.PlayArrow,
                         onClick = { showModeDialog = true },
@@ -161,7 +163,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             textAlign = TextAlign.Center
                         )
 
-                        ModernGameButton(
+                        GenericButton(
                             text = stringResource(R.string.singleplayer),
                             icon = Icons.Default.Person,
                             onClick = { navController.navigate("game") },
@@ -170,7 +172,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             gradientColors = SinglePlayerGradient
                         )
 
-                        ModernGameButton(
+                        GenericButton(
                             text = stringResource(R.string.multiplayer),
                             icon = Icons.Default.Groups,
                             onClick = { navController.navigate("game_1vs1") },
@@ -185,7 +187,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
                         ) {
-                            ModernGameButton(
+                            GenericButton(
                                 text = stringResource(R.string.settings_title),
                                 icon = Icons.Default.Settings,
                                 onClick = { navController.navigate("settings") },
@@ -194,7 +196,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                                 gradientColors = SettingsGradient
                             )
 
-                            ModernGameButton(
+                            GenericButton(
                                 text = stringResource(R.string.history),
                                 icon = Icons.Default.History,
                                 onClick = { navController.navigate("history") },
