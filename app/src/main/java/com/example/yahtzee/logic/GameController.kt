@@ -1,6 +1,6 @@
 package com.example.yahtzee.logic
 
-import com.example.yahtzee.model.GameState
+import com.example.yahtzee.model.GameStateMultiplayer
 
 class GameController {
     companion object {
@@ -65,8 +65,8 @@ class GameController {
         return combinations.all { scoreMap[it] != null }
     }
 
-    fun resetGame(): GameState {
-        return GameState(
+    fun resetGame(): GameStateMultiplayer {
+        return GameStateMultiplayer(
             diceValues = List(5) { null },  // Inizializza i dadi con valori nulli
             scoreMap = combinations.associateWith { null }.toMutableMap(),
             remainingRolls = 3,
