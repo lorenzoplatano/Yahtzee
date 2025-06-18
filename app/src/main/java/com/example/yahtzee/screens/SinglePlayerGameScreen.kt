@@ -187,7 +187,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Sfondo
             Image(
-                painter = painterResource(id = R.drawable.chunky),
+                painter = painterResource(id = R.drawable.sfondo_generale),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
