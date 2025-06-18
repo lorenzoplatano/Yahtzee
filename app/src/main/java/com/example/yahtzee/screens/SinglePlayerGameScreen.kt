@@ -614,7 +614,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
             if (showHomeDialog) {
                 AlertDialog(
                     onDismissRequest = { showHomeDialog = false },
-                    title = { Text(stringResource(id = R.string.dialog_home_title)) },
+                    title = { Text(stringResource(id = R.string.dialog_title)) },
                     text = { Text(stringResource(id = R.string.dialog_home_text)) },
                     confirmButton = {
                         TextButton(onClick = {
