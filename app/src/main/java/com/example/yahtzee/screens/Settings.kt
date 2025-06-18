@@ -46,7 +46,6 @@ import com.example.yahtzee.localization.LocalLocalizationManager
 import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.CardDark
 import com.example.yahtzee.ui.theme.CardLight
-import com.example.yahtzee.ui.theme.SettingsTheme
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 import com.example.yahtzee.ui.theme.mainTextColor
 
@@ -82,7 +81,6 @@ fun Settings(
     val titleColor = mainTextColor(isDarkTheme)
     val cardBackground = if (isDarkTheme) CardDark else CardLight
 
-    SettingsTheme(darkTheme = isDarkTheme) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Sfondo
             Image(
@@ -181,7 +179,7 @@ fun Settings(
             }
         }
     }
-}
+
 
 @Composable
 fun LanguageDialog(
