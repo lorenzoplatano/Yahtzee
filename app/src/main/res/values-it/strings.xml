@@ -8,12 +8,10 @@
     <string name="history">Storico Partite</string>
     
     <!-- Impostazioni -->
-    <string name="theme">Tema</string>
     <string name="dark_theme">Scuro</string>
     <string name="light_theme">Chiaro</string>
     <string name="language">Lingua</string>
     <string name="rules">Regole</string>
-    <string name="reset_settings">Reset Impostazioni</string>
     
     <!-- Pulsanti e azioni -->
     <string name="ok_button">OK</string>
@@ -48,7 +46,6 @@
     <string name="total_score">Totale</string>
     <string name="roll">Lancia</string>
     <string name="reset">Reset</string>
-    <string name="game_ended">Partita Terminata!</string>
     <string name="final_score">Punteggio finale: %1$d</string>
     <string name="new_record">NUOVO RECORD!</string>
     <string name="new_game">Nuova Partita</string>
@@ -65,4 +62,8 @@
     <string name="pareggio">Pareggio! %1$d-%2$d</string>
     <string name="player1">Giocatore 1</string>
     <string name="player2">Giocatore 2</string>
+
+    <!-- History Screen -->
+    <string name="date">Data</string>
+    <string name="score_label">Punteggio</string>
 </resources>

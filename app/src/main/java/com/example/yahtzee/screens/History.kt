@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -158,7 +159,7 @@ fun HistoryScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Impostazioni",
+                    contentDescription = stringResource(R.string.settings_title),
                     tint = Color.White,
                     modifier = Modifier.size((20 * scaleFactor).dp.coerceAtLeast(18.dp).coerceAtMost(24.dp))
                 )
@@ -186,7 +187,7 @@ fun HistoryScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Storico Partite",
+                    text = stringResource(R.string.history),
                     style = if (isCompactHeight)
                         MaterialTheme.typography.headlineMedium
                     else
@@ -201,14 +202,14 @@ fun HistoryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     SortableColumnHeader(
-                        title = "Data",
+                        title = stringResource(R.string.date),
                         isSorted = uiState.sortColumn == SortColumn.DATE,
                         ascending = uiState.sortOrder == SortOrder.ASC,
                         onClick = { viewModel.onSortChange(SortColumn.DATE) },
                         isDarkTheme = isDarkTheme
                     )
                     SortableColumnHeader(
-                        title = "Punteggio",
+                        title = stringResource(R.string.score_label),
                         isSorted = uiState.sortColumn == SortColumn.SCORE,
                         ascending = uiState.sortOrder == SortOrder.ASC,
                         onClick = { viewModel.onSortChange(SortColumn.SCORE) },

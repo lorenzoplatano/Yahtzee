@@ -8,12 +8,10 @@
     <string name="history">Game History</string>
     
     <!-- Impostazioni -->
-    <string name="theme">Theme</string>
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="language">Language</string>
     <string name="rules">Rules</string>
-    <string name="reset_settings">Reset Settings</string>
     
     <!-- Pulsanti e azioni -->
     <string name="ok_button">OK</string>
@@ -48,7 +46,6 @@
     <string name="total_score">Total Score</string>
     <string name="roll">Roll</string>
     <string name="reset">Reset</string>
-    <string name="game_ended">Game Ended!</string>
     <string name="final_score">Final score: %1$d</string>
     <string name="new_record">NEW RECORD!</string>
     <string name="new_game">New Game</string>
@@ -65,4 +62,8 @@
     <string name="pareggio">Draw! %1$d-%2$d</string>
     <string name="player1">Player 1</string>
     <string name="player2">Player 2</string>
+
+    <!-- History Screen -->
+    <string name="date">Date</string>
+    <string name="score_label">Score</string>
 </resources>
