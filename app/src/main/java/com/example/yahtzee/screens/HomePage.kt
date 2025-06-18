@@ -4,20 +4,7 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -25,40 +12,25 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.ModernGameButton
-import com.example.yahtzee.ui.theme.HomeTheme
+import com.example.yahtzee.ui.theme.*
 import kotlin.times
-
-
 
 @Composable
 fun Homepage(navController: NavController, isDarkTheme: Boolean) {
@@ -66,12 +38,10 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
     var showExitDialog by remember { mutableStateOf(false) }
     var showModeDialog by remember { mutableStateOf(false) }
 
-    // Ottieni le dimensioni dello schermo per layout responsivi
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    // Calcola dimensioni responsive
     val isCompactScreen = screenHeight < 600.dp
     val buttonWidth = (screenWidth * 0.8f).coerceAtMost(400.dp)
     val buttonTextSize = if (isCompactScreen) 16.sp else 18.sp
@@ -85,26 +55,44 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text(stringResource(R.string.dialog_home_title)) },
-            text = { Text(stringResource(R.string.dialog_home_text)) },
+            title = {
+                Text(
+                    stringResource(R.string.dialog_home_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = HomeDialogTitle
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.dialog_home_text),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     showExitDialog = false
                     (context as? Activity)?.finish()
                 }) {
-                    Text(stringResource(R.string.confirm))
+                    Text(
+                        stringResource(R.string.confirm),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(
+                        stringResource(R.string.cancel),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             }
         )
     }
+    val backgroundRes = if (!showModeDialog) R.drawable.chunky else R.drawable.sfondo_generale
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Immagine di sfondo
+
         Image(
             painter = painterResource(id = R.drawable.chunky),
             contentDescription = stringResource(R.string.app_name),
@@ -113,19 +101,16 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
             alignment = Alignment.Center
         )
 
-        // Overlay scuro per migliorare leggibilità
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.3f))
         )
 
-        // Contenitore principale responsivo
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
             if (!showModeDialog) {
-                // Visualizzazione pulsante iniziale a 2/3 dello schermo
                 Column(
                     modifier = Modifier
                         .widthIn(max = 400.dp)
@@ -141,14 +126,10 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                         onClick = { showModeDialog = true },
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = buttonTextSize,
-                        gradientColors = listOf(
-                            Color(0xFF667EEA),
-                            Color(0xFF764BA2)
-                        )
+                        gradientColors = HomeButtonGradient
                     )
                 }
             } else {
-                // Visualizzazione scelta modalità di gioco
                 Card(
                     modifier = Modifier
                         .widthIn(max = 450.dp)
@@ -168,10 +149,10 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                     ) {
                         Text(
                             text = stringResource(R.string.select_mode),
-                            fontSize = buttonTextSize.times(1.1f),
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayMedium,
                             modifier = Modifier.padding(bottom = 8.dp),
-                            color = Color(0xFF1A1A1A),
+                            color = HomeDialogTitle,
+                            textAlign = TextAlign.Center
                         )
 
                         ModernGameButton(
@@ -180,10 +161,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             onClick = { navController.navigate("game") },
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = buttonTextSize,
-                            gradientColors = listOf(
-                                Color(0xFF4ECDC4),
-                                Color(0xFF44A08D)
-                            )
+                            gradientColors = SinglePlayerGradient
                         )
 
                         ModernGameButton(
@@ -192,10 +170,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             onClick = { navController.navigate("game_1vs1") },
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = buttonTextSize,
-                            gradientColors = listOf(
-                                Color(0xFFFF6B6B),
-                                Color(0xFFFF8E53)
-                            )
+                            gradientColors = MultiPlayerGradient
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -210,10 +185,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                                 onClick = { navController.navigate("settings") },
                                 modifier = Modifier.size(48.dp),
                                 showIconOnly = true,
-                                gradientColors = listOf(
-                                    Color(0xFF9C27B0),
-                                    Color(0xFF673AB7)
-                                )
+                                gradientColors = SettingsGradient
                             )
 
                             ModernGameButton(
@@ -222,10 +194,7 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                                 onClick = { navController.navigate("history") },
                                 modifier = Modifier.size(48.dp),
                                 showIconOnly = true,
-                                gradientColors = listOf(
-                                    Color(0xFFFF9800),
-                                    Color(0xFFFF5722)
-                                )
+                                gradientColors = HistoryGradient
                             )
                         }
 
@@ -233,7 +202,11 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
                             onClick = { showModeDialog = false },
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
-                            Text(stringResource(R.string.back), color = Color(0xFF764BA2))
+                            Text(
+                                stringResource(R.string.back),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = HomeBackText
+                            )
                         }
                     }
                 }

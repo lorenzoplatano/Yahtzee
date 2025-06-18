@@ -18,8 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 
-
-
+val HomeButtonGradient = listOf(HomeButtonStart, HomeButtonEnd)
+val SinglePlayerGradient = listOf(SinglePlayerStart, SinglePlayerEnd)
+val MultiPlayerGradient = listOf(MultiPlayerStart, MultiPlayerEnd)
+val SettingsGradient = listOf(SettingsStart, SettingsEnd)
+val HistoryGradient = listOf(HistoryStart, HistoryEnd)
+val SettingsButtonStart = Color(0xFF43CEA2)
+val SettingsButtonEnd = Color(0xFF185A9D)
+val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
 
 private val DarkColorScheme = darkColorScheme(
     primary = Blue200,
