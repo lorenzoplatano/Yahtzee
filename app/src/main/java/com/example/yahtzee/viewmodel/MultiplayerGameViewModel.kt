@@ -5,14 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.yahtzee.logic.GameController
-import com.example.yahtzee.model.MultiplayerGameState
+import com.example.yahtzee.model.GameStateMultiplayer
 
 
 class MultiplayerGameViewModel : ViewModel() {
     private val logic = GameController()
     val combinations = GameController.combinations
 
-    var state by mutableStateOf(MultiplayerGameState())
+    var state by mutableStateOf(GameStateMultiplayer())
         private set
 
     fun rollDice() {
@@ -60,7 +60,7 @@ class MultiplayerGameViewModel : ViewModel() {
     }
 
     fun resetGame() {
-        state = MultiplayerGameState(
+        state = GameStateMultiplayer(
             diceValues = List(5) { (1..6).random() }
         )
     }
