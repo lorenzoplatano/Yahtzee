@@ -434,9 +434,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     Button(
                                         onClick = { startNewGameDirectly() },
                                         modifier = Modifier
-                                            .fillMaxWidth(0.7f)
-                                            .height((48 * scaleFactor).dp),
-                                        shape = RoundedCornerShape(10.dp),
+                                            .fillMaxWidth(0.8f)
+                                            .height((56 * scaleFactor).dp),
+                                        shape = RoundedCornerShape((12 * scaleFactor).dp),
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color.Transparent,
                                             contentColor = Color.White
@@ -451,8 +451,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                                         startX = 0f,
                                                         endX = Float.POSITIVE_INFINITY
                                                     ),
-                                                    shape = RoundedCornerShape((10 * scaleFactor).dp)
-                                                ),
+                                                    shape = RoundedCornerShape((16 * scaleFactor).dp)  // Aumentato da 10 a 16
+                                                )
+                                                .padding(vertical = (6 * scaleFactor).dp),  // Aggiunto padding verticale
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Row(
@@ -467,7 +468,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                                 )
                                                 Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                                 Text(
-                                                    text = stringResource(R.string.new_game),
+                                                    text = stringResource(id = R.string.new_game),
                                                     fontSize = (16 * scaleFactor).sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
