@@ -473,7 +473,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             totalScore1,
                                             totalScore2
                                         ),
-                                        fontSize = (22 * scaleFactor).sp,
+                                        fontSize = (18 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         color = winnerColor, // Usa il colore dinamico
                                         textAlign = TextAlign.Center,
