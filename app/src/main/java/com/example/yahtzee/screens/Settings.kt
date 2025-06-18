@@ -6,27 +6,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,7 +33,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,13 +43,11 @@ import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.localization.AppLanguage
 import com.example.yahtzee.localization.LocalLocalizationManager
-import com.example.yahtzee.screens.components.ModernGameButton
+import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.CardDark
 import com.example.yahtzee.ui.theme.CardLight
 import com.example.yahtzee.ui.theme.SettingsTheme
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
-import com.example.yahtzee.ui.theme.HomeDialogTitle
-import com.example.yahtzee.ui.theme.HomeBackText
 import com.example.yahtzee.ui.theme.mainTextColor
 
 // Stato iniziale delle impostazioni
@@ -128,7 +118,7 @@ fun Settings(
                         textAlign = TextAlign.Center
                     )
 
-                    ModernGameButton(
+                    GenericButton(
                         text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
                         icon = Icons.Default.Person,
                         onClick = { showLanguageDialog = true },
@@ -137,7 +127,7 @@ fun Settings(
                         gradientColors = SettingsButtonGradient
                     )
 
-                    ModernGameButton(
+                    GenericButton(
                         text = if (isDarkTheme)
                             stringResource(id = R.string.light_theme)
                         else
@@ -152,7 +142,7 @@ fun Settings(
                         gradientColors = SettingsButtonGradient
                     )
 
-                    ModernGameButton(
+                    GenericButton(
                         text = stringResource(id = R.string.rules),
                         icon = Icons.Default.History,
                         onClick = { showRulesDialog = true },
