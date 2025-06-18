@@ -1,4 +1,3 @@
-
 package com.example.yahtzee.viewmodel
 
 import androidx.compose.runtime.getValue
@@ -53,7 +52,6 @@ class MultiplayerGameViewModel : ViewModel() {
             scoreMapPlayer1 = newScoreMap1,
             scoreMapPlayer2 = newScoreMap2,
             isPlayer1Turn = !state.isPlayer1Turn,
-            diceValues = List(5) { (1..6).random() },
             heldDice = List(5) { false },
             remainingRolls = 3,
             hasRolledAtLeastOnce = false,

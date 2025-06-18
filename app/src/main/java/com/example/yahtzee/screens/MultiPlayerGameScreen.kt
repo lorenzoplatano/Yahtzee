@@ -1,6 +1,7 @@
 package com.example.yahtzee.screens
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,10 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -33,12 +35,8 @@ import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import com.example.yahtzee.ui.theme.MultiPlayerTheme
-import com.example.yahtzee.components.DiceWithDots
-import com.example.yahtzee.components.GameDiceRow
-import com.example.yahtzee.screens.components.ModernGameButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.compareTo
 
 @Composable
 fun MultiplayerGameScreen(navController: NavController) {
@@ -46,11 +44,21 @@ fun MultiplayerGameScreen(navController: NavController) {
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
+    // Calcola fattori di scala basati sulle dimensioni dello schermo
+    val scaleFactor = remember {
+        (screenWidth / 360.dp).coerceIn(0.85f, 1.2f)
+    }
+
+    // Flag per schermi compatti (sia altezza che larghezza)
     val isCompactScreen = screenHeight < 600.dp
-    // Calcolo dinamico della dimensione dei dadi per riempire la card
-    val diceAreaWidth = screenWidth * 0.9f - 32.dp // padding interno card
+    val isNarrowScreen = screenWidth < 340.dp
+
+    // Calcolo dinamico delle dimensioni
+    val diceAreaWidth = screenWidth * 0.9f - 32.dp
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
-    val tableRowFontSize = if (isCompactScreen) 11.sp else 12.sp
+    val tableRowFontSize = (if (isCompactScreen) 11.sp else 12.sp) * scaleFactor
+    val headerPadding = screenHeight * 0.05f
+    val bottomAreaHeight = screenHeight * 0.1f
 
     val viewModel: MultiplayerGameViewModel = viewModel()
     val state = viewModel.state
@@ -95,35 +103,20 @@ fun MultiplayerGameScreen(navController: NavController) {
     var isRolling by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    // ANIMAZIONE DADI
-    val diceAnimations = List(5) { index ->
-        val randomEndRotation = remember(isRolling) { (-720..720).random().toFloat() }
-        val rotation by animateFloatAsState(
-            targetValue = if (isRolling && !state.heldDice[index]) randomEndRotation else 0f,
-            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
-            label = "diceRotation"
-        )
-        val scale by animateFloatAsState(
-            targetValue = if (isRolling && !state.heldDice[index]) 0.8f else 1f,
-            animationSpec = repeatable(
-                iterations = 2,
-                animation = tween(250, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "diceScale"
-        )
-        Pair(rotation, scale)
-    }
+    // Nuova variabile per sapere quando l'animazione è davvero finita
+    var animationDone by remember { mutableStateOf(true) }
 
     fun rollDiceWithAnimation() {
         if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) {
             coroutineScope.launch {
                 isRolling = true
+                animationDone = false
                 showPreviews = false
-                delay(550)
+                delay(500) // durata animazione
                 viewModel.rollDice()
-                delay(100)
+                delay(500) // attesa per completare animazione visiva
                 isRolling = false
+                animationDone = true
                 showPreviews = true
             }
         }
@@ -159,12 +152,16 @@ fun MultiplayerGameScreen(navController: NavController) {
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
             )
-            // Home button: abbassato di qualche dp
+
+            // Home button con posizionamento responsive
             Card(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 40.dp, end = 16.dp) // era 32.dp, ora 40.dp
-                    .size(44.dp)
+                    .padding(
+                        top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
+                        end = (screenWidth * 0.04f).coerceAtLeast(12.dp)
+                    )
+                    .size((44 * scaleFactor).dp)
                     .shadow(
                         elevation = 6.dp,
                         shape = RoundedCornerShape(10.dp)
@@ -189,101 +186,226 @@ fun MultiplayerGameScreen(navController: NavController) {
                         imageVector = Icons.Default.Home,
                         contentDescription = "Home",
                         tint = Color.White,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size((22 * scaleFactor).dp)
                     )
                 }
             }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        top = 90.dp, // era 80.dp, ora abbassato di 10dp
-                        start = 8.dp,
-                        end = 8.dp,
-                        bottom = 60.dp
+                        top = (headerPadding * 2).coerceAtLeast(80.dp).coerceAtMost(100.dp),
+                        start = (screenWidth * 0.02f).coerceAtLeast(8.dp),
+                        end = (screenWidth * 0.02f).coerceAtLeast(8.dp),
+                        bottom = bottomAreaHeight.coerceAtLeast(40.dp)
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // Card unica per i dadi, abbassata di qualche dp
+                // Card unica per i dadi con altezza relativa
                 if (!state.gameEnded) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
-                            .height(diceSize + 24.dp)
-                            .padding(horizontal = 4.dp)
-                            .offset(y = 8.dp), // aggiunto offset per abbassare la card dei dadi
+                            .height((diceSize + 24.dp).coerceAtMost(screenHeight * 0.12f))
+                            .padding(horizontal = (4 * scaleFactor).dp)
+                            .offset(y = (8 * scaleFactor).dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White.copy(alpha = 0.95f)
                         ),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape((12 * scaleFactor).dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            state.diceValues.forEachIndexed { index, value ->
-                                Card(
-                                    modifier = Modifier
-                                        .size(diceSize)
-                                        .shadow(
-                                            elevation = if (state.heldDice[index]) 8.dp else 4.dp,
-                                            shape = RoundedCornerShape(10.dp)
-                                        )
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .clickable(
-                                            enabled = state.remainingRolls < 3 && !state.gameEnded,
-                                            onClick = { viewModel.toggleHold(index) }
+                        MultiGameDiceRow(
+                            diceValues = state.diceValues,
+                            heldDice = state.heldDice,
+                            onDiceClick = { index ->
+                                if (state.remainingRolls < 3 && !state.gameEnded) {
+                                    viewModel.toggleHold(index)
+                                }
+                            },
+                            enabled = state.remainingRolls < 3 && !state.gameEnded,
+                            diceSize = diceSize,
+                            isRolling = isRolling
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+
+                // TABELLA con altezza adattiva
+                if (!state.gameEnded) {
+                    val tableMaxHeight = if (isCompactScreen) {
+                        screenHeight * 0.68f
+                    } else {
+                        screenHeight * 0.62f
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(
+                                min = (screenHeight * 0.40f).coerceAtLeast(400.dp),
+                                max = tableMaxHeight.coerceAtMost(600.dp)
+                            )
+                            .padding(horizontal = (screenWidth * 0.02f).coerceAtLeast(8.dp))
+                            .offset(y = (8 * scaleFactor).dp)
+                            .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White.copy(alpha = 0.96f)
+                        ),
+                        shape = RoundedCornerShape((14 * scaleFactor).dp)
+                    ) {
+                        Column {
+                            // HEADER CON RETTANGOLO SEMITRASPARENTE SUL PLAYER DI TURNO
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        brush = Brush.horizontalGradient(
+                                            listOf(Color(0xFF667EEA), Color(0xFF764BA2))
                                         ),
-                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                                    shape = RoundedCornerShape(10.dp)
-                                ) {
+                                        shape = RoundedCornerShape(topStart = (14 * scaleFactor).dp, topEnd = (14 * scaleFactor).dp)
+                                    )
+                                    .padding(horizontal = (10 * scaleFactor).dp, vertical = (10 * scaleFactor).dp)
+                            ) {
+                                Row {
+                                    Text(
+                                        text = "COMBINATION",
+                                        modifier = Modifier.weight(2f),
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        fontSize = (13 * scaleFactor).sp
+                                    )
+                                    // Player 1 header con highlight se è il suo turno
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                brush = if (state.heldDice[index] && value != null) {
-                                                    Brush.horizontalGradient(
-                                                        listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
-                                                    )
-                                                } else {
-                                                    Brush.horizontalGradient(
-                                                        listOf(Color(0xFFF7FAFC), Color(0xFFEDF2F7))
-                                                    )
-                                                },
-                                                shape = RoundedCornerShape(10.dp)
+                                            .weight(1f)
+                                            .padding(horizontal = (2 * scaleFactor).dp)
+                                            .then(
+                                                if (state.isPlayer1Turn)
+                                                    Modifier
+                                                        .background(
+                                                            Color.White.copy(alpha = 0.22f),
+                                                            shape = RoundedCornerShape((6 * scaleFactor).dp)
+                                                        )
+                                                        .border(
+                                                            width = (2 * scaleFactor).dp,
+                                                            color = Color.White.copy(alpha = 0.35f),
+                                                            shape = RoundedCornerShape((6 * scaleFactor).dp)
+                                                        )
+                                                else Modifier
                                             )
-                                            .border(
-                                                width = if (state.heldDice[index] && value != null) 2.dp else 1.dp,
-                                                color = if (state.heldDice[index] && value != null) Color.White else Color(0xFFE2E8F0),
-                                                shape = RoundedCornerShape(10.dp)
-                                            ),
-                                        contentAlignment = Alignment.Center
                                     ) {
-                                        if (value != null) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxSize(0.8f)
-                                                    .graphicsLayer {
-                                                        rotationZ = diceAnimations[index].first
-                                                        scaleX = diceAnimations[index].second
-                                                        scaleY = diceAnimations[index].second
-                                                    },
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                DiceWithDots(
-                                                    value = value,
-                                                    size = diceSize * 0.8f,
-                                                    dotColor = if (state.heldDice[index])
-                                                        Color.White
-                                                    else
-                                                        Color(0xFF2D3748)
-                                                )
-                                            }
+                                        Text(
+                                            text = "Player 1",
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = (2 * scaleFactor).dp),
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            fontSize = (13 * scaleFactor).sp
+                                        )
+                                    }
+                                    // Player 2 header con highlight se è il suo turno
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(horizontal = (2 * scaleFactor).dp)
+                                            .then(
+                                                if (!state.isPlayer1Turn)
+                                                    Modifier
+                                                        .background(
+                                                            Color.White.copy(alpha = 0.22f),
+                                                            shape = RoundedCornerShape((6 * scaleFactor).dp)
+                                                        )
+                                                        .border(
+                                                            width = (2 * scaleFactor).dp,
+                                                            color = Color.White.copy(alpha = 0.35f),
+                                                            shape = RoundedCornerShape((6 * scaleFactor).dp)
+                                                        )
+                                                else Modifier
+                                            )
+                                    ) {
+                                        Text(
+                                            text = "Player 2",
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = (2 * scaleFactor).dp),
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            fontSize = (13 * scaleFactor).sp
+                                        )
+                                    }
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = (4 * scaleFactor).dp, vertical = (2 * scaleFactor).dp)
+                            ) {
+                                val allRows = combinationKeys + listOf("Bonus", "Total")
+                                allRows.forEachIndexed { index, combination ->
+                                    if (index != 0) {
+                                        HorizontalDivider(
+                                            thickness = (0.2 * scaleFactor).dp,
+                                            color = Color(0xFFE2E8F0)
+                                        )
+                                    }
+                                    when (combination) {
+                                        "Bonus" -> {
+                                            MultiplayerTableRowStyled(
+                                                combination = "Bonus ($progressBonusText1 | $progressBonusText2)",
+                                                player1Score = bonus1,
+                                                player2Score = bonus2,
+                                                bold = true,
+                                                alternate = index % 2 == 1,
+                                                isPlayer1Turn = state.isPlayer1Turn,
+                                                fontSize = (14 * scaleFactor).sp,
+                                                compactPadding = true,
+                                                scaleFactor = scaleFactor
+                                            )
+                                        }
+                                        "Total" -> {
+                                            MultiplayerTableRowStyled(
+                                                combination = "TOTAL",
+                                                player1Score = totalScore1,
+                                                player2Score = totalScore2,
+                                                bold = true,
+                                                alternate = index % 2 == 1,
+                                                isPlayer1Turn = state.isPlayer1Turn,
+                                                fontSize = (16 * scaleFactor).sp,
+                                                compactPadding = true,
+                                                scaleFactor = scaleFactor
+                                            )
+                                        }
+                                        else -> {
+                                            val player1Score = state.scoreMapPlayer1[combination]
+                                            val player2Score = state.scoreMapPlayer2[combination]
+                                            // Mostra la preview solo se l'animazione è finita
+                                            val previewScore = if (showPreviews && animationDone) previewScores[combination] else null
+                                            // Abilita la selezione solo se l'animazione è finita
+                                            val isEnabled = !state.gameEnded &&
+                                                    state.hasRolledAtLeastOnce &&
+                                                    showPreviews && animationDone &&
+                                                    ((state.isPlayer1Turn && player1Score == null) || (!state.isPlayer1Turn && player2Score == null))
+                                            MultiplayerTableRowStyled(
+                                                combination = combinationLabels[combination] ?: combination,
+                                                player1Score = player1Score,
+                                                player2Score = player2Score,
+                                                previewScore = previewScore,
+                                                enabled = isEnabled,
+                                                onClick = { if (isEnabled) viewModel.selectScore(combination) },
+                                                bold = false,
+                                                alternate = index % 2 == 1,
+                                                isPlayer1Turn = state.isPlayer1Turn,
+                                                fontSize = (13 * scaleFactor).sp,
+                                                compactPadding = true,
+                                                scaleFactor = scaleFactor
+                                            )
                                         }
                                     }
                                 }
@@ -292,204 +414,114 @@ fun MultiplayerGameScreen(navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp)) // era 8.dp, ora 16.dp per abbassare la tabella
-
-                // Card tabella combinazioni, abbassata di qualche dp
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 540.dp, max = 600.dp)
-                        .padding(horizontal = 8.dp)
-                        .offset(y = 8.dp) // aggiunto offset per abbassare la sezione punteggi
-                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(14.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.96f)
-                    ),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Column {
-                        Box(
+                // CARD FINE PARTITA CENTRATA con dimensioni responsive
+                if (state.gameEnded) {
+                    Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Card(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    brush = Brush.horizontalGradient(
-                                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
-                                    ),
-                                    shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp)
-                                )
-                                .padding(horizontal = 10.dp, vertical = 10.dp)
+                                .fillMaxWidth(0.8f)
+                                .wrapContentHeight()
+                                .shadow(elevation = 10.dp, shape = RoundedCornerShape((18 * scaleFactor).dp)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White.copy(alpha = 0.97f)
+                            ),
+                            shape = RoundedCornerShape((18 * scaleFactor).dp)
                         ) {
-                            Row {
-                                Text(
-                                    text = "COMBINATION",
-                                    modifier = Modifier.weight(2f),
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    fontSize = 13.sp
-                                )
-                                Text(
-                                    text = "Player 1",
-                                    modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    fontSize = 13.sp
-                                )
-                                Text(
-                                    text = "Player 2",
-                                    modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    fontSize = 13.sp
-                                )
-                            }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 4.dp, vertical = 2.dp)
-                        ) {
-                            // Tutte le combinazioni + bonus + total
-                            val allRows = combinationKeys + listOf("Bonus", "Total")
-                            allRows.forEachIndexed { index, combination ->
-                                if (index != 0) {
-                                    HorizontalDivider(
-                                        thickness = 0.2.dp,
-                                        color = Color(0xFFE2E8F0)
+                            Column(
+                                modifier = Modifier
+                                    .padding(vertical = (32 * scaleFactor).dp, horizontal = (18 * scaleFactor).dp)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                val winner = when {
+                                    totalScore1 > totalScore2 -> "Player 1"
+                                    totalScore2 > totalScore1 -> "Player 2"
+                                    else -> null
+                                }
+                                if (winner != null) {
+                                    Text(
+                                        text = "$winner vince $totalScore1 - $totalScore2!",
+                                        fontSize = (22 * scaleFactor).sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF4ECDC4),
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Pareggio! $totalScore1 - $totalScore2",
+                                        fontSize = (22 * scaleFactor).sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF4ECDC4),
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
-                                when (combination) {
-                                    "Bonus" -> {
-                                        MultiplayerTableRowStyled(
-                                            combination = "Bonus ($progressBonusText1 | $progressBonusText2)",
-                                            player1Score = bonus1,
-                                            player2Score = bonus2,
-                                            bold = true,
-                                            alternate = index % 2 == 1,
-                                            isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 14.sp, // leggermente più piccolo
-                                            compactPadding = true
+                                Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Button(
+                                        onClick = { showResetDialog = true },
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.7f)
+                                            .height((48 * scaleFactor).dp),
+                                        shape = RoundedCornerShape((10 * scaleFactor).dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF4ECDC4),
+                                            contentColor = Color.White
                                         )
-                                    }
-                                    "Total" -> {
-                                        MultiplayerTableRowStyled(
-                                            combination = "TOTAL",
-                                            player1Score = totalScore1,
-                                            player2Score = totalScore2,
-                                            bold = true,
-                                            alternate = index % 2 == 1,
-                                            isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 16.sp,
-                                            compactPadding = true
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = "Nuova Partita",
+                                            tint = Color.White,
+                                            modifier = Modifier.size((20 * scaleFactor).dp)
                                         )
-                                    }
-                                    else -> {
-                                        val player1Score = state.scoreMapPlayer1[combination]
-                                        val player2Score = state.scoreMapPlayer2[combination]
-                                        val previewScore = if (showPreviews) previewScores[combination] else null
-                                        val isEnabled = !state.gameEnded &&
-                                                state.hasRolledAtLeastOnce &&
-                                                ((state.isPlayer1Turn && player1Score == null) || (!state.isPlayer1Turn && player2Score == null))
-                                        MultiplayerTableRowStyled(
-                                            combination = combinationLabels[combination] ?: combination,
-                                            player1Score = player1Score,
-                                            player2Score = player2Score,
-                                            previewScore = previewScore,
-                                            enabled = isEnabled,
-                                            onClick = { if (isEnabled) viewModel.selectScore(combination) },
-                                            bold = false,
-                                            alternate = index % 2 == 1,
-                                            isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = 13.sp,
-                                            compactPadding = true
+                                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                                        Text(
+                                            text = "Nuova Partita",
+                                            fontSize = (15 * scaleFactor).sp,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                if (state.gameEnded) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .shadow(elevation = 6.dp, shape = RoundedCornerShape(12.dp)),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.95f)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(14.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "Partita Terminata!",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE53E3E)
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Player 1: $totalScore1 | Player 2: $totalScore2",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF2D3748)
-                            )
-                            val winner = when {
-                                totalScore1 > totalScore2 -> "Player 1 Vince!"
-                                totalScore2 > totalScore1 -> "Player 2 Vince!"
-                                else -> "Pareggio!"
-                            }
-                            Text(
-                                text = winner,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4ECDC4),
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            ModernGameButton(
-                                text = "Nuova Partita",
-                                icon = Icons.Default.Refresh,
-                                onClick = { showResetDialog = true },
-                                modifier = Modifier.fillMaxWidth(0.7f),
-                                fontSize = 14.sp,
-                                gradientColors = listOf(
-                                    Color(0xFF4ECDC4),
-                                    Color(0xFF44A08D)
-                                )
-                            )
                         }
                     }
                 }
             }
 
-            // Bottoni in basso
+            // Bottoni in basso con dimensioni responsive
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, bottom = 56.dp)
+                    .padding(
+                        start = (screenWidth * 0.03f).coerceAtLeast(12.dp),
+                        end = (screenWidth * 0.03f).coerceAtLeast(12.dp),
+                        bottom = (screenHeight * 0.03f).coerceAtLeast(56.dp)
+                    )
                     .align(Alignment.BottomCenter)
-                    .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
+                    .shadow(elevation = 8.dp, shape = RoundedCornerShape((16 * scaleFactor).dp)),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape((16 * scaleFactor).dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(68.dp)
+                        .height((68 * scaleFactor).dp)
                         .background(
                             brush = Brush.horizontalGradient(
                                 listOf(Color(0xFF667EEA), Color(0xFF764BA2))
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape((16 * scaleFactor).dp)
                         )
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                        .padding(horizontal = (8 * scaleFactor).dp, vertical = (6 * scaleFactor).dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
@@ -497,22 +529,22 @@ fun MultiplayerGameScreen(navController: NavController) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        // Pulsante "Roll"
+                        // Pulsante "Roll" con dimensioni relative
                         Card(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(52.dp)
+                                .height((52 * scaleFactor).dp)
                                 .shadow(
                                     elevation = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 8.dp else 4.dp,
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape((12 * scaleFactor).dp)
                                 )
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape((12 * scaleFactor).dp))
                                 .clickable(
                                     enabled = state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld,
                                     onClick = { rollDiceWithAnimation() }
                                 ),
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape((12 * scaleFactor).dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -527,7 +559,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                                 listOf(Color.Gray.copy(alpha = 0.5f), Color.Gray.copy(alpha = 0.3f))
                                             )
                                         },
-                                        shape = RoundedCornerShape(12.dp)
+                                        shape = RoundedCornerShape((12 * scaleFactor).dp)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -539,36 +571,36 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         imageVector = Icons.Default.Refresh,
                                         contentDescription = "Roll",
                                         tint = Color.White,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size((20 * scaleFactor).dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                     Text(
                                         text = "Roll (${state.remainingRolls})",
                                         color = Color.White,
-                                        fontSize = 14.sp,
+                                        fontSize = (14 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1,
-                                        modifier = Modifier.padding(vertical = 4.dp)
+                                        modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
                                     )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
 
-                        // Pulsante "Reset"
+                        // Pulsante "Reset" con dimensioni relative
                         Card(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(52.dp)
+                                .height((52 * scaleFactor).dp)
                                 .shadow(
                                     elevation = 8.dp,
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape((12 * scaleFactor).dp)
                                 )
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape((12 * scaleFactor).dp))
                                 .clickable { showResetDialog = true },
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape((12 * scaleFactor).dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -577,7 +609,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         brush = Brush.horizontalGradient(
                                             listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
                                         ),
-                                        shape = RoundedCornerShape(12.dp)
+                                        shape = RoundedCornerShape((12 * scaleFactor).dp)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -589,16 +621,16 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         imageVector = Icons.Default.Refresh,
                                         contentDescription = "Reset",
                                         tint = Color.White,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size((20 * scaleFactor).dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                     Text(
                                         text = "Reset",
                                         color = Color.White,
-                                        fontSize = 14.sp,
+                                        fontSize = (14 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1,
-                                        modifier = Modifier.padding(vertical = 4.dp)
+                                        modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
                                     )
                                 }
                             }
@@ -609,7 +641,6 @@ fun MultiplayerGameScreen(navController: NavController) {
         }
     }
 }
-
 
 @Composable
 fun MultiplayerTableRowStyled(
@@ -624,7 +655,8 @@ fun MultiplayerTableRowStyled(
     alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
     fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
-    compactPadding: Boolean = false
+    compactPadding: Boolean = false,
+    scaleFactor: Float = 1f
 ) {
     val backgroundColor = when {
         enabled -> Color(0xFFF0F9FF)
@@ -638,28 +670,37 @@ fun MultiplayerTableRowStyled(
         else -> Color(0xFF4A5568)
     }
 
-    val verticalPadding = if (compactPadding) 5.5.dp else 6.dp
+    // Calcola padding in base alle dimensioni dello schermo
+    val horizontalPadding = (8 * scaleFactor).dp
+    val verticalPadding = if (compactPadding) {
+        (5.5f * scaleFactor).dp
+    } else {
+        (6f * scaleFactor).dp
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 2.dp, vertical = 0.5.dp)
+            .padding(horizontal = (2 * scaleFactor).dp, vertical = (0.5 * scaleFactor).dp)
             .then(
                 if (enabled) {
                     Modifier
-                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(6.dp))
-                        .border(1.dp, Color(0xFF3B82F6), RoundedCornerShape(6.dp))
+                        .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
+                        .border(
+                            (1 * scaleFactor).dp,
+                            Color(0xFF3B82F6),
+                            RoundedCornerShape((6 * scaleFactor).dp)
+                        )
                 } else Modifier
             )
             .clickable(enabled = enabled) { onClick() },
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        shape = RoundedCornerShape(6.dp)
+        shape = RoundedCornerShape((6 * scaleFactor).dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = verticalPadding
-                )
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding)
         ) {
             Text(
                 text = combination,
@@ -684,6 +725,263 @@ fun MultiplayerTableRowStyled(
                 color = textColor,
                 fontSize = fontSize
             )
+        }
+    }
+}
+
+@Composable
+fun MultiDiceWithDots(
+    value: Int,
+    size: androidx.compose.ui.unit.Dp,
+    dotColor: Color = Color.Black
+) {
+    val dotSize = size / 5
+    val padding = size / 5
+
+    Canvas(
+        modifier = Modifier.size(size)
+    ) {
+        val center = Offset(this.size.width / 2, this.size.height / 2)
+        val topLeft = Offset(padding.toPx(), padding.toPx())
+        val topRight = Offset(this.size.width - padding.toPx(), padding.toPx())
+        val centerLeft = Offset(padding.toPx(), center.y)
+        val centerRight = Offset(this.size.width - padding.toPx(), center.y)
+        val bottomLeft = Offset(padding.toPx(), this.size.height - padding.toPx())
+        val bottomRight = Offset(this.size.width - padding.toPx(), this.size.height - padding.toPx())
+
+        when (value) {
+            1 -> drawCircle(
+                color = dotColor,
+                radius = dotSize.toPx() / 2,
+                center = center,
+                style = Fill
+            )
+            2 -> {
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomLeft,
+                    style = Fill
+                )
+            }
+            3 -> {
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = center,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomLeft,
+                    style = Fill
+                )
+            }
+            4 -> {
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomRight,
+                    style = Fill
+                )
+            }
+            5 -> {
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = center,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomRight,
+                    style = Fill
+                )
+            }
+            6 -> {
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = topRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = centerLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = centerRight,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomLeft,
+                    style = Fill
+                )
+                drawCircle(
+                    color = dotColor,
+                    radius = dotSize.toPx() / 2,
+                    center = bottomRight,
+                    style = Fill
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MultiGameDiceRow(
+    diceValues: List<Int>,
+    heldDice: List<Boolean>,
+    onDiceClick: (Int) -> Unit,
+    enabled: Boolean,
+    diceSize: androidx.compose.ui.unit.Dp = 50.dp,
+    isRolling: Boolean = false
+) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val scaleFactor = remember { (screenWidth / 360.dp).coerceIn(0.85f, 1.2f) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding((14 * scaleFactor).dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        val diceAnimations = List(diceValues.size) { index ->
+            val randomEndRotation = remember(isRolling) { (-720..720).random().toFloat() }
+            val rotation by animateFloatAsState(
+                targetValue = if (isRolling && !heldDice[index]) randomEndRotation else 0f,
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                label = "diceRotation"
+            )
+            val scale by animateFloatAsState(
+                targetValue = if (isRolling && !heldDice[index]) 0.8f else 1f,
+                animationSpec = repeatable(
+                    iterations = 2,
+                    animation = tween(250, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "diceScale"
+            )
+            Pair(rotation, scale)
+        }
+
+        diceValues.forEachIndexed { index, value ->
+            Card(
+                modifier = Modifier
+                    .size(diceSize)
+                    .shadow(
+                        elevation = if (heldDice[index]) 6.dp else 3.dp,
+                        shape = RoundedCornerShape((8 * scaleFactor).dp)
+                    )
+                    .clickable(enabled = enabled) {
+                        onDiceClick(index)
+                    },
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape((8 * scaleFactor).dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = if (heldDice[index]) {
+                                Brush.horizontalGradient(
+                                    listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                )
+                            } else {
+                                Brush.horizontalGradient(
+                                    listOf(Color(0xFFF7FAFC), Color(0xFFEDF2F7))
+                                )
+                            },
+                            shape = RoundedCornerShape((8 * scaleFactor).dp)
+                        )
+                        .border(
+                            width = if (heldDice[index]) (2 * scaleFactor).dp else (1 * scaleFactor).dp,
+                            color = if (heldDice[index]) Color.White else Color(0xFFE2E8F0),
+                            shape = RoundedCornerShape((8 * scaleFactor).dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(0.8f)
+                            .graphicsLayer {
+                                rotationZ = diceAnimations[index].first
+                                scaleX = diceAnimations[index].second
+                                scaleY = diceAnimations[index].second
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        MultiDiceWithDots(
+                            value = value,
+                            size = diceSize * 0.8f,
+                            dotColor = if (heldDice[index]) Color.White else Color(0xFF2D3748)
+                        )
+                    }
+                }
+            }
         }
     }
 }
