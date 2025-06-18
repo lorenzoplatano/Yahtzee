@@ -27,6 +27,11 @@ val SettingsButtonStart = Color(0xFF43CEA2)
 val SettingsButtonEnd = Color(0xFF185A9D)
 val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
 
+val BothCardLight = Color.White.copy(alpha = 0.95f)
+val BothCardDark = Color(0xFF23272E).copy(alpha = 0.92f)
+val TableLight = Color.White.copy(alpha = 0.96f)
+val TableDark = Color(0xFF23272E).copy(alpha = 0.96f)
+
 
 
 
@@ -109,22 +114,6 @@ fun BlueGradientBackground(content: @Composable () -> Unit) {
     }
 }
 
-@Composable
-fun RedGradientBackground(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Red100, Red500, Red700)
-                )
-            )
-    ) {
-        content()
-    }
-}
-
-// Temi specifici per schermata
 
 @Composable
 fun SinglePlayerTheme(content: @Composable () -> Unit) {
@@ -147,73 +136,6 @@ fun MultiPlayerTheme(
     )
 }
 
-@Composable
-fun SettingsTheme(
-    darkTheme: Boolean,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography
-    ) {
-        if (darkTheme) {
-            DarkGradientBackground {
-                content()
-            }
-        } else {
-            BlueGradientBackground {
-                content()
-            }
-        }
-    }
-}
-
-
-@Composable
-fun HomeTheme(
-    darkTheme: Boolean,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography
-    ) {
-        if (darkTheme) {
-            DarkGradientBackground {
-                content()
-            }
-        } else {
-            BlueGradientBackground {
-                content()
-            }
-        }
-    }
-}
-
-
-@Composable
-fun HistoryTheme(
-    darkTheme: Boolean,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) DarkColorScheme else BlueColorScheme
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography
-    ) {
-        if (darkTheme) {
-            DarkGradientBackground {
-                content()
-            }
-        } else {
-            BlueGradientBackground {
-                content()
-            }
-        }
-    }
-}
 @Composable
 fun YahtzeeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
