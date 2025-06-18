@@ -82,7 +82,7 @@ fun Settings(
     val cardBackground = if (isDarkTheme) CardDark else CardLight
 
         Box(modifier = Modifier.fillMaxSize()) {
-            // Sfondo
+
             Image(
                 painter = painterResource(id = R.drawable.sfondo_generale),
                 contentDescription = null,
