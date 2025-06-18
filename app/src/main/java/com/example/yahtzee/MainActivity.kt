@@ -5,13 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,17 +25,15 @@ import com.example.yahtzee.screens.SinglePlayerGameScreen
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 
 class MainActivity : ComponentActivity() {
-    // Singleton per memorizzare la lingua selezionata
     companion object {
         private var localizationManager = LocalizationManager()
-        
+
         fun getLocalizationManager(): LocalizationManager {
             return localizationManager
         }
     }
 
     override fun attachBaseContext(newBase: Context) {
-        // Applica la lingua corrente al context base
         val context = getLocalizationManager().applyLanguage(newBase)
         super.attachBaseContext(context)
     }
@@ -44,12 +41,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         setContent {
             // Stato globale per il tema (chiaro/scuro)
             var isDarkTheme by rememberSaveable { mutableStateOf(false) }
-            
+
+            // Fornisci il LocalizationManager a tutta l'app
             CompositionLocalProvider(LocalLocalizationManager provides getLocalizationManager()) {
+                // Applica il tema UNA SOLA VOLTA globalmente
                 YahtzeeTheme(darkTheme = isDarkTheme) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -58,11 +57,8 @@ class MainActivity : ComponentActivity() {
                         YahtzeeApp(
                             isDarkTheme = isDarkTheme,
                             onThemeChange = { isDarkTheme = it },
-                            onLanguageChange = { language -> 
-                                // Aggiorna la lingua nel LocalizationManager
+                            onLanguageChange = { language ->
                                 getLocalizationManager().setLanguage(language)
-                                
-                                // Ricrea l'attività per applicare la nuova lingua
                                 recreateActivity()
                             }
                         )
@@ -71,9 +67,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
+
     private fun recreateActivity() {
-        // Ricrea l'attività per applicare il cambio lingua
         recreate()
     }
 
@@ -87,13 +82,13 @@ class MainActivity : ComponentActivity() {
         NavHost(navController = navController, startDestination = "homepage") {
             composable("homepage") { Homepage(navController, isDarkTheme) }
             composable("history") { HistoryScreen(navController, isDarkTheme) }
-            composable("settings") { 
+            composable("settings") {
                 Settings(
-                    navController = navController, 
-                    isDarkTheme = isDarkTheme, 
+                    navController = navController,
+                    isDarkTheme = isDarkTheme,
                     onThemeChange = onThemeChange,
                     onLanguageChange = onLanguageChange
-                ) 
+                )
             }
             composable("game_1vs1") { MultiplayerGameScreen(navController) }
             composable("game") { SinglePlayerGameScreen(navController) }
