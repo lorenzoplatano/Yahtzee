@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,31 +33,31 @@ import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.ui.theme.SinglePlayerTheme
+import com.example.yahtzee.ui.theme.BothCardDark
+import com.example.yahtzee.ui.theme.BothCardLight
+import com.example.yahtzee.ui.theme.TableDark
+import com.example.yahtzee.ui.theme.TableLight
+import com.example.yahtzee.ui.theme.mainTextColor
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-// Importa i componenti dalla posizione corretta
 import com.example.yahtzee.screens.components.Dice
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 
 @Composable
-fun SinglePlayerGameScreen(navController: NavController) {
+fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    // Calcola fattori di scala basati sulle dimensioni dello schermo
     val scaleFactor = remember {
         (screenWidth / 360.dp).coerceIn(0.85f, 1.2f)
     }
 
-    // Flag per schermi compatti
     val isCompactScreen = screenHeight < 600.dp
-
-    // Calcolo dinamico delle dimensioni
     val diceAreaWidth = screenWidth * 0.9f - 32.dp
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
     val headerPadding = screenHeight * 0.05f
@@ -120,9 +121,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                 isRolling = true
                 animationDone = false
                 showPreviews = false
-                delay(800) // Durata dell'animazione
+                delay(800)
                 viewModel.rollDice()
-                delay(200) // Piccola pausa per completare l'animazione
+                delay(200)
                 isRolling = false
                 animationDone = true
                 showPreviews = true
@@ -134,29 +135,36 @@ fun SinglePlayerGameScreen(navController: NavController) {
         viewModel.resetGame()
     }
 
+    // --- COLORI DINAMICI PER IL TEMA ---
+    val cardBackground = if (isDarkTheme) BothCardDark else BothCardLight
+    val tableBackground = if (isDarkTheme) TableDark else TableLight
+    val titleColor = mainTextColor(isDarkTheme)
+    val dividerColor = if (isDarkTheme) Color(0xFF353A40) else Color(0xFFE2E8F0)
+
     SinglePlayerTheme {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
-                title = { Text(stringResource(R.string.dialog_title)) },
-                text = { Text(stringResource(R.string.dialog_reset_text)) },
+                title = { Text(stringResource(R.string.dialog_title), color = titleColor) },
+                text = { Text(stringResource(R.string.dialog_reset_text), color = titleColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.resetGame()
                         showResetDialog = false
-                    }) { Text(stringResource(R.string.confirm)) }
+                    }) { Text(stringResource(R.string.confirm), color = titleColor) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel)) }
-                }
+                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel), color = titleColor) }
+                },
+                containerColor = cardBackground
             )
         }
 
         if (showHomeDialog) {
             AlertDialog(
                 onDismissRequest = { showHomeDialog = false },
-                title = { Text(stringResource(id = R.string.dialog_title)) },
-                text = { Text(stringResource(id = R.string.dialog_home_text)) },
+                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor) },
+                text = { Text(stringResource(id = R.string.dialog_home_text), color = titleColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         showHomeDialog = false
@@ -164,14 +172,15 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             popUpTo(0) { inclusive = true }
                         }
                     }) {
-                        Text(stringResource(id = R.string.confirm))
+                        Text(stringResource(id = R.string.confirm), color = titleColor)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showHomeDialog = false }) {
-                        Text(stringResource(id = R.string.cancel))
+                        Text(stringResource(id = R.string.cancel), color = titleColor)
                     }
-                }
+                },
+                containerColor = cardBackground
             )
         }
 
@@ -188,7 +197,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
             )
-            
+
             // Home Button in alto a destra
             Box(
                 modifier = Modifier
@@ -231,13 +240,13 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             .padding(horizontal = (4 * scaleFactor).dp)
                             .offset(y = (8 * scaleFactor).dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.95f)
+                            containerColor = cardBackground
                         ),
                         shape = RoundedCornerShape((12 * scaleFactor).dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
                         MultiDiceRow(
-                            diceValues = state.diceValues.map { it ?: 1 }, // Converto i null in 1
+                            diceValues = state.diceValues.map { it ?: 1 },
                             heldDice = state.heldDice,
                             onDiceClick = { index ->
                                 if (state.remainingRolls < 3 && !state.gameEnded) {
@@ -273,7 +282,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                             .offset(y = (8 * scaleFactor).dp)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.96f)
+                            containerColor = tableBackground
                         ),
                         shape = RoundedCornerShape((14 * scaleFactor).dp)
                     ) {
@@ -319,17 +328,17 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     if (index != 0) {
                                         HorizontalDivider(
                                             thickness = (0.2 * scaleFactor).dp,
-                                            color = Color(0xFFE2E8F0)
+                                            color = dividerColor
                                         )
                                     }
-                                    
+
                                     val currentScore = state.scoreMap[combination]
                                     val previewScore = if (showPreviews && animationDone) previewScores[combination] else null
-                                    val isEnabled = state.canSelectScore && 
-                                                   currentScore == null && 
-                                                   !state.gameEnded && 
-                                                   animationDone
-                                    
+                                    val isEnabled = state.canSelectScore &&
+                                            currentScore == null &&
+                                            !state.gameEnded &&
+                                            animationDone
+
                                     SinglePlayerTableRow(
                                         combination = combinationLabels[combination] ?: combination,
                                         score = currentScore,
@@ -341,15 +350,16 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                         fontSize = (13 * scaleFactor).sp,
                                         compactPadding = true,
                                         selected = currentScore != null,
-                                        scaleFactor = scaleFactor
+                                        scaleFactor = scaleFactor,
+                                        isDarkTheme = isDarkTheme
                                     )
                                 }
-                                
+
                                 HorizontalDivider(
                                     thickness = (0.2 * scaleFactor).dp,
-                                    color = Color(0xFFE2E8F0)
+                                    color = dividerColor
                                 )
-                                
+
                                 // Bonus row
                                 SinglePlayerTableRow(
                                     combination = stringResource(R.string.bonus) + " ($progressBonusText)",
@@ -358,14 +368,15 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     alternate = false,
                                     fontSize = (14 * scaleFactor).sp,
                                     compactPadding = true,
-                                    scaleFactor = scaleFactor
+                                    scaleFactor = scaleFactor,
+                                    isDarkTheme = isDarkTheme
                                 )
-                                
+
                                 HorizontalDivider(
                                     thickness = (0.2 * scaleFactor).dp,
-                                    color = Color(0xFFE2E8F0)
+                                    color = dividerColor
                                 )
-                                
+
                                 // Total row
                                 SinglePlayerTableRow(
                                     combination = stringResource(R.string.total_score).uppercase(),
@@ -374,7 +385,8 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     alternate = false,
                                     fontSize = (16 * scaleFactor).sp,
                                     compactPadding = true,
-                                    scaleFactor = scaleFactor
+                                    scaleFactor = scaleFactor,
+                                    isDarkTheme = isDarkTheme
                                 )
                             }
                         }
@@ -394,7 +406,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                 .wrapContentHeight()
                                 .shadow(elevation = 10.dp, shape = RoundedCornerShape((18 * scaleFactor).dp)),
                             colors = CardDefaults.cardColors(
-                                containerColor = Color.White.copy(alpha = 0.97f)
+                                containerColor = cardBackground
                             ),
                             shape = RoundedCornerShape((18 * scaleFactor).dp)
                         ) {
@@ -412,7 +424,7 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth()
                                 )
-                                
+
                                 if (viewModel.isNewHighScore) {
                                     Spacer(modifier = Modifier.height((12 * scaleFactor).dp))
                                     Text(
@@ -424,9 +436,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
-                                
+
                                 Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
-                                
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.Center
@@ -451,9 +463,9 @@ fun SinglePlayerGameScreen(navController: NavController) {
                                                         startX = 0f,
                                                         endX = Float.POSITIVE_INFINITY
                                                     ),
-                                                    shape = RoundedCornerShape((16 * scaleFactor).dp)  // Aumentato da 10 a 16
+                                                    shape = RoundedCornerShape((16 * scaleFactor).dp)
                                                 )
-                                                .padding(vertical = (6 * scaleFactor).dp),  // Aggiunto padding verticale
+                                                .padding(vertical = (6 * scaleFactor).dp),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Row(
@@ -515,23 +527,23 @@ fun SinglePlayerTableRow(
     fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
     compactPadding: Boolean = false,
     selected: Boolean = false,
-    scaleFactor: Float = 1f
+    scaleFactor: Float = 1f,
+    isDarkTheme: Boolean = false
 ) {
     val backgroundColor = when {
-        enabled -> Color(0xFFF0F9FF)
-        selected -> Color(0xFFE0F7FA)
-        alternate -> Color(0xFFFAFAFA)
+        enabled -> if (isDarkTheme) Color(0xFF2C2F34) else Color(0xFFF0F9FF)
+        selected -> if (isDarkTheme) Color(0xFF23272E) else Color(0xFFE0F7FA)
+        alternate -> if (isDarkTheme) Color(0xFF23272E) else Color(0xFFFAFAFA)
         else -> Color.Transparent
     }
 
     val textColor = when {
-        enabled -> Color(0xFF1E40AF)
-        bold -> Color(0xFF1A1A1A)
-        score != null -> Color(0xFF4ECDC4) // Punteggio selezionato con colore distintivo
-        else -> Color(0xFF4A5568)
+        enabled -> if (isDarkTheme) Color.White else Color(0xFF1E40AF)
+        bold -> mainTextColor(isDarkTheme)
+        score != null -> Color(0xFF4ECDC4)
+        else -> if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568)
     }
 
-    // Calcola padding in base alle dimensioni dello schermo
     val horizontalPadding = (8 * scaleFactor).dp
     val verticalPadding = if (compactPadding) {
         (5.5f * scaleFactor).dp
@@ -549,7 +561,7 @@ fun SinglePlayerTableRow(
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
                         .border(
                             (1 * scaleFactor).dp,
-                            Color(0xFF3B82F6),
+                            if (isDarkTheme) Color(0xFF4ECDC4) else Color(0xFF3B82F6),
                             RoundedCornerShape((6 * scaleFactor).dp)
                         )
                 } else Modifier
@@ -568,7 +580,7 @@ fun SinglePlayerTableRow(
                 text = combination,
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = Color(0xFF4A5568), // Colore costante per i nomi delle combinazioni
+                color = if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568),
                 fontSize = fontSize
             )
             Text(
