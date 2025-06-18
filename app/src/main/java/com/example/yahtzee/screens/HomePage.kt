@@ -55,7 +55,6 @@ fun Homepage(navController: NavController, isDarkTheme: Boolean) {
         showExitDialog = true
     }
 
-    HomeTheme(darkTheme = isDarkTheme) {}
 
     if (showExitDialog) {
         AlertDialog(
