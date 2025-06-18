@@ -2,6 +2,7 @@
 package com.example.yahtzee.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-
+import androidx.compose.ui.res.painterResource
+import com.example.yahtzee.R
+import androidx.compose.ui.text.font.FontFamily
 
 val HomeButtonGradient = listOf(HomeButtonStart, HomeButtonEnd)
 val SinglePlayerGradient = listOf(SinglePlayerStart, SinglePlayerEnd)
@@ -32,7 +36,16 @@ val BothCardDark = Color(0xFF23272E).copy(alpha = 0.92f)
 val TableLight = Color.White.copy(alpha = 0.96f)
 val TableDark = Color(0xFF23272E).copy(alpha = 0.96f)
 
+fun yahtzeeCardColor(isDarkTheme: Boolean): Color = if (isDarkTheme) BothCardDark else BothCardLight
+fun yahtzeeTableColor(isDarkTheme: Boolean): Color = if (isDarkTheme) TableDark else TableLight
 
+
+@Composable
+fun yahtzeeMainTextColor(isDarkTheme: Boolean): Color = mainTextColor(isDarkTheme)
+
+
+fun yahtzeeDividerColor(isDarkTheme: Boolean): Color = if (isDarkTheme) Color(0xFF353A40) else Color(0xFFE2E8F0)
+val yahtzeeFontFamily: FontFamily get() = YahtzeeFontFamily
 
 
 @Composable
@@ -157,3 +170,5 @@ fun YahtzeeTheme(
         content = content
     )
 }
+
+

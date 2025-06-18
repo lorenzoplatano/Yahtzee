@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.yahtzee.R
 
+
 // 1. Definisci il tuo FontFamily custom (sostituisci i font con quelli che hai in res/font)
 val YahtzeeFontFamily = FontFamily.Default
 // 2. Typography centralizzata (Material3: usa il costruttore di default e copia solo quello che ti serve)
