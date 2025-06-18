@@ -84,6 +84,9 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         val context = this
 
+        // Stato persistente per controllare se mostrare la selezione modalità
+        var showModeSelection by rememberSaveable { mutableStateOf(false) }
+
         // Stato per triggerare lo shake nelle schermate di gioco
         var singlePlayerShakeTrigger by remember { mutableStateOf(0) }
         var multiPlayerShakeTrigger by remember { mutableStateOf(0) }
@@ -115,7 +118,14 @@ class MainActivity : ComponentActivity() {
         }
 
         NavHost(navController = navController, startDestination = "homepage") {
-            composable("homepage") { Homepage(navController, isDarkTheme) }
+            composable("homepage") {
+                Homepage(
+                    navController = navController,
+                    isDarkTheme = isDarkTheme,
+                    showModeSelection = showModeSelection,
+                    onModeSelectionChanged = { showModeSelection = it }
+                )
+            }
             composable("history") { HistoryScreen(navController, isDarkTheme) }
             composable("settings") {
                 Settings(
@@ -128,15 +138,13 @@ class MainActivity : ComponentActivity() {
             composable("game_1vs1") {
                 MultiplayerGameScreen(
                     navController = navController,
-                    isDarkTheme = isDarkTheme,
-                    shakeTrigger = multiPlayerShakeTrigger
+                    isDarkTheme = isDarkTheme
                 )
             }
             composable("game") {
                 SinglePlayerGameScreen(
                     navController = navController,
-                    isDarkTheme = isDarkTheme,
-                    shakeTrigger = singlePlayerShakeTrigger
+                    isDarkTheme = isDarkTheme
                 )
             }
         }
