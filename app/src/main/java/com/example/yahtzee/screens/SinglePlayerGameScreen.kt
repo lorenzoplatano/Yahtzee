@@ -47,7 +47,7 @@ import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 
 @Composable
-fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
+fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, shakeTrigger: Int = 0) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -134,7 +134,11 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
     fun startNewGameDirectly() {
         viewModel.resetGame()
     }
-
+    LaunchedEffect(shakeTrigger) {
+        if (shakeTrigger > 0) {
+            rollDiceWithAnimation()
+        }
+    }
     // --- COLORI DINAMICI PER IL TEMA ---
     val cardBackground = if (isDarkTheme) BothCardDark else BothCardLight
     val tableBackground = if (isDarkTheme) TableDark else TableLight
