@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -50,10 +52,13 @@ import com.example.yahtzee.R
 import com.example.yahtzee.localization.AppLanguage
 import com.example.yahtzee.localization.LocalLocalizationManager
 import com.example.yahtzee.screens.components.ModernGameButton
+import com.example.yahtzee.ui.theme.CardDark
+import com.example.yahtzee.ui.theme.CardLight
 import com.example.yahtzee.ui.theme.SettingsTheme
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 import com.example.yahtzee.ui.theme.HomeDialogTitle
 import com.example.yahtzee.ui.theme.HomeBackText
+import com.example.yahtzee.ui.theme.mainTextColor
 
 // Stato iniziale delle impostazioni
 private val initialSettings = SettingsState(
@@ -84,6 +89,9 @@ fun Settings(
     val isCompactScreen = screenHeight < 600.dp
     val buttonFontSize = if (isCompactScreen) 16.sp else 18.sp
 
+    val titleColor = mainTextColor(isDarkTheme)
+    val cardBackground = if (isDarkTheme) CardDark else CardLight
+
     SettingsTheme(darkTheme = isDarkTheme) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Sfondo
@@ -105,7 +113,7 @@ fun Settings(
                     .align(Alignment.Center)
                     .shadow(8.dp, RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = cardBackground)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -115,7 +123,7 @@ fun Settings(
                     Text(
                         text = stringResource(R.string.settings_title),
                         style = MaterialTheme.typography.displayMedium,
-                        color = HomeDialogTitle,
+                        color = titleColor,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -130,8 +138,14 @@ fun Settings(
                     )
 
                     ModernGameButton(
-                        text = stringResource(id = R.string.theme),
-                        icon = Icons.Default.Settings,
+                        text = if (isDarkTheme)
+                            stringResource(id = R.string.light_theme)
+                        else
+                            stringResource(id = R.string.dark_theme),
+                        icon = if (isDarkTheme)
+                            Icons.Default.Brightness7 // Sole: tema chiaro
+                        else
+                            Icons.Default.Brightness4, // Luna: tema scuro
                         onClick = { onThemeChange(!isDarkTheme) },
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = buttonFontSize,
@@ -147,28 +161,13 @@ fun Settings(
                         gradientColors = SettingsButtonGradient
                     )
 
-                    ModernGameButton(
-                        text = stringResource(id = R.string.reset_settings),
-                        icon = Icons.Default.Settings,
-                        onClick = {
-                            settingsState = initialSettings
-                            onThemeChange(false)
-                            if (initialSettings.language != localizationManager.getCurrentLanguage()) {
-                                onLanguageChange(initialSettings.language)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = buttonFontSize,
-                        gradientColors = SettingsButtonGradient
-                    )
-
                     TextButton(
                         onClick = { navController.navigate("homepage") }
                     ) {
                         Text(
                             text = stringResource(id = R.string.back),
                             style = MaterialTheme.typography.labelLarge,
-                            color = HomeBackText
+                            color = if (isDarkTheme) CardLight else CardDark
                         )
                     }
                 }
@@ -182,12 +181,13 @@ fun Settings(
                         onLanguageChange(lang)
                         showLanguageDialog = false
                     },
-                    onDismiss = { showLanguageDialog = false }
+                    onDismiss = { showLanguageDialog = false },
+                    isDarkTheme = isDarkTheme
                 )
             }
 
             if (showRulesDialog) {
-                RulesDialog(onDismiss = { showRulesDialog = false })
+                RulesDialog(onDismiss = { showRulesDialog = false }, isDarkTheme = isDarkTheme)
             }
         }
     }
@@ -197,15 +197,19 @@ fun Settings(
 fun LanguageDialog(
     currentLanguage: AppLanguage,
     onSelectLanguage: (AppLanguage) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isDarkTheme: Boolean
 ) {
+    val titleColor = mainTextColor(isDarkTheme)
+    val dialogBackground = if (isDarkTheme) CardDark else CardLight
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = dialogBackground,
         title = {
             Text(
                 stringResource(id = R.string.select_language),
                 style = MaterialTheme.typography.headlineMedium,
-                color = HomeDialogTitle
+                color = titleColor
             )
         },
         text = {
@@ -218,7 +222,7 @@ fun LanguageDialog(
                         .padding(8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal,
-                    color = HomeDialogTitle
+                    color = titleColor
                 )
                 Text(
                     AppLanguage.ENGLISH.displayName,
@@ -228,7 +232,7 @@ fun LanguageDialog(
                         .padding(8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal,
-                    color = HomeDialogTitle
+                    color = titleColor
                 )
             }
         },
@@ -238,22 +242,27 @@ fun LanguageDialog(
 
 @Composable
 fun RulesDialog(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isDarkTheme: Boolean
 ) {
+    val titleColor = mainTextColor(isDarkTheme)
+    val dialogBackground = if (isDarkTheme) CardDark else CardLight
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = dialogBackground,
         title = {
             Text(
                 stringResource(id = R.string.rules_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = HomeDialogTitle
+                color = titleColor
             )
         },
         text = {
             Column {
                 Text(
                     stringResource(id = R.string.game_rules),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = titleColor
                 )
             }
         },
@@ -261,7 +270,8 @@ fun RulesDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     stringResource(id = R.string.ok_button),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
+                    color = titleColor
                 )
             }
         }

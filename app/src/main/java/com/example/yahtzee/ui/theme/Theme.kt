@@ -27,6 +27,19 @@ val SettingsButtonStart = Color(0xFF43CEA2)
 val SettingsButtonEnd = Color(0xFF185A9D)
 val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
 
+
+
+val CardLight = Color.White.copy(alpha = 0.9f)
+val CardDark = Color(0xFF23272E).copy(alpha = 0.92f)
+
+
+@Composable
+fun mainTextColor(darkTheme: Boolean): Color {
+    return if (darkTheme) Color.White else HomeDialogTitle
+}
+
+
+
 private val DarkColorScheme = darkColorScheme(
     primary = Blue200,
     onPrimary = Blue900,
