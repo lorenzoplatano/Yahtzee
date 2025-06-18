@@ -4,8 +4,6 @@ import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,51 +11,48 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import com.example.yahtzee.ui.theme.MultiPlayerTheme
+import com.example.yahtzee.ui.theme.BothCardDark
+import com.example.yahtzee.ui.theme.BothCardLight
+import com.example.yahtzee.ui.theme.TableDark
+import com.example.yahtzee.ui.theme.TableLight
+import com.example.yahtzee.ui.theme.mainTextColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun MultiplayerGameScreen(navController: NavController) {
+fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean) {
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    // Calcola fattori di scala basati sulle dimensioni dello schermo
     val scaleFactor = remember {
         (screenWidth / 360.dp).coerceIn(0.85f, 1.2f)
     }
 
-    // Flag per schermi compatti
     val isCompactScreen = screenHeight < 600.dp
 
-    // Calcolo dinamico delle dimensioni
     val diceAreaWidth = screenWidth * 0.9f - 32.dp
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
     val headerPadding = screenHeight * 0.05f
@@ -106,8 +101,6 @@ fun MultiplayerGameScreen(navController: NavController) {
     var isRolling by remember { mutableStateOf(false) }
     var showHomeDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-
-    // Nuova variabile per sapere quando l'animazione è davvero finita
     var animationDone by remember { mutableStateOf(true) }
 
     fun rollDiceWithAnimation() {
@@ -116,16 +109,9 @@ fun MultiplayerGameScreen(navController: NavController) {
                 isRolling = true
                 animationDone = false
                 showPreviews = false
-
-                // Aumenta il tempo di animazione per sincronizzarlo con l'animazione migliorata
-                // che ora dura 700ms
-                delay(800) // Leggermente più lungo dell'animazione dei dadi per garantire che sia completata
-
+                delay(800)
                 viewModel.rollDice()
-
-                // Piccolo ritardo aggiuntivo per permettere al giocatore di vedere i nuovi valori
                 delay(200)
-
                 isRolling = false
                 animationDone = true
                 showPreviews = true
@@ -133,29 +119,36 @@ fun MultiplayerGameScreen(navController: NavController) {
         }
     }
 
+    // Colori dinamici per dark/light mode
+    val cardBackground = if (isDarkTheme) BothCardDark else BothCardLight
+    val tableBackground = if (isDarkTheme) TableDark else TableLight
+    val titleColor = mainTextColor(isDarkTheme)
+    val dividerColor = if (isDarkTheme) Color(0xFF353A40) else Color(0xFFE2E8F0)
+
     MultiPlayerTheme(isPlayerOne = state.isPlayer1Turn) {
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
-                title = { Text(stringResource(id = R.string.dialog_title)) },
-                text = { Text(stringResource(id = R.string.dialog_reset_text)) },
+                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor) },
+                text = { Text(stringResource(id = R.string.dialog_reset_text), color = titleColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.resetGame()
                         showResetDialog = false
-                    }) { Text(stringResource(id = R.string.confirm)) }
+                    }) { Text(stringResource(id = R.string.confirm), color = titleColor) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(id = R.string.cancel))  }
-                }
+                    TextButton(onClick = { showResetDialog = false }) { Text(stringResource(id = R.string.cancel), color = titleColor) }
+                },
+                containerColor = cardBackground
             )
         }
 
         if (showHomeDialog) {
             AlertDialog(
                 onDismissRequest = { showHomeDialog = false },
-                title = { Text(stringResource(id = R.string.dialog_title)) },
-                text = { Text(stringResource(id = R.string.dialog_home_text)) },
+                title = { Text(stringResource(id = R.string.dialog_title), color = titleColor) },
+                text = { Text(stringResource(id = R.string.dialog_home_text), color = titleColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         showHomeDialog = false
@@ -163,20 +156,21 @@ fun MultiplayerGameScreen(navController: NavController) {
                             popUpTo(0) { inclusive = true }
                         }
                     }) {
-                        Text(stringResource(id = R.string.confirm))
+                        Text(stringResource(id = R.string.confirm), color = titleColor)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showHomeDialog = false }) {
-                        Text(stringResource(id = R.string.cancel))
+                        Text(stringResource(id = R.string.cancel), color = titleColor)
                     }
-                }
+                },
+                containerColor = cardBackground
             )
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(id = R.drawable.chunky),
+                painter = painterResource(id = R.drawable.sfondo_generale),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -219,7 +213,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // Card unica per i dadi con altezza relativa
+                // Card unica per i dadi
                 if (!state.gameEnded) {
                     Card(
                         modifier = Modifier
@@ -228,7 +222,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                             .padding(horizontal = (4 * scaleFactor).dp)
                             .offset(y = (8 * scaleFactor).dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.95f)
+                            containerColor = cardBackground
                         ),
                         shape = RoundedCornerShape((12 * scaleFactor).dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -270,12 +264,12 @@ fun MultiplayerGameScreen(navController: NavController) {
                             .offset(y = (8 * scaleFactor).dp)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.96f)
+                            containerColor = tableBackground
                         ),
                         shape = RoundedCornerShape((14 * scaleFactor).dp)
                     ) {
                         Column {
-                            // HEADER CON RETTANGOLO SEMITRASPARENTE SUL PLAYER DI TURNO
+                            // HEADER
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -295,7 +289,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         color = Color.White,
                                         fontSize = (13 * scaleFactor).sp
                                     )
-                                    // Player 1 header con highlight se è il suo turno
+                                    // Player 1 header
                                     Box(
                                         modifier = Modifier
                                             .weight(1f)
@@ -326,7 +320,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             fontSize = (13 * scaleFactor).sp
                                         )
                                     }
-                                    // Player 2 header con highlight se è il suo turno
+                                    // Player 2 header
                                     Box(
                                         modifier = Modifier
                                             .weight(1f)
@@ -369,7 +363,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     if (index != 0) {
                                         HorizontalDivider(
                                             thickness = (0.2 * scaleFactor).dp,
-                                            color = Color(0xFFE2E8F0)
+                                            color = dividerColor
                                         )
                                     }
                                     when (combination) {
@@ -383,7 +377,8 @@ fun MultiplayerGameScreen(navController: NavController) {
                                                 isPlayer1Turn = state.isPlayer1Turn,
                                                 fontSize = (14 * scaleFactor).sp,
                                                 compactPadding = true,
-                                                scaleFactor = scaleFactor
+                                                scaleFactor = scaleFactor,
+                                                isDarkTheme = isDarkTheme
                                             )
                                         }
                                         "Total" -> {
@@ -396,15 +391,14 @@ fun MultiplayerGameScreen(navController: NavController) {
                                                 isPlayer1Turn = state.isPlayer1Turn,
                                                 fontSize = (16 * scaleFactor).sp,
                                                 compactPadding = true,
-                                                scaleFactor = scaleFactor
+                                                scaleFactor = scaleFactor,
+                                                isDarkTheme = isDarkTheme
                                             )
                                         }
                                         else -> {
                                             val player1Score = state.scoreMapPlayer1[combination]
                                             val player2Score = state.scoreMapPlayer2[combination]
-                                            // Mostra la preview solo se l'animazione è finita
                                             val previewScore = if (showPreviews && animationDone) previewScores[combination] else null
-                                            // Abilita la selezione solo se l'animazione è finita
                                             val isEnabled = !state.gameEnded &&
                                                     state.hasRolledAtLeastOnce &&
                                                     showPreviews && animationDone &&
@@ -421,7 +415,8 @@ fun MultiplayerGameScreen(navController: NavController) {
                                                 isPlayer1Turn = state.isPlayer1Turn,
                                                 fontSize = (13 * scaleFactor).sp,
                                                 compactPadding = true,
-                                                scaleFactor = scaleFactor
+                                                scaleFactor = scaleFactor,
+                                                isDarkTheme = isDarkTheme
                                             )
                                         }
                                     }
@@ -431,7 +426,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                     }
                 }
 
-                // CARD FINE PARTITA CENTRATA con dimensioni responsive
+                // CARD FINE PARTITA
                 if (state.gameEnded) {
                     Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
                     Box(
@@ -444,7 +439,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 .wrapContentHeight()
                                 .shadow(elevation = 10.dp, shape = RoundedCornerShape((18 * scaleFactor).dp)),
                             colors = CardDefaults.cardColors(
-                                containerColor = Color.White.copy(alpha = 0.97f)
+                                containerColor = cardBackground
                             ),
                             shape = RoundedCornerShape((18 * scaleFactor).dp)
                         ) {
@@ -459,11 +454,10 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     totalScore2 > totalScore1 -> stringResource(id = R.string.player2)
                                     else -> null
                                 }
-                                // Determina il colore in base al vincitore
                                 val winnerColor = when (winner) {
-                                    stringResource(id = R.string.player1) -> Color(0xFF4ECDC4) // Colore del bottone Roll
-                                    stringResource(id = R.string.player1) -> Color(0xFFFF6B6B) // Colore del bottone Reset
-                                    else -> Color(0xFF764BA2) // Colore viola del bottone impostazioni (pareggio)
+                                    "Player 1" -> Color(0xFF4ECDC4)
+                                    "Player 2" -> Color(0xFFFF6B6B)
+                                    else -> Color(0xFF764BA2)
                                 }
                                 if (winner != null) {
                                     Text(
@@ -473,9 +467,9 @@ fun MultiplayerGameScreen(navController: NavController) {
                                             totalScore1,
                                             totalScore2
                                         ),
-                                        fontSize = (18 * scaleFactor).sp,
+                                        fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = winnerColor, // Usa il colore dinamico
+                                        color = winnerColor,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -488,7 +482,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         ),
                                         fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = winnerColor, // Usa il colore dinamico
+                                        color = winnerColor,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -500,7 +494,6 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 ) {
                                     Button(
                                         onClick = {
-                                            // Avvia direttamente una nuova partita senza dialog
                                             viewModel.resetGame()
                                         },
                                         modifier = Modifier
@@ -588,39 +581,35 @@ fun MultiplayerTableRow(
     isPlayer1Turn: Boolean = true,
     fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
     compactPadding: Boolean = false,
-    scaleFactor: Float = 1f
+    scaleFactor: Float = 1f,
+    isDarkTheme: Boolean = false
 ) {
     val backgroundColor = when {
-        enabled -> Color(0xFFF0F9FF)
-        alternate -> Color(0xFFFAFAFA)
+        enabled -> if (isDarkTheme) Color(0xFF2C2F34) else Color(0xFFF0F9FF)
+        alternate -> if (isDarkTheme) Color(0xFF23272E) else Color(0xFFFAFAFA)
         else -> Color.Transparent
     }
 
     val textColor = when {
-        enabled -> Color(0xFF1E40AF)
-        bold -> Color(0xFF1A1A1A)
-        else -> Color(0xFF4A5568)
+        enabled -> if (isDarkTheme) Color.White else Color(0xFF1E40AF)
+        bold -> mainTextColor(isDarkTheme)
+        else -> if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568)
     }
 
-    // Colori specifici per i giocatori
-    val player1Color = Color(0xFF4ECDC4) // Colore del bottone Roll
-    val player2Color = Color(0xFFFF6B6B) // Colore del bottone Reset
+    val player1Color = Color(0xFF4ECDC4)
+    val player2Color = Color(0xFFFF6B6B)
 
-// Determina il colore per il punteggio del Player 1
     val player1TextColor = when {
-        player1Score != null -> player1Color // Se ha già un punteggio, usa il suo colore
-        previewScore != null && isPlayer1Turn -> Color(0xFF1E40AF) // Preview solo se è il suo turno
+        player1Score != null -> player1Color
+        previewScore != null && isPlayer1Turn -> textColor
         else -> textColor
     }
-
-// Determina il colore per il punteggio del Player 2
     val player2TextColor = when {
-        player2Score != null -> player2Color // Se ha già un punteggio, usa il suo colore
-        previewScore != null && !isPlayer1Turn -> Color(0xFF1E40AF) // Preview solo se è il suo turno
+        player2Score != null -> player2Color
+        previewScore != null && !isPlayer1Turn -> textColor
         else -> textColor
     }
 
-    // Calcola padding in base alle dimensioni dello schermo
     val horizontalPadding = (8 * scaleFactor).dp
     val verticalPadding = if (compactPadding) {
         (5.5f * scaleFactor).dp
@@ -638,7 +627,7 @@ fun MultiplayerTableRow(
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
                         .border(
                             (1 * scaleFactor).dp,
-                            Color(0xFF3B82F6),
+                            if (isDarkTheme) Color(0xFF4ECDC4) else Color(0xFF3B82F6),
                             RoundedCornerShape((6 * scaleFactor).dp)
                         )
                 } else Modifier
@@ -664,7 +653,7 @@ fun MultiplayerTableRow(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = player1TextColor, // Usa il colore specifico
+                color = player1TextColor,
                 fontSize = fontSize
             )
             Text(
@@ -672,10 +661,9 @@ fun MultiplayerTableRow(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = player2TextColor, // Usa il colore specifico
+                color = player2TextColor,
                 fontSize = fontSize
             )
         }
     }
 }
-
