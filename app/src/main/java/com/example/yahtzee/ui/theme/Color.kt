@@ -47,5 +47,5 @@ val HistoryEnd = Color(0xFFFF5722)
 val HomeBackText = Color(0xFF764BA2)
 val HomeDialogTitle = Color(0xFF1A1A1A)
 
-val SettingsCardLight = Color(0xFFF5F5F5)
-val SettingsCardDark = Color(0xFF212121)
+val CardLight = Color.White.copy(alpha = 0.9f)
+val CardDark = Color(0xFF23272E).copy(alpha = 0.92f)

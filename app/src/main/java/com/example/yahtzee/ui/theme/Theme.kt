@@ -29,9 +29,6 @@ val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
 
 
 
-val CardLight = Color.White.copy(alpha = 0.9f)
-val CardDark = Color(0xFF23272E).copy(alpha = 0.92f)
-
 
 @Composable
 fun mainTextColor(darkTheme: Boolean): Color {
