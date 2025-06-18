@@ -37,6 +37,7 @@ import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import com.example.yahtzee.ui.theme.MultiPlayerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.compareTo
 
 @Composable
 fun MultiplayerGameScreen(navController: NavController) {
@@ -49,14 +50,12 @@ fun MultiplayerGameScreen(navController: NavController) {
         (screenWidth / 360.dp).coerceIn(0.85f, 1.2f)
     }
 
-    // Flag per schermi compatti (sia altezza che larghezza)
+    // Flag per schermi compatti
     val isCompactScreen = screenHeight < 600.dp
-    val isNarrowScreen = screenWidth < 340.dp
 
     // Calcolo dinamico delle dimensioni
     val diceAreaWidth = screenWidth * 0.9f - 32.dp
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
-    val tableRowFontSize = (if (isCompactScreen) 11.sp else 12.sp) * scaleFactor
     val headerPadding = screenHeight * 0.05f
     val bottomAreaHeight = screenHeight * 0.1f
 
@@ -112,9 +111,16 @@ fun MultiplayerGameScreen(navController: NavController) {
                 isRolling = true
                 animationDone = false
                 showPreviews = false
-                delay(500) // durata animazione
+
+                // Aumenta il tempo di animazione per sincronizzarlo con l'animazione migliorata
+                // che ora dura 700ms
+                delay(800) // Leggermente più lungo dell'animazione dei dadi per garantire che sia completata
+
                 viewModel.rollDice()
-                delay(500) // attesa per completare animazione visiva
+
+                // Piccolo ritardo aggiuntivo per permettere al giocatore di vedere i nuovi valori
+                delay(200)
+
                 isRolling = false
                 animationDone = true
                 showPreviews = true
@@ -227,7 +233,8 @@ fun MultiplayerGameScreen(navController: NavController) {
                             },
                             enabled = state.remainingRolls < 3 && !state.gameEnded,
                             diceSize = diceSize,
-                            isRolling = isRolling
+                            isRolling = isRolling,
+                            isPlayer1Turn = state.isPlayer1Turn
                         )
                     }
                 }
@@ -442,12 +449,18 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     totalScore2 > totalScore1 -> "Player 2"
                                     else -> null
                                 }
+                                // Determina il colore in base al vincitore
+                                val winnerColor = when (winner) {
+                                    "Player 1" -> Color(0xFF4ECDC4) // Colore del bottone Roll
+                                    "Player 2" -> Color(0xFFFF6B6B) // Colore del bottone Reset
+                                    else -> Color(0xFF764BA2) // Colore viola del bottone impostazioni (pareggio)
+                                }
                                 if (winner != null) {
                                     Text(
                                         text = "$winner vince $totalScore1 - $totalScore2!",
                                         fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF4ECDC4),
+                                        color = winnerColor, // Usa il colore dinamico
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -456,7 +469,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         text = "Pareggio! $totalScore1 - $totalScore2",
                                         fontSize = (22 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF4ECDC4),
+                                        color = winnerColor, // Usa il colore dinamico
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -467,28 +480,54 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     horizontalArrangement = Arrangement.Center
                                 ) {
                                     Button(
-                                        onClick = { showResetDialog = true },
+                                        onClick = {
+                                            // Avvia direttamente una nuova partita senza dialog
+                                            viewModel.resetGame()
+                                        },
                                         modifier = Modifier
-                                            .fillMaxWidth(0.7f)
-                                            .height((48 * scaleFactor).dp),
-                                        shape = RoundedCornerShape((10 * scaleFactor).dp),
+                                            .fillMaxWidth(0.8f)
+                                            .height((56 * scaleFactor).dp),
+                                        shape = RoundedCornerShape((12 * scaleFactor).dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF4ECDC4),
+                                            containerColor = Color.Transparent,
                                             contentColor = Color.White
                                         )
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Nuova Partita",
-                                            tint = Color.White,
-                                            modifier = Modifier.size((20 * scaleFactor).dp)
-                                        )
-                                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
-                                        Text(
-                                            text = "Nuova Partita",
-                                            fontSize = (15 * scaleFactor).sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    brush = Brush.horizontalGradient(
+                                                        colors = when (winner) {
+                                                            "Player 1" -> listOf(Color(0xFF4ECDC4), Color(0xFF2AB7CA))
+                                                            "Player 2" -> listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                                            else -> listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                                                        },
+                                                        startX = 0f,
+                                                        endX = Float.POSITIVE_INFINITY
+                                                    ),
+                                                    shape = RoundedCornerShape((10 * scaleFactor).dp)
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Refresh,
+                                                    contentDescription = "Nuova Partita",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size((24 * scaleFactor).dp)
+                                                )
+                                                Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                                                Text(
+                                                    text = "Nuova Partita",
+                                                    fontSize = (16 * scaleFactor).sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -497,7 +536,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                 }
             }
 
-            // Bottoni in basso con dimensioni responsive
+            if(!state.gameEnded){// Bottoni in basso con dimensioni responsive
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -550,15 +589,9 @@ fun MultiplayerGameScreen(navController: NavController) {
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .background(
-                                        brush = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) {
-                                            Brush.horizontalGradient(
-                                                listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
-                                            )
-                                        } else {
-                                            Brush.horizontalGradient(
-                                                listOf(Color.Gray.copy(alpha = 0.5f), Color.Gray.copy(alpha = 0.3f))
-                                            )
-                                        },
+                                        brush = Brush.horizontalGradient(
+                                            listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                        ),
                                         shape = RoundedCornerShape((12 * scaleFactor).dp)
                                     ),
                                 contentAlignment = Alignment.Center
@@ -570,13 +603,13 @@ fun MultiplayerGameScreen(navController: NavController) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
                                         contentDescription = "Roll",
-                                        tint = Color.White,
+                                        tint = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
                                         modifier = Modifier.size((20 * scaleFactor).dp)
                                     )
                                     Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                     Text(
                                         text = "Roll (${state.remainingRolls})",
-                                        color = Color.White,
+                                        color = Color.White.copy(alpha = if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) 1f else 0.6f),
                                         fontSize = (14 * scaleFactor).sp,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1,
@@ -631,7 +664,7 @@ fun MultiplayerGameScreen(navController: NavController) {
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         modifier = Modifier.padding(vertical = (4 * scaleFactor).dp)
-                                    )
+                                    )}
                                 }
                             }
                         }
@@ -668,6 +701,24 @@ fun MultiplayerTableRowStyled(
         enabled -> Color(0xFF1E40AF)
         bold -> Color(0xFF1A1A1A)
         else -> Color(0xFF4A5568)
+    }
+
+    // Colori specifici per i giocatori
+    val player1Color = Color(0xFF4ECDC4) // Colore del bottone Roll
+    val player2Color = Color(0xFFFF6B6B) // Colore del bottone Reset
+
+// Determina il colore per il punteggio del Player 1
+    val player1TextColor = when {
+        player1Score != null -> player1Color // Se ha già un punteggio, usa il suo colore
+        previewScore != null && isPlayer1Turn -> Color(0xFF1E40AF) // Preview solo se è il suo turno
+        else -> textColor
+    }
+
+// Determina il colore per il punteggio del Player 2
+    val player2TextColor = when {
+        player2Score != null -> player2Color // Se ha già un punteggio, usa il suo colore
+        previewScore != null && !isPlayer1Turn -> Color(0xFF1E40AF) // Preview solo se è il suo turno
+        else -> textColor
     }
 
     // Calcola padding in base alle dimensioni dello schermo
@@ -714,7 +765,7 @@ fun MultiplayerTableRowStyled(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = textColor,
+                color = player1TextColor, // Usa il colore specifico
                 fontSize = fontSize
             )
             Text(
@@ -722,7 +773,7 @@ fun MultiplayerTableRowStyled(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = textColor,
+                color = player2TextColor, // Usa il colore specifico
                 fontSize = fontSize
             )
         }
@@ -897,7 +948,8 @@ fun MultiGameDiceRow(
     onDiceClick: (Int) -> Unit,
     enabled: Boolean,
     diceSize: androidx.compose.ui.unit.Dp = 50.dp,
-    isRolling: Boolean = false
+    isRolling: Boolean = false,
+    isPlayer1Turn: Boolean = true
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -910,22 +962,53 @@ fun MultiGameDiceRow(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val diceAnimations = List(diceValues.size) { index ->
-            val randomEndRotation = remember(isRolling) { (-720..720).random().toFloat() }
+            // Rotazione più casuale e variabile per ogni dado
+            val randomEndRotation = remember(isRolling) {
+                (-540..720).random().toFloat() + (index * 45f)
+            }
+
+            // Aggiungiamo una rotazione basata sul valore del dado per più varietà
+            val valueBasedRotation = remember(diceValues[index], isRolling) {
+                diceValues[index] * 60f
+            }
+
+            // Animazione di rotazione più fluida con effetto di rimbalzo
             val rotation by animateFloatAsState(
-                targetValue = if (isRolling && !heldDice[index]) randomEndRotation else 0f,
-                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                targetValue = if (isRolling && !heldDice[index]) randomEndRotation + valueBasedRotation else 0f,
+                animationSpec = tween(
+                    durationMillis = 650,
+                    easing = EaseOutBack
+                ),
                 label = "diceRotation"
             )
+
+            // Animazione di scala che simula un lancio più naturale
             val scale by animateFloatAsState(
-                targetValue = if (isRolling && !heldDice[index]) 0.8f else 1f,
-                animationSpec = repeatable(
-                    iterations = 2,
-                    animation = tween(250, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
+                targetValue = if (isRolling && !heldDice[index]) 0.85f else 1f,
+                animationSpec = keyframes {
+                    durationMillis = 700
+                    0.7f at 0
+                    1.1f at 350
+                    0.95f at 500
+                    1f at 700
+                },
                 label = "diceScale"
             )
-            Pair(rotation, scale)
+
+            // Offset orizzontale per aggiungere movimento laterale
+            val offsetX by animateFloatAsState(
+                targetValue = if (isRolling && !heldDice[index]) 0f else 0f,
+                animationSpec = keyframes {
+                    durationMillis = 700
+                    (-15f) at 0
+                    10f at 250
+                    (-5f) at 500
+                    0f at 700
+                },
+                label = "offsetX"
+            )
+
+            Triple(rotation, scale, offsetX)
         }
 
         diceValues.forEachIndexed { index, value ->
@@ -947,9 +1030,17 @@ fun MultiGameDiceRow(
                         .fillMaxSize()
                         .background(
                             brush = if (heldDice[index]) {
-                                Brush.horizontalGradient(
-                                    listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
-                                )
+                                if (isPlayer1Turn) {
+                                    // Colori per Player 1 (verde-acqua)
+                                    Brush.horizontalGradient(
+                                        listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                    )
+                                } else {
+                                    // Colori per Player 2 (rosso-arancio)
+                                    Brush.horizontalGradient(
+                                        listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                    )
+                                }
                             } else {
                                 Brush.horizontalGradient(
                                     listOf(Color(0xFFF7FAFC), Color(0xFFEDF2F7))
