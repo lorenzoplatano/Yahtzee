@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -28,6 +29,12 @@ import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 import com.example.yahtzee.ui.theme.Typography
+import com.example.yahtzee.ui.theme.violaceo
+import com.example.yahtzee.ui.theme.blu_chiaro
+import com.example.yahtzee.ui.theme.verde_acqua
+import com.example.yahtzee.ui.theme.verde_azzurro
+import com.example.yahtzee.ui.theme.arancio_rosso
+import com.example.yahtzee.ui.theme.arancione
 import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,6 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MultiplayerGameScreen(
     navController: NavController,
+    isDarkTheme: Boolean = false,
     shakeTrigger: Int = 0
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -166,13 +174,17 @@ fun MultiplayerGameScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
     ) {
         Image(
             painter = painterResource(id = R.drawable.sfondo_generale),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
         )
 
         Box(
@@ -261,13 +273,13 @@ fun MultiplayerGameScreen(
                     shape = RoundedCornerShape((14 * scaleFactor).dp)
                 ) {
                     Column {
-                        // HEADER
+                        // HEADER con colori HomeButton
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
                                     brush = Brush.horizontalGradient(
-                                        listOf(colorScheme.primary, colorScheme.secondary)
+                                        listOf(violaceo, blu_chiaro)
                                     ),
                                     shape = RoundedCornerShape(
                                         topStart = (if (isCompactScreen) (10 * scaleFactor) else (14 * scaleFactor)).dp,
@@ -283,7 +295,7 @@ fun MultiplayerGameScreen(
                                     text = stringResource(id = R.string.combination),
                                     modifier = Modifier.weight(2f),
                                     fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onPrimary,
+                                    color = Color.White,
                                     style = Typography.titleSmall
                                 )
                                 // Player 1 header
@@ -295,12 +307,12 @@ fun MultiplayerGameScreen(
                                             if (state.isPlayer1Turn)
                                                 Modifier
                                                     .background(
-                                                        colorScheme.onPrimary.copy(alpha = 0.22f),
+                                                        Color.White.copy(alpha = 0.22f),
                                                         shape = RoundedCornerShape((6 * scaleFactor).dp)
                                                     )
                                                     .border(
                                                         width = (2 * scaleFactor).dp,
-                                                        color = colorScheme.onPrimary.copy(alpha = 0.35f),
+                                                        color = Color.White.copy(alpha = 0.35f),
                                                         shape = RoundedCornerShape((6 * scaleFactor).dp)
                                                     )
                                             else Modifier
@@ -313,7 +325,7 @@ fun MultiplayerGameScreen(
                                             .padding(vertical = (2 * scaleFactor).dp),
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorScheme.onPrimary,
+                                        color = Color.White,
                                         style = Typography.titleSmall
                                     )
                                 }
@@ -326,12 +338,12 @@ fun MultiplayerGameScreen(
                                             if (!state.isPlayer1Turn)
                                                 Modifier
                                                     .background(
-                                                        colorScheme.onPrimary.copy(alpha = 0.22f),
+                                                        Color.White.copy(alpha = 0.22f),
                                                         shape = RoundedCornerShape((6 * scaleFactor).dp)
                                                     )
                                                     .border(
                                                         width = (2 * scaleFactor).dp,
-                                                        color = colorScheme.onPrimary.copy(alpha = 0.35f),
+                                                        color = Color.White.copy(alpha = 0.35f),
                                                         shape = RoundedCornerShape((6 * scaleFactor).dp)
                                                     )
                                             else Modifier
@@ -344,7 +356,7 @@ fun MultiplayerGameScreen(
                                             .padding(vertical = (2 * scaleFactor).dp),
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorScheme.onPrimary,
+                                        color = Color.White,
                                         style = Typography.titleSmall
                                     )
                                 }
@@ -357,7 +369,6 @@ fun MultiplayerGameScreen(
                         ) {
                             val allRows = combinationKeys + listOf("Bonus", "Total")
                             allRows.forEachIndexed { index, combination ->
-                                // NESSUNA alternanza: tutte le righe hanno lo stesso colore!
                                 when (combination) {
                                     "Bonus" -> {
                                         MultiplayerTableRow(
@@ -365,7 +376,7 @@ fun MultiplayerGameScreen(
                                             player1Score = bonus1,
                                             player2Score = bonus2,
                                             bold = true,
-                                            alternate = false, // <--- nessuna alternanza
+                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
                                             fontSize = Typography.bodyMedium.fontSize,
                                             scaleFactor = scaleFactor,
@@ -379,7 +390,7 @@ fun MultiplayerGameScreen(
                                             player1Score = totalScore1,
                                             player2Score = totalScore2,
                                             bold = true,
-                                            alternate = false, // <--- nessuna alternanza
+                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
                                             fontSize = Typography.bodyMedium.fontSize,
                                             scaleFactor = scaleFactor,
@@ -403,7 +414,7 @@ fun MultiplayerGameScreen(
                                             enabled = isEnabled,
                                             onClick = { if (isEnabled) viewModel.selectScore(combination) },
                                             bold = false,
-                                            alternate = false, // <--- nessuna alternanza
+                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
                                             fontSize = Typography.bodyMedium.fontSize,
                                             scaleFactor = scaleFactor,
@@ -447,8 +458,8 @@ fun MultiplayerGameScreen(
                                 else -> null
                             }
                             val winnerColor = when (winner) {
-                                stringResource(id = R.string.player1) -> colorScheme.primary
-                                stringResource(id = R.string.player2) -> colorScheme.secondary
+                                stringResource(id = R.string.player1) -> verde_acqua
+                                stringResource(id = R.string.player2) -> arancio_rosso
                                 else -> colorScheme.tertiary
                             }
                             if (winner != null) {
@@ -493,8 +504,8 @@ fun MultiplayerGameScreen(
                                         .height((56 * scaleFactor).dp),
                                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = colorScheme.primary,
-                                        contentColor = colorScheme.onPrimary
+                                        containerColor = Color.Transparent,
+                                        contentColor = Color.White
                                     )
                                 ) {
                                     Box(
@@ -503,9 +514,9 @@ fun MultiplayerGameScreen(
                                             .background(
                                                 brush = Brush.horizontalGradient(
                                                     colors = when (winner) {
-                                                        stringResource(id = R.string.player1) -> listOf(colorScheme.primary, colorScheme.primaryContainer)
-                                                        stringResource(id = R.string.player2) -> listOf(colorScheme.secondary, colorScheme.secondaryContainer)
-                                                        else -> listOf(colorScheme.primary, colorScheme.secondary)
+                                                        stringResource(id = R.string.player1) -> listOf(verde_acqua, verde_azzurro)
+                                                        stringResource(id = R.string.player2) -> listOf(arancio_rosso, arancione)
+                                                        else -> listOf(violaceo, blu_chiaro)
                                                     },
                                                     startX = 0f,
                                                     endX = Float.POSITIVE_INFINITY
@@ -521,14 +532,15 @@ fun MultiplayerGameScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Refresh,
                                                 contentDescription = null,
-                                                tint = colorScheme.onPrimary,
+                                                tint = Color.White,
                                                 modifier = Modifier.size((24 * scaleFactor).dp)
                                             )
                                             Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                                             Text(
                                                 text = stringResource(id = R.string.new_game),
                                                 style = Typography.labelLarge,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White
                                             )
                                         }
                                     }
@@ -568,14 +580,13 @@ fun MultiplayerTableRow(
     enabled: Boolean = false,
     onClick: () -> Unit = {},
     bold: Boolean = false,
-    alternate: Boolean = false, // Ignorato, tutte le righe sono uguali
+    alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
     fontSize: androidx.compose.ui.unit.TextUnit = Typography.bodyMedium.fontSize,
     scaleFactor: Float = 1f,
     isCompactScreen: Boolean = false,
     colorScheme: ColorScheme = MaterialTheme.colorScheme
 ) {
-    // Tutte le righe hanno lo stesso colore della tabella (surface)
     val backgroundColor = colorScheme.surface
 
     val textColor = when {
@@ -584,8 +595,9 @@ fun MultiplayerTableRow(
         else -> colorScheme.onSurfaceVariant
     }
 
-    val player1Color = colorScheme.primary
-    val player2Color = colorScheme.secondary
+    // Colori dei punteggi come i pulsanti di controllo
+    val player1Color = verde_acqua // Colore del pulsante lancia
+    val player2Color = arancio_rosso // Colore del pulsante reset
 
     val player1TextColor = when {
         player1Score != null -> player1Color
