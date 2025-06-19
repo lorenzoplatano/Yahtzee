@@ -1,8 +1,8 @@
-package com.example.yahtzee.logic
+package com.example.yahtzee.service
 
 import com.example.yahtzee.model.GameState
 
-class GameController {
+class GameService {
     companion object {
         val combinations = listOf(
             "Aces", "Twos", "Threes", "Fours", "Fives", "Sixes",
@@ -20,8 +20,7 @@ class GameController {
 
     fun calculateScore(
         combination: String,
-        diceValues: List<Int?>,
-        scoreMap: Map<String, Int?>
+        diceValues: List<Int?>
     ): Int {
         // Filtra via eventuali valori nulli prima di calcolare il punteggio
         val nonNullValues = diceValues.filterNotNull()

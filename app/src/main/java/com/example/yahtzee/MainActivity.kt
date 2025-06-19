@@ -6,30 +6,49 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yahtzee.util.AppLanguage
-import com.example.yahtzee.util.LocalLocalizationManager
-import com.example.yahtzee.util.LocalizationManager
-import com.example.yahtzee.util.SettingsManager
+import com.example.yahtzee.db.AppDatabase
+import com.example.yahtzee.repository.GameHistoryRepository
+import com.example.yahtzee.repository.SettingsRepository
 import com.example.yahtzee.screens.*
 import com.example.yahtzee.ui.theme.YahtzeeTheme
+import com.example.yahtzee.model.AppLanguage
+import com.example.yahtzee.util.LocalLocalizationManager
+import com.example.yahtzee.util.LocalizationManager
 import com.example.yahtzee.util.ShakeDetector
+import com.example.yahtzee.viewmodel.HistoryViewModel
+import com.example.yahtzee.viewmodel.HistoryViewModelFactory
+import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
+import com.example.yahtzee.viewmodel.MultiplayerGameViewModelFactory
+import com.example.yahtzee.viewmodel.SettingsViewModel
+import com.example.yahtzee.viewmodel.SettingsViewModelFactory
+import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
+import com.example.yahtzee.viewmodel.SinglePlayerGameViewModelFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
-    private lateinit var settingsManager: SettingsManager
+    private lateinit var settingsRepository: SettingsRepository
     private var savedLanguage: AppLanguage? = null
+
+    // ✅ SettingsViewModel creato nella MainActivity con Factory
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        SettingsViewModelFactory(settingsRepository)
+    }
 
     companion object {
         private var localizationManager = LocalizationManager()
@@ -41,12 +60,12 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         // Carica la lingua salvata dalle preferenze PRIMA di creare il contesto
-        if (!::settingsManager.isInitialized) {
-            settingsManager = SettingsManager(newBase.applicationContext)
+        if (!::settingsRepository.isInitialized) {
+            settingsRepository = SettingsRepository(newBase.applicationContext)
         }
         // Carica la lingua in modo sincrono
         val language = runBlocking {
-            settingsManager.languageFlow.first()
+            settingsRepository.languageFlow.first()
         }
         savedLanguage = language
         localizationManager.setLanguage(language)
@@ -59,47 +78,38 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // Raccoglie i flussi delle impostazioni come stati in Compose
-            val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = false)
-            val isShakeEnabled by settingsManager.isShakeEnabledFlow.collectAsState(initial = true)
-            val currentLanguage by settingsManager.languageFlow.collectAsState(initial = savedLanguage ?: AppLanguage.ITALIAN)
+    // ✅ Accesso diretto allo stato del ViewModel
+    val uiState = settingsViewModel.uiState
+    val isDarkTheme = uiState.isDarkTheme
+    val isShakeEnabled = uiState.isShakeEnabled
+    val currentLanguage = uiState.currentLanguage
 
-            // Aggiorna il LocalizationManager solo se cambia la lingua
-            LaunchedEffect(currentLanguage) {
-                localizationManager.setLanguage(currentLanguage)
-            }
+    // Aggiorna il LocalizationManager solo se cambia la lingua
+    LaunchedEffect(currentLanguage) {
+        localizationManager.setLanguage(currentLanguage)
+    }
 
-            CompositionLocalProvider(LocalLocalizationManager provides localizationManager) {
-                YahtzeeTheme(darkTheme = isDarkTheme) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        YahtzeeApp(
-                            isDarkTheme = isDarkTheme,
-                            onThemeChange = { newValue ->
-                                lifecycleScope.launch {
-                                    settingsManager.setDarkTheme(newValue)
-                                }
-                            },
-                            onLanguageChange = { language ->
-                                lifecycleScope.launch {
-                                    settingsManager.setLanguage(language)
-                                    localizationManager.setLanguage(language)
-                                    recreateActivity()
-                                }
-                            },
-                            isShakeEnabled = isShakeEnabled,
-                            onShakeToggle = { newValue ->
-                                lifecycleScope.launch {
-                                    settingsManager.setShakeEnabled(newValue)
-                                }
-                            }
-                        )
+    CompositionLocalProvider(LocalLocalizationManager provides localizationManager) {
+        YahtzeeTheme(darkTheme = isDarkTheme) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                YahtzeeApp(
+                    isShakeEnabled = isShakeEnabled,
+                    settingsViewModel = settingsViewModel,
+                    onLanguageChange = { language ->
+                        lifecycleScope.launch {
+                            settingsRepository.setLanguage(language)
+                            localizationManager.setLanguage(language)
+                            recreateActivity()
+                        }
                     }
-                }
+                )
             }
         }
+    }
+}
     }
 
     private fun recreateActivity() {
@@ -108,15 +118,28 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun YahtzeeApp(
-        isDarkTheme: Boolean,
-        onThemeChange: (Boolean) -> Unit,
-        onLanguageChange: (AppLanguage) -> Unit,
         isShakeEnabled: Boolean,
-        onShakeToggle: (Boolean) -> Unit
+        settingsViewModel: SettingsViewModel,
+        onLanguageChange: (AppLanguage) -> Unit
     ) {
-        // Il resto del codice di YahtzeeApp rimane invariato
         val navController = rememberNavController()
-        val context = this
+        val context = LocalContext.current
+
+        // ✅ Crea Repository e ViewModel nel Composable
+        val db = remember { AppDatabase.getDatabase(context) }
+        val gameHistoryRepository = remember { GameHistoryRepository(db.gameHistoryDao()) }
+
+        val singlePlayerGameViewModel: SinglePlayerGameViewModel = viewModel(
+            factory = SinglePlayerGameViewModelFactory(gameHistoryRepository)
+        )
+
+        val multiplayerGameViewModel: MultiplayerGameViewModel = viewModel(
+            factory = MultiplayerGameViewModelFactory()
+        )
+
+        val historyViewModel: HistoryViewModel = viewModel(
+            factory = HistoryViewModelFactory(gameHistoryRepository)
+        )
 
         var showModeSelection by rememberSaveable { mutableStateOf(false) }
         var singlePlayerShakeTrigger by remember { mutableStateOf(0) }
@@ -135,7 +158,7 @@ class MainActivity : ComponentActivity() {
 
         // Listener per la navigazione e per l'attivazione shake
         DisposableEffect(isShakeEnabled, navController) {
-            val listener = androidx.navigation.NavController.OnDestinationChangedListener { _, destination, _ ->
+            val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
                 val isGameScreen = destination.route == "game" || destination.route == "game_1vs1"
                 if (isGameScreen && isShakeEnabled) {
                     shakeDetector.register(sensorManager)
@@ -170,27 +193,31 @@ class MainActivity : ComponentActivity() {
                     onModeSelectionChanged = { showModeSelection = it }
                 )
             }
-            composable("history") { HistoryScreen(navController) }
+            composable("history") {
+                HistoryScreen(
+                    navController = navController,
+                    viewModel = historyViewModel  // ✅ Passa il ViewModel
+                )
+            }
             composable("settings") {
                 Settings(
                     navController = navController,
-                    isDarkTheme = isDarkTheme,
-                    onThemeChange = onThemeChange,
-                    onLanguageChange = onLanguageChange,
-                    isShakeEnabled = isShakeEnabled,
-                    onShakeToggle = onShakeToggle
+                    viewModel = settingsViewModel,  // ✅ Passa il ViewModel
+                    onLanguageChange = onLanguageChange
                 )
             }
             composable("game_1vs1") {
                 MultiplayerGameScreen(
                     navController = navController,
-                    shakeTrigger = multiPlayerShakeTrigger
+                    shakeTrigger = multiPlayerShakeTrigger,
+                    viewModel = multiplayerGameViewModel  // ✅ Passa il ViewModel
                 )
             }
             composable("game") {
                 SinglePlayerGameScreen(
                     navController = navController,
-                    shakeTrigger = singlePlayerShakeTrigger
+                    shakeTrigger = singlePlayerShakeTrigger,
+                    viewModel = singlePlayerGameViewModel  // ✅ Passa il ViewModel
                 )
             }
         }

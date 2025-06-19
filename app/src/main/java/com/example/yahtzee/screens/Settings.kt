@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Person
@@ -41,37 +42,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yahtzee.R
-import com.example.yahtzee.util.AppLanguage
-import com.example.yahtzee.util.LocalLocalizationManager
+import com.example.yahtzee.model.AppLanguage
+import com.example.yahtzee.viewmodel.SettingsViewModel
 import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 
-private val initialSettings = SettingsState(
-    language = AppLanguage.ITALIAN,
-    isShakeEnabled = true
-)
-
-data class SettingsState(
-    val language: AppLanguage,
-    val isShakeEnabled: Boolean
-)
 
 @Composable
 fun Settings(
     navController: NavController,
-    isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit,
-    onLanguageChange: (AppLanguage) -> Unit,
-    isShakeEnabled: Boolean = true,
-    onShakeToggle: (Boolean) -> Unit = {}
+    viewModel: SettingsViewModel,  // ✅ Riceve ViewModel invece di Repository
+    onLanguageChange: (AppLanguage) -> Unit
 ) {
-    val localizationManager = LocalLocalizationManager.current
-    var settingsState by remember {
-        mutableStateOf(SettingsState(
-            language = localizationManager.getCurrentLanguage(),
-            isShakeEnabled = isShakeEnabled
-        ))
-    }
+
+
+    val uiState = viewModel.uiState
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showRulesDialog by remember { mutableStateOf(false) }
 
@@ -121,7 +106,7 @@ fun Settings(
                 )
 
                 GenericButton(
-                    text = stringResource(id = R.string.language) + ": " + settingsState.language.getLocalizedName(),
+                    text = stringResource(id = R.string.language) + ": " + uiState.currentLanguage.getLocalizedName(),
                     icon = Icons.Default.Person,
                     onClick = { showLanguageDialog = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -130,31 +115,27 @@ fun Settings(
                 )
 
                 GenericButton(
-                    text = if (isDarkTheme)
-                        stringResource(id =R.string.dark_theme)
+                    text = if (uiState.isDarkTheme)
+                        stringResource(id = R.string.dark_theme)
                     else
                         stringResource(id = R.string.light_theme),
-                    icon = if (isDarkTheme)
-                        Icons.Default.Brightness7
+                    icon = if (uiState.isDarkTheme)
+                        Icons.Default.Brightness3
                     else
-                        Icons.Default.Brightness4,
-                    onClick = { onThemeChange(!isDarkTheme) },
+                        Icons.Default.Brightness7,
+                    onClick = { viewModel.toggleTheme() },
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = buttonFontSize,
                     gradientColors = SettingsButtonGradient
                 )
 
                 GenericButton(
-                    text = if (settingsState.isShakeEnabled)
+                    text = if (uiState.isShakeEnabled)
                         stringResource(id = R.string.shake_enabled)
                     else
                         stringResource(id = R.string.shake_disabled),
                     icon = Icons.Default.Vibration,
-                    onClick = {
-                        val newShakeState = !settingsState.isShakeEnabled
-                        settingsState = settingsState.copy(isShakeEnabled = newShakeState)
-                        onShakeToggle(newShakeState)
-                    },
+                    onClick = { viewModel.toggleShake() },
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = buttonFontSize,
                     gradientColors = SettingsButtonGradient
@@ -183,9 +164,9 @@ fun Settings(
 
         if (showLanguageDialog) {
             LanguageDialog(
-                currentLanguage = settingsState.language,
+                currentLanguage = uiState.currentLanguage,
                 onSelectLanguage = { lang ->
-                    settingsState = settingsState.copy(language = lang)
+                    viewModel.setLanguage(lang)
                     onLanguageChange(lang)
                     showLanguageDialog = false
                 },

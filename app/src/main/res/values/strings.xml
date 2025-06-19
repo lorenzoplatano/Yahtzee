@@ -8,8 +8,8 @@
     <string name="history">Game History</string>
     
     <!-- Impostatazioni -->
-    <string name="dark_theme">Dark</string>
-    <string name="light_theme">Light</string>
+    <string name="dark_theme">Theme: Dark</string>
+    <string name="light_theme">Theme: Light</string>
     <string name="language">Language</string>
     <string name="rules">Rules</string>
     <string name="shake_enabled">Shake to roll: Yes</string>

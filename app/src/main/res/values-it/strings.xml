@@ -8,8 +8,8 @@
     <string name="history">Storico Partite</string>
     
     <!-- Impostatazioni -->
-    <string name="dark_theme">Scuro</string>
-    <string name="light_theme">Chiaro</string>
+    <string name="dark_theme">Tema: Scuro</string>
+    <string name="light_theme">Tema: Chiaro</string>
     <string name="language">Lingua</string>
     <string name="rules">Regole</string>
     <string name="shake_enabled">Shake per lanciare: Sì</string>

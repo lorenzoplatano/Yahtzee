@@ -27,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,27 +34,22 @@ import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.model.*
+import com.example.yahtzee.repository.GameHistoryRepository
 import com.example.yahtzee.viewmodel.HistoryViewModel
-import com.example.yahtzee.ui.theme.HomeButtonGradient
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
 import com.example.yahtzee.screens.components.GenericButton
+import com.example.yahtzee.viewmodel.HistoryViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun HistoryScreen(
     navController: NavController,
+    viewModel: HistoryViewModel  // ✅ Aggiungi questo parametro
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
-    val viewModel: HistoryViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return HistoryViewModel(db.gameHistoryDao()) as T
-            }
-        }
-    )
 
     val uiState by viewModel.uiState
 

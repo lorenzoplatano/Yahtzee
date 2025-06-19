@@ -42,7 +42,6 @@ fun Homepage(
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val screenWidth = configuration.screenWidthDp.dp
 
     val isCompactScreen = screenHeight < 600.dp
     val buttonTextSize = if (isCompactScreen) 16.sp else 18.sp

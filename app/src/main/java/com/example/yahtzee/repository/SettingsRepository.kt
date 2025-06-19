@@ -1,14 +1,17 @@
-package com.example.yahtzee.util
+package com.example.yahtzee.repository
 
 import android.content.Context
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.yahtzee.model.AppLanguage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore("settings")
 
-class SettingsManager(private val context: Context) {
+class SettingsRepository(private val context: Context) {
 
     companion object {
         // Chiavi per i dati

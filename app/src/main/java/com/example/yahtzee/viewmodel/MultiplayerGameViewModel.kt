@@ -4,20 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.yahtzee.logic.GameController
+import com.example.yahtzee.service.GameService
 import com.example.yahtzee.model.GameStateMultiplayer
 
 
-class MultiplayerGameViewModel : ViewModel() {
-    private val logic = GameController()
-    val combinations = GameController.combinations
+class MultiplayerGameViewModel(
+    private val gameService: GameService = GameService()  // ✅ Aggiungi GameService
+) : ViewModel() {
+    val combinations = GameService.combinations
 
     var state by mutableStateOf(GameStateMultiplayer())
         private set
 
     fun rollDice() {
         if (state.remainingRolls > 0 && !state.gameEnded) {
-            val newDice = logic.rollDice(state.diceValues, state.heldDice)
+            val newDice = gameService.rollDice(state.diceValues, state.heldDice)
             state = state.copy(
                 diceValues = newDice,
                 remainingRolls = state.remainingRolls - 1,
@@ -38,7 +39,7 @@ class MultiplayerGameViewModel : ViewModel() {
         val currentScoreMap = if (state.isPlayer1Turn) state.scoreMapPlayer1 else state.scoreMapPlayer2
         if (currentScoreMap[combination] != null) return
 
-        val score = logic.calculateScore(combination, state.diceValues, currentScoreMap)
+        val score = gameService.calculateScore(combination, state.diceValues)
         val newScoreMap1 = if (state.isPlayer1Turn)
             state.scoreMapPlayer1.toMutableMap().also { it[combination] = score }
         else state.scoreMapPlayer1
@@ -70,7 +71,7 @@ class MultiplayerGameViewModel : ViewModel() {
         return if (state.hasRolledAtLeastOnce) {
             combinations.associateWith { combo ->
                 if (currentScoreMap[combo] == null)
-                    logic.calculateScore(combo, state.diceValues, currentScoreMap)
+                    gameService.calculateScore(combo, state.diceValues)
                 else null
             }
         } else emptyMap()

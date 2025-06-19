@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,22 +32,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.db.AppDatabase
+import com.example.yahtzee.repository.GameHistoryRepository
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.example.yahtzee.screens.components.Dice
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
-import com.example.yahtzee.ui.theme.arancio_rosso
-import com.example.yahtzee.ui.theme.arancione
-import com.example.yahtzee.ui.theme.verde_acqua
 import com.example.yahtzee.ui.theme.verde_azzurro
 
 @Composable
-fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) {
+fun SinglePlayerGameScreen(
+    navController: NavController,
+    shakeTrigger: Int,
+    viewModel: SinglePlayerGameViewModel  // ✅ Aggiungi questo parametro
+){
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -63,15 +63,6 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
     val headerPadding = screenHeight * 0.05f
     val bottomAreaHeight = screenHeight * 0.1f
-
-    val db = remember { AppDatabase.getDatabase(context) }
-    val viewModel: SinglePlayerGameViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SinglePlayerGameViewModel(db) as T
-            }
-        }
-    )
 
     val state = viewModel.state
     var showResetDialog by remember { mutableStateOf(false) }
@@ -373,9 +364,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                     enabled = isEnabled,
                                     onClick = { if (isEnabled) viewModel.selectScore(combination) },
                                     bold = false,
-                                    alternate = index % 2 == 1,
                                     fontSize = (if (isCompactScreen) (10 * scaleFactor) else (13 * scaleFactor)).sp,
-                                    selected = currentScore != null,
                                     scaleFactor = scaleFactor,
                                     fontFamily = fontFamily,
                                     isCompactScreen = isCompactScreen,
@@ -393,7 +382,6 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                 combination = stringResource(R.string.bonus) + " ($progressBonusText)",
                                 score = bonus,
                                 bold = true,
-                                alternate = false,
                                 fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
                                 fontFamily = fontFamily,
@@ -410,7 +398,6 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                 combination = stringResource(R.string.total_score).uppercase(),
                                 score = totalScore,
                                 bold = true,
-                                alternate = false,
                                 fontSize = (if (isCompactScreen) (12 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
                                 fontFamily = fontFamily,
@@ -553,9 +540,7 @@ fun SinglePlayerTableRow(
     enabled: Boolean = false,
     onClick: () -> Unit = {},
     bold: Boolean = false,
-    alternate: Boolean = false,
     fontSize: TextUnit = 14.sp,
-    selected: Boolean = false,
     scaleFactor: Float = 1f,
     fontFamily: FontFamily? = null,
     isCompactScreen: Boolean = false,

@@ -1,6 +1,5 @@
 package com.example.yahtzee.screens
 
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,7 +45,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MultiplayerGameScreen(
     navController: NavController,
-    shakeTrigger: Int = 0
+    shakeTrigger: Int = 0,
+    viewModel: MultiplayerGameViewModel  // ✅ Aggiungi questo parametro
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
@@ -65,7 +65,6 @@ fun MultiplayerGameScreen(
     val headerPadding = screenHeight * 0.05f
     val bottomAreaHeight = screenHeight * 0.1f
 
-    val viewModel: MultiplayerGameViewModel = viewModel()
     val state = viewModel.state
     var showResetDialog by remember { mutableStateOf(false) }
     val previewScores = viewModel.previewScores()

@@ -5,29 +5,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yahtzee.logic.GameController
-import com.example.yahtzee.db.AppDatabase
+import com.example.yahtzee.service.GameService
 import com.example.yahtzee.db.GameHistoryEntity
+import com.example.yahtzee.repository.GameHistoryRepository
 import kotlinx.coroutines.launch
 
 class SinglePlayerGameViewModel(
-    private val db: AppDatabase
+    private val gameHistoryRepository: GameHistoryRepository,
+    private val gameService: GameService = GameService()  // ✅ Aggiungi GameService
 ) : ViewModel() {
-    private val controller = GameController()
 
-    var state by mutableStateOf(controller.resetGame())
+
+    var state by mutableStateOf(gameService.resetGame())
         private set
 
     // Stato per tenere traccia se è stato battuto il record
     var isNewHighScore by mutableStateOf(false)
         private set
 
-    val combinations = GameController.combinations
+    val combinations = GameService.combinations
 
     fun rollDice() {
         if (state.remainingRolls > 0 && !state.gameEnded) {
             state = state.copy(
-                diceValues = controller.rollDice(state.diceValues, state.heldDice),
+                diceValues = gameService.rollDice(state.diceValues, state.heldDice),
                 remainingRolls = state.remainingRolls - 1,
                 canSelectScore = true
             )
@@ -45,8 +46,8 @@ class SinglePlayerGameViewModel(
     fun selectScore(combination: String) {
         if (state.canSelectScore && state.scoreMap[combination] == null && !state.gameEnded) {
             val newScoreMap = state.scoreMap.toMutableMap()
-            newScoreMap[combination] = controller.calculateScore(combination, state.diceValues, state.scoreMap)
-            val ended = controller.isGameEnded(newScoreMap)
+            newScoreMap[combination] = gameService.calculateScore(combination, state.diceValues)
+            val ended = gameService.isGameEnded(newScoreMap)
             state = state.copy(
                 scoreMap = newScoreMap,
                 remainingRolls = 3,
@@ -61,7 +62,7 @@ class SinglePlayerGameViewModel(
     }
 
     fun resetGame() {
-        state = controller.resetGame()
+        state = gameService.resetGame()
         isNewHighScore = false
     }
 
@@ -69,7 +70,7 @@ class SinglePlayerGameViewModel(
         return if (state.canSelectScore) {
             combinations.associateWith { combination ->
                 if (state.scoreMap[combination] == null) {
-                    controller.calculateScore(combination, state.diceValues, state.scoreMap)
+                    gameService.calculateScore(combination, state.diceValues)
                 } else null
             }
         } else emptyMap()
@@ -82,14 +83,11 @@ class SinglePlayerGameViewModel(
         val totalScore = state.scoreMap.values.filterNotNull().sum() + bonus
 
         viewModelScope.launch {
-            // Verifica se il punteggio attuale è un nuovo record
-            val highestScore = db.gameHistoryDao().getHighestScore() ?: 0
+            val highestScore = gameHistoryRepository.getHighestScore() ?: 0
             if (totalScore > highestScore) {
                 isNewHighScore = true
             }
-
-            // Salva il punteggio nel database
-            db.gameHistoryDao().insertGameHistory(
+            gameHistoryRepository.insertGameHistory(
                 GameHistoryEntity(
                     date = System.currentTimeMillis(),
                     score = totalScore

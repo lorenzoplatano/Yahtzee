@@ -1,18 +1,19 @@
 package com.example.yahtzee.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yahtzee.model.*
-import com.example.yahtzee.db.GameHistoryDao
 import com.example.yahtzee.db.GameHistoryEntity
+import com.example.yahtzee.repository.GameHistoryRepository
 import kotlinx.coroutines.launch
 import java.util.*
 
 class HistoryViewModel(
-    private val dao: GameHistoryDao
+    private val gameHistoryRepository: GameHistoryRepository
 ) : ViewModel() {
     // Stato UI osservabile
-    var uiState = androidx.compose.runtime.mutableStateOf(HistoryState())
+    var uiState = mutableStateOf(HistoryState())
         private set
 
     init {
@@ -21,7 +22,7 @@ class HistoryViewModel(
 
     private fun loadHistory() {
         viewModelScope.launch {
-            val entities = dao.getAllHistory()
+            val entities = gameHistoryRepository.getAllHistory()
             val entries = entities.map { it.toGameHistoryEntry() }
             updateSortedHistory(entries, uiState.value.sortColumn, uiState.value.sortOrder)
         }
