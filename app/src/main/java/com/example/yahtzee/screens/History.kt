@@ -6,9 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -38,14 +36,13 @@ import com.example.yahtzee.R
 import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.model.*
 import com.example.yahtzee.viewmodel.HistoryViewModel
-import com.example.yahtzee.ui.theme.*
+import com.example.yahtzee.ui.theme.HomeButtonGradient
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    isDarkTheme: Boolean
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
@@ -69,10 +66,8 @@ fun HistoryScreen(
     val headerPadding = (screenHeight.value * 0.08f).dp.coerceAtLeast(32.dp).coerceAtMost(60.dp)
     val isCompactHeight = screenHeight < 700.dp
 
-    // Colori dinamici dal tema
-    val cardBackground = if (isDarkTheme) CardDark else CardLight
-    val overlayColor = if (isDarkTheme) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.3f)
-    val titleColor = mainTextColor(isDarkTheme)
+    // Unica dichiarazione richiesta
+    val colorScheme = MaterialTheme.colorScheme
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Background image
@@ -83,11 +78,11 @@ fun HistoryScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Semi-transparent overlay
+        // Semi-transparent overlay (alpha fisso)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(overlayColor)
+                .background(colorScheme.background.copy(alpha = 0.4f))
         )
 
         // Home icon (top-left)
@@ -112,9 +107,7 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(Color(0xFF667EEA), Color(0xFF764BA2))
-                        ),
+                        brush = Brush.horizontalGradient(HomeButtonGradient),
                         shape = RoundedCornerShape(10.dp)
                     ),
                 contentAlignment = Alignment.Center
@@ -150,9 +143,7 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(Color(0xFF667EEA), Color(0xFF764BA2))
-                        ),
+                        brush = Brush.horizontalGradient(HomeButtonGradient),
                         shape = RoundedCornerShape(10.dp)
                     ),
                 contentAlignment = Alignment.Center
@@ -180,7 +171,7 @@ fun HistoryScreen(
                 .align(Alignment.TopCenter)
                 .shadow(8.dp, RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = cardBackground)
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -192,7 +183,7 @@ fun HistoryScreen(
                         MaterialTheme.typography.headlineMedium
                     else
                         MaterialTheme.typography.displaySmall,
-                    color = titleColor,
+                    color = colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
@@ -205,15 +196,13 @@ fun HistoryScreen(
                         title = stringResource(R.string.date),
                         isSorted = uiState.sortColumn == SortColumn.DATE,
                         ascending = uiState.sortOrder == SortOrder.ASC,
-                        onClick = { viewModel.onSortChange(SortColumn.DATE) },
-                        isDarkTheme = isDarkTheme
+                        onClick = { viewModel.onSortChange(SortColumn.DATE) }
                     )
                     SortableColumnHeader(
                         title = stringResource(R.string.score_label),
                         isSorted = uiState.sortColumn == SortColumn.SCORE,
                         ascending = uiState.sortOrder == SortOrder.ASC,
-                        onClick = { viewModel.onSortChange(SortColumn.SCORE) },
-                        isDarkTheme = isDarkTheme
+                        onClick = { viewModel.onSortChange(SortColumn.SCORE) }
                     )
                 }
 
@@ -229,7 +218,7 @@ fun HistoryScreen(
                         )
                 ) {
                     items(uiState.history) { entry ->
-                        HistoryRow(entry, isDarkTheme)
+                        HistoryRow(entry)
                     }
                 }
             }
@@ -243,9 +232,7 @@ fun SortableColumnHeader(
     isSorted: Boolean,
     ascending: Boolean,
     onClick: () -> Unit,
-    isDarkTheme: Boolean
 ) {
-    val titleColor = mainTextColor(isDarkTheme)
     Row(
         modifier = Modifier.clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
@@ -253,23 +240,22 @@ fun SortableColumnHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = titleColor
+            color = MaterialTheme.colorScheme.onSurface
         )
         if (isSorted) {
             Icon(
                 imageVector = if (ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = titleColor
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
 }
 
 @Composable
-fun HistoryRow(entry: GameHistoryEntry, isDarkTheme: Boolean) {
+fun HistoryRow(entry: GameHistoryEntry) {
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val titleColor = mainTextColor(isDarkTheme)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -279,12 +265,12 @@ fun HistoryRow(entry: GameHistoryEntry, isDarkTheme: Boolean) {
         Text(
             text = dateFormat.format(entry.date),
             style = MaterialTheme.typography.bodyMedium,
-            color = titleColor
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = entry.score.toString(),
             style = MaterialTheme.typography.bodyMedium,
-            color = titleColor
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
