@@ -33,12 +33,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.ui.theme.SinglePlayerTheme
-import com.example.yahtzee.ui.theme.yahtzeeCardColor
-import com.example.yahtzee.ui.theme.yahtzeeTableColor
-import com.example.yahtzee.ui.theme.yahtzeeMainTextColor
-import com.example.yahtzee.ui.theme.yahtzeeDividerColor
-import com.example.yahtzee.ui.theme.yahtzeeFontFamily
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +42,7 @@ import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
 
 @Composable
-fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, shakeTrigger: Int = 0) {
+fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -140,37 +134,33 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
             rollDiceWithAnimation()
         }
     }
-    // --- COLORI E FONT CENTRALIZZATI ---
-    val cardBackground = yahtzeeCardColor(isDarkTheme)
-    val tableBackground = yahtzeeTableColor(isDarkTheme)
-    val titleColor = yahtzeeMainTextColor(isDarkTheme)
-    val dividerColor = yahtzeeDividerColor(isDarkTheme)
-    val fontFamily = yahtzeeFontFamily
 
+    val colorScheme = MaterialTheme.colorScheme
+    val fontFamily: FontFamily? = null
 
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text(stringResource(R.string.dialog_title), color = titleColor, fontFamily = fontFamily) },
-            text = { Text(stringResource(R.string.dialog_reset_text), color = titleColor, fontFamily = fontFamily) },
+            title = { Text(stringResource(R.string.dialog_title), color = colorScheme.onSurface, fontFamily = fontFamily) },
+            text = { Text(stringResource(R.string.dialog_reset_text), color = colorScheme.onSurface, fontFamily = fontFamily) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.resetGame()
                     showResetDialog = false
-                }) { Text(stringResource(R.string.confirm), color = titleColor, fontFamily = fontFamily) }
+                }) { Text(stringResource(R.string.confirm), color = colorScheme.primary, fontFamily = fontFamily) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel), color = titleColor, fontFamily = fontFamily) }
+                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel), color = colorScheme.primary, fontFamily = fontFamily) }
             },
-            containerColor = cardBackground
+            containerColor = colorScheme.surface
         )
     }
 
     if (showHomeDialog) {
         AlertDialog(
             onDismissRequest = { showHomeDialog = false },
-            title = { Text(stringResource(id = R.string.dialog_title), color = titleColor, fontFamily = fontFamily) },
-            text = { Text(stringResource(id = R.string.dialog_home_text), color = titleColor, fontFamily = fontFamily) },
+            title = { Text(stringResource(id = R.string.dialog_title), color = colorScheme.onSurface, fontFamily = fontFamily) },
+            text = { Text(stringResource(id = R.string.dialog_home_text), color = colorScheme.onSurface, fontFamily = fontFamily) },
             confirmButton = {
                 TextButton(onClick = {
                     showHomeDialog = false
@@ -178,15 +168,15 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                         popUpTo(0) { inclusive = true }
                     }
                 }) {
-                    Text(stringResource(id = R.string.confirm), color = titleColor, fontFamily = fontFamily)
+                    Text(stringResource(id = R.string.confirm), color = colorScheme.primary, fontFamily = fontFamily)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showHomeDialog = false }) {
-                    Text(stringResource(id = R.string.cancel), color = titleColor, fontFamily = fontFamily)
+                    Text(stringResource(id = R.string.cancel), color = colorScheme.primary, fontFamily = fontFamily)
                 }
             },
-            containerColor = cardBackground
+            containerColor = colorScheme.surface
         )
     }
 
@@ -201,7 +191,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
+                .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
         // Home Button in alto a destra
@@ -246,7 +236,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                         .padding(horizontal = (4 * scaleFactor).dp)
                         .offset(y = (8 * scaleFactor).dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = cardBackground
+                        containerColor = colorScheme.secondaryContainer // Uniforma al colore della tabella
                     ),
                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -287,7 +277,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
 
                     colors = CardDefaults.cardColors(
-                        containerColor = tableBackground
+                        containerColor = colorScheme.secondaryContainer
                     ),
                     shape = RoundedCornerShape((14 * scaleFactor).dp)
                 ) {
@@ -298,7 +288,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                 .fillMaxWidth()
                                 .background(
                                     brush = Brush.horizontalGradient(
-                                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                                        listOf(colorScheme.primary, colorScheme.secondary)
                                     ),
                                     shape = RoundedCornerShape(
                                         topStart = (if (isCompactScreen) (10 * scaleFactor) else (14 * scaleFactor)).dp,
@@ -314,7 +304,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                     text = stringResource(R.string.combination),
                                     modifier = Modifier.weight(2f),
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = colorScheme.onPrimary,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                     fontFamily = fontFamily
                                 )
@@ -323,7 +313,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                     modifier = Modifier.weight(1f),
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = colorScheme.onPrimary,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                     fontFamily = fontFamily
                                 )
@@ -340,7 +330,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                 if (index != 0) {
                                     HorizontalDivider(
                                         thickness = (0.2 * scaleFactor).dp,
-                                        color = dividerColor
+                                        color = colorScheme.outlineVariant
                                     )
                                 }
 
@@ -362,7 +352,6 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                     fontSize = (if (isCompactScreen) (10 * scaleFactor) else (13 * scaleFactor)).sp,
                                     selected = currentScore != null,
                                     scaleFactor = scaleFactor,
-                                    isDarkTheme = isDarkTheme,
                                     fontFamily = fontFamily,
                                     isCompactScreen = isCompactScreen
                                 )
@@ -370,7 +359,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
 
                             HorizontalDivider(
                                 thickness = (0.2 * scaleFactor).dp,
-                                color = dividerColor
+                                color = colorScheme.outlineVariant
                             )
 
                             // Bonus row
@@ -381,13 +370,12 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                 alternate = false,
                                 fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
-                                isDarkTheme = isDarkTheme,
                                 fontFamily = fontFamily
                             )
 
                             HorizontalDivider(
                                 thickness = (0.2 * scaleFactor).dp,
-                                color = dividerColor
+                                color = colorScheme.outlineVariant
                             )
 
                             // Total row
@@ -398,7 +386,6 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                 alternate = false,
                                 fontSize = (if (isCompactScreen) (12 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
-                                isDarkTheme = isDarkTheme,
                                 fontFamily = fontFamily
                             )
                         }
@@ -419,7 +406,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                             .wrapContentHeight()
                             .shadow(elevation = 10.dp, shape = RoundedCornerShape((18 * scaleFactor).dp)),
                         colors = CardDefaults.cardColors(
-                            containerColor = cardBackground
+                            containerColor = colorScheme.surface
                         ),
                         shape = RoundedCornerShape((18 * scaleFactor).dp)
                     ) {
@@ -433,7 +420,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                 text = stringResource(R.string.final_score, totalScore),
                                 fontSize = (22 * scaleFactor).sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4ECDC4),
+                                color = colorScheme.primary,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
                                 fontFamily = fontFamily
@@ -445,7 +432,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                     text = stringResource(R.string.new_record),
                                     fontSize = (20 * scaleFactor).sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = Color(0xFFFFC107),
+                                    color = colorScheme.tertiary,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth(),
                                     fontFamily = fontFamily
@@ -474,7 +461,7 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
                                             .fillMaxSize()
                                             .background(
                                                 brush = Brush.horizontalGradient(
-                                                    listOf(Color(0xFF4ECDC4), Color(0xFF2AB7CA)),
+                                                    listOf(colorScheme.primary, colorScheme.secondary),
                                                     startX = 0f,
                                                     endX = Float.POSITIVE_INFINITY
                                                 ),
@@ -530,7 +517,6 @@ fun SinglePlayerGameScreen(navController: NavController, isDarkTheme: Boolean, s
     }
 }
 
-
 @Composable
 fun SinglePlayerTableRow(
     combination: String,
@@ -543,28 +529,23 @@ fun SinglePlayerTableRow(
     fontSize: TextUnit = 14.sp,
     selected: Boolean = false,
     scaleFactor: Float = 1f,
-    isDarkTheme: Boolean = false,
     fontFamily: FontFamily? = null,
     isCompactScreen: Boolean = false
 ) {
-    val backgroundColor = when {
-        enabled -> if (isDarkTheme) Color(0xFF2C2F34) else Color(0xFFF0F9FF)
-        selected -> if (isDarkTheme) Color(0xFF23272E) else Color(0xFFE0F7FA)
-        alternate -> if (isDarkTheme) Color(0xFF23272E) else Color(0xFFFAFAFA)
-        else -> Color.Transparent
-    }
+    val colorScheme = MaterialTheme.colorScheme
+
+    // Usa sempre colorScheme.secondaryContainer come background per tutte le righe (come la Card della tabella)
+    val backgroundColor = colorScheme.secondaryContainer
 
     val textColor = when {
-        enabled -> if (isDarkTheme) Color.White else Color(0xFF1E40AF)
-        bold -> yahtzeeMainTextColor(isDarkTheme)
-        score != null -> Color(0xFF4ECDC4)
-        else -> if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568)
+        enabled -> colorScheme.primary
+        bold -> colorScheme.onSurface
+        score != null -> colorScheme.primary
+        else -> colorScheme.onSurfaceVariant
     }
 
     val horizontalPadding = (8 * scaleFactor).dp
     val verticalPadding = (if (isCompactScreen) (2.5 * scaleFactor) else (5.5 * scaleFactor)).dp
-
-
 
     Card(
         modifier = Modifier
@@ -576,7 +557,7 @@ fun SinglePlayerTableRow(
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
                         .border(
                             (1 * scaleFactor).dp,
-                            if (isDarkTheme) Color(0xFF4ECDC4) else Color(0xFF3B82F6),
+                            colorScheme.primary,
                             RoundedCornerShape((6 * scaleFactor).dp)
                         )
                 } else Modifier
@@ -595,7 +576,7 @@ fun SinglePlayerTableRow(
                 text = combination,
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568),
+                color = colorScheme.onSurface,
                 fontSize = fontSize,
                 fontFamily = fontFamily
             )

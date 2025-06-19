@@ -12,7 +12,7 @@ class ShakeDetector(
 
     private var lastShakeTime: Long = 0
     private val shakeThresholdGravity = 2f
-    private val shakeSlopTimeMs = 750
+    private val shakeSlopTimeMs = 2500
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event == null) return
