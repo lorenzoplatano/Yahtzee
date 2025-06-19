@@ -30,6 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.yahtzee.R
+import com.example.yahtzee.ui.theme.arancio_rosso
+import com.example.yahtzee.ui.theme.arancione
+import com.example.yahtzee.ui.theme.blu_chiaro
+import com.example.yahtzee.ui.theme.blu_sbiadito
+import com.example.yahtzee.ui.theme.perla
+import com.example.yahtzee.ui.theme.perla_bianca
+import com.example.yahtzee.ui.theme.perlina
+import com.example.yahtzee.ui.theme.verde_acqua
+import com.example.yahtzee.ui.theme.verde_azzurro
+import com.example.yahtzee.ui.theme.violaceo
 
 @Composable
 fun Dice(
@@ -286,24 +296,24 @@ fun MultiDiceRow(
                                 // usa sempre il gradiente per il giocatore 1
                                 if (isSinglePlayer || isPlayer1Turn) {
                                     Brush.linearGradient(
-                                        listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                        listOf(verde_acqua, verde_azzurro)
                                     )
                                 } else {
                                     // Solo in modalità multiplayer quando è il turno del giocatore 2
                                     Brush.linearGradient(
-                                        listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                        listOf(arancio_rosso, arancione)
                                     )
                                 }
                             } else {
                                 Brush.linearGradient(
-                                    listOf(Color(0xFFF8F9FA), Color(0xFFE9ECEF))
+                                    listOf(perla, perla_bianca)
                                 )
                             },
                             shape = RoundedCornerShape((8 * scaleFactor).dp)
                         )
                         .border(
                             width = if (heldDice[index]) (2 * scaleFactor).dp else (1 * scaleFactor).dp,
-                            color = if (heldDice[index]) Color.White else Color(0xFFE2E8F0),
+                            color = if (heldDice[index]) Color.White else perlina,
                             shape = RoundedCornerShape((8 * scaleFactor).dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -321,7 +331,7 @@ fun MultiDiceRow(
                         Dice(
                             value = value,
                             size = diceSize * 0.8f,
-                            dotColor = if (heldDice[index]) Color.White else Color(0xFF2D3748)
+                            dotColor = if (heldDice[index]) Color.White else blu_sbiadito
                         )
                     }
                 }
@@ -353,7 +363,7 @@ fun HomeButton(
                 .fillMaxSize()
                 .background(
                     brush = Brush.horizontalGradient(
-                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                        listOf(violaceo, blu_chiaro)
                     ),
                     shape = RoundedCornerShape(10.dp)
                 ),
@@ -399,7 +409,7 @@ fun GameControlButtons(
                 .height((68 * scaleFactor).dp)
                 .background(
                     brush = Brush.horizontalGradient(
-                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                        listOf(violaceo, blu_chiaro)
                     ),
                     shape = RoundedCornerShape((16 * scaleFactor).dp)
                 )
@@ -433,7 +443,7 @@ fun GameControlButtons(
                             .fillMaxSize()
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    listOf(Color(0xFF4ECDC4), Color(0xFF44A08D))
+                                   listOf(verde_acqua, verde_azzurro)
                                 ),
                                 shape = RoundedCornerShape((12 * scaleFactor).dp)
                             ),
@@ -483,7 +493,7 @@ fun GameControlButtons(
                             .fillMaxSize()
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53))
+                                    listOf(arancio_rosso, arancione)
                                 ),
                                 shape = RoundedCornerShape((12 * scaleFactor).dp)
                             ),
