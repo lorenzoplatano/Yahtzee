@@ -209,10 +209,10 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
         // Home Button in alto a destra
         Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopStart)
                 .padding(
-                    top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
-                    end = (screenWidth * 0.04f).coerceAtLeast(12.dp)
+                    top = headerPadding.coerceAtLeast(12.dp).coerceAtMost(40.dp),
+                    start = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
             HomeButton(
@@ -223,6 +223,19 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                         showHomeDialog = true
                     }
                 },
+                scaleFactor = scaleFactor
+            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(
+                    top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
+                    end = (screenWidth * 0.05f).coerceAtLeast(16.dp)
+                )
+        ) {
+            SettingsButton(
+                onClick = { navController.navigate("settings") },
                 scaleFactor = scaleFactor
             )
         }
