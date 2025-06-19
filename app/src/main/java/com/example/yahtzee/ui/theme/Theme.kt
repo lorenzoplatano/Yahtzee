@@ -1,11 +1,6 @@
-
 package com.example.yahtzee.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -13,108 +8,35 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import com.example.yahtzee.R
-import androidx.compose.ui.text.font.FontFamily
 
-val HomeButtonGradient = listOf(HomeButtonStart, HomeButtonEnd)
-val SinglePlayerGradient = listOf(SinglePlayerStart, SinglePlayerEnd)
-val MultiPlayerGradient = listOf(MultiPlayerStart, MultiPlayerEnd)
-val SettingsGradient = listOf(SettingsStart, SettingsEnd)
-val HistoryGradient = listOf(HistoryStart, HistoryEnd)
-val SettingsButtonStart = Color(0xFF43CEA2)
-val SettingsButtonEnd = Color(0xFF185A9D)
-val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
-
-val BothCardLight = Color.White.copy(alpha = 0.95f)
-val BothCardDark = Color(0xFF23272E).copy(alpha = 0.92f)
-val TableLight = Color.White.copy(alpha = 0.96f)
-val TableDark = Color(0xFF23272E).copy(alpha = 0.96f)
-
-fun yahtzeeCardColor(isDarkTheme: Boolean): Color = if (isDarkTheme) BothCardDark else BothCardLight
-
-fun yahtzeeTableColor(isDarkTheme: Boolean): Color = if (isDarkTheme) TableDark else TableLight
-
-
-@Composable
-fun yahtzeeMainTextColor(isDarkTheme: Boolean): Color = mainTextColor(isDarkTheme)
-
-
-fun yahtzeeDividerColor(isDarkTheme: Boolean): Color = if (isDarkTheme) Color(0xFF353A40) else Color(0xFFE2E8F0)
-val yahtzeeFontFamily: FontFamily get() = YahtzeeFontFamily
-
-
-@Composable
-fun mainTextColor(darkTheme: Boolean): Color {
-    return if (darkTheme) Color.White else HomeDialogTitle
-}
-
-
-
+// Definizione degli schemi di colori usando SOLO i colori da Colors.kt
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue200,
-    onPrimary = Blue900,
-    primaryContainer = Blue700,
-    onPrimaryContainer = Blue50,
-    secondary = Blue400,
-    onSecondary = Blue900,
-    background = Blue900,
-    onBackground = Color.White,
-    surface = Blue800,
-    onSurface = Color.White,
+    primary = BothCardDark,                // colore principale scuro
+    onPrimary = Color.White,               // testo su primary
+    primaryContainer = TableDark,          // contenitore principale scuro
+    onPrimaryContainer = Color.White,      // testo su contenitore principale
+    secondary = DividerDark,               // colore secondario scuro
+    onSecondary = Color.White,             // testo su secondario
+    background = TableDark,                // colore di sfondo scuro
+    onBackground = Color.White,            // testo su sfondo
+    surface = BothCardDark,                // superficie scura (es. card)
+    onSurface = Color.White,               // testo su superficie
 )
 
-private val BlueColorScheme = lightColorScheme(
-    primary = Blue500,
-    onPrimary = Color.White,
-    primaryContainer = Blue100,
-    onPrimaryContainer = Blue900,
-    secondary = Blue700,
-    onSecondary = Color.White,
-    background = Blue50,
-    onBackground = Blue900,
-    surface = Blue100,
-    onSurface = Blue900,
+private val LightColorScheme = lightColorScheme(
+    primary = BothCardLight,               // colore principale chiaro
+    onPrimary = HomeDialogTitle,           // testo su primary
+    primaryContainer = TableLight,         // contenitore principale chiaro
+    onPrimaryContainer = HomeDialogTitle,  // testo su contenitore principale
+    secondary = DividerLight,              // colore secondario chiaro
+    onSecondary = HomeDialogTitle,         // testo su secondario
+    background = TableLight,               // colore di sfondo chiaro
+    onBackground = HomeDialogTitle,        // testo su sfondo
+    surface = BothCardLight,               // superficie chiara (es. card)
+    onSurface = HomeDialogTitle,           // testo su superficie
 )
-
-private val RedColorScheme = lightColorScheme(
-    primary = Red500,
-    onPrimary = Color.White,
-    primaryContainer = Red100,
-    onPrimaryContainer = Red900,
-    secondary = Red700,
-    onSecondary = Color.White,
-    background = Red50,
-    onBackground = Red900,
-    surface = Red100,
-    onSurface = Red900,
-)
-
-@Composable
-fun SinglePlayerTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = BlueColorScheme,
-        typography = Typography,
-        content = content
-    )
-}
-
-@Composable
-fun MultiPlayerTheme(
-    isPlayerOne: Boolean,
-    content: @Composable () -> Unit
-) {
-    MaterialTheme(
-        colorScheme = if (isPlayerOne) BlueColorScheme else RedColorScheme,
-        typography = Typography,
-        content = content
-    )
-}
 
 @Composable
 fun YahtzeeTheme(
@@ -127,8 +49,8 @@ fun YahtzeeTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme // <-- CORRETTO QUI!
-        else -> BlueColorScheme
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(
@@ -137,5 +59,3 @@ fun YahtzeeTheme(
         content = content
     )
 }
-
-
