@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
         var multiPlayerShakeTrigger by remember { mutableStateOf(0) }
 
         // Setup ShakeDetector solo quando serve (cioè quando siamo in una schermata di gioco)
-        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val shakeDetector = remember {
             ShakeDetector {
                 // Determina quale schermata di gioco è attiva e triggera il relativo stato
@@ -121,12 +121,11 @@ class MainActivity : ComponentActivity() {
             composable("homepage") {
                 Homepage(
                     navController = navController,
-                    isDarkTheme = isDarkTheme,
                     showModeSelection = showModeSelection,
                     onModeSelectionChanged = { showModeSelection = it }
                 )
             }
-            composable("history") { HistoryScreen(navController, isDarkTheme) }
+            composable("history") { HistoryScreen(navController) }
             composable("settings") {
                 Settings(
                     navController = navController,
@@ -138,13 +137,13 @@ class MainActivity : ComponentActivity() {
             composable("game_1vs1") {
                 MultiplayerGameScreen(
                     navController = navController,
-                    isDarkTheme = isDarkTheme
+                    shakeTrigger = multiPlayerShakeTrigger
                 )
             }
             composable("game") {
                 SinglePlayerGameScreen(
                     navController = navController,
-                    isDarkTheme = isDarkTheme
+                    shakeTrigger = singlePlayerShakeTrigger
                 )
             }
         }

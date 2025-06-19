@@ -17,7 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +34,6 @@ import com.example.yahtzee.ui.theme.*
 @Composable
 fun Homepage(
     navController: NavController,
-    isDarkTheme: Boolean,
     showModeSelection: Boolean = false,
     onModeSelectionChanged: (Boolean) -> Unit = {}
 ) {
@@ -48,8 +47,7 @@ fun Homepage(
     val isCompactScreen = screenHeight < 600.dp
     val buttonTextSize = if (isCompactScreen) 16.sp else 18.sp
 
-    val cardBackground = if (isDarkTheme) CardDark else CardLight
-    val titleColor = mainTextColor(isDarkTheme)
+    val colorScheme = MaterialTheme.colorScheme
 
     val backgroundRes = if (!showModeSelection) R.drawable.chunky else R.drawable.sfondo_generale
 
@@ -64,14 +62,14 @@ fun Homepage(
                 Text(
                     stringResource(R.string.dialog_title),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
             },
             text = {
                 Text(
                     stringResource(R.string.dialog_home_text),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
             },
             confirmButton = {
@@ -82,7 +80,7 @@ fun Homepage(
                     Text(
                         stringResource(R.string.confirm),
                         style = MaterialTheme.typography.labelLarge,
-                        color = titleColor
+                        color = colorScheme.onSurface
                     )
                 }
             },
@@ -91,7 +89,7 @@ fun Homepage(
                     Text(
                         stringResource(R.string.cancel),
                         style = MaterialTheme.typography.labelLarge,
-                        color = titleColor
+                        color = colorScheme.onSurface
                     )
                 }
             }
@@ -108,10 +106,13 @@ fun Homepage(
             alignment = Alignment.Center
         )
 
+        // Overlay scuro/chiaro in base al tema
+        val isDarkTheme = colorScheme.background.luminance() < 0.5f
+        val overlayAlpha = if (isDarkTheme) 0.5f else 0.3f
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
+                .background(colorScheme.background.copy(alpha = overlayAlpha))
         )
 
         Box(
@@ -145,7 +146,7 @@ fun Homepage(
                         .align(Alignment.Center)
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
                     colors = CardDefaults.cardColors(
-                        containerColor = cardBackground
+                        containerColor = colorScheme.surface
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -158,7 +159,7 @@ fun Homepage(
                             text = stringResource(R.string.select_mode),
                             style = MaterialTheme.typography.displayMedium,
                             modifier = Modifier.padding(bottom = 8.dp),
-                            color = titleColor,
+                            color = colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
 
@@ -212,7 +213,7 @@ fun Homepage(
                             Text(
                                 stringResource(R.string.back),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = if (isDarkTheme) CardLight else CardDark
+                                color = colorScheme.primary
                             )
                         }
                     }
