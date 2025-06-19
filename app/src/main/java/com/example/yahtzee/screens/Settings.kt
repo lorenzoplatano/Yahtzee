@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -44,12 +43,8 @@ import com.example.yahtzee.R
 import com.example.yahtzee.localization.AppLanguage
 import com.example.yahtzee.localization.LocalLocalizationManager
 import com.example.yahtzee.screens.components.GenericButton
-import com.example.yahtzee.ui.theme.CardDark
-import com.example.yahtzee.ui.theme.CardLight
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
-import com.example.yahtzee.ui.theme.mainTextColor
 
-// Stato iniziale delle impostazioni
 private val initialSettings = SettingsState(
     language = AppLanguage.ITALIAN
 )
@@ -74,130 +69,127 @@ fun Settings(
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val screenWidth = configuration.screenWidthDp.dp
     val isCompactScreen = screenHeight < 600.dp
     val buttonFontSize = if (isCompactScreen) 16.sp else 18.sp
 
-    val titleColor = mainTextColor(isDarkTheme)
-    val cardBackground = if (isDarkTheme) CardDark else CardLight
+    val colorScheme = MaterialTheme.colorScheme
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-            Image(
-                painter = painterResource(id = R.drawable.sfondo_generale),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            // Overlay scuro
-            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+        Image(
+            painter = painterResource(id = R.drawable.sfondo_generale),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        // Overlay trasparente, alpha fisso
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorScheme.background.copy(alpha = 0.18f))
+        )
 
-            // Card contenente le impostazioni
-            Card(
-                modifier = Modifier
-                    .widthIn(max = 450.dp)
-                    .fillMaxWidth(0.9f)
-                    .padding(16.dp)
-                    .align(Alignment.Center)
-                    .shadow(8.dp, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = cardBackground)
+        Card(
+            modifier = Modifier
+                .widthIn(max = 450.dp)
+                .fillMaxWidth(0.9f)
+                .padding(16.dp)
+                .align(Alignment.Center)
+                .shadow(8.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+
+                GenericButton(
+                    text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
+                    icon = Icons.Default.Person,
+                    onClick = { showLanguageDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = SettingsButtonGradient
+                )
+
+                GenericButton(
+                    text = if (isDarkTheme)
+                        stringResource(id = R.string.light_theme)
+                    else
+                        stringResource(id = R.string.dark_theme),
+                    icon = if (isDarkTheme)
+                        Icons.Default.Brightness7
+                    else
+                        Icons.Default.Brightness4,
+                    onClick = { onThemeChange(!isDarkTheme) },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = SettingsButtonGradient
+                )
+
+                GenericButton(
+                    text = stringResource(id = R.string.rules),
+                    icon = Icons.Default.History,
+                    onClick = { showRulesDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = SettingsButtonGradient
+                )
+
+                TextButton(
+                    onClick = { navController.popBackStack() }
                 ) {
                     Text(
-                        text = stringResource(R.string.settings_title),
-                        style = MaterialTheme.typography.displayMedium,
-                        color = titleColor,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.back),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = colorScheme.primary
                     )
-
-                    GenericButton(
-                        text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
-                        icon = Icons.Default.Person,
-                        onClick = { showLanguageDialog = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = buttonFontSize,
-                        gradientColors = SettingsButtonGradient
-                    )
-
-                    GenericButton(
-                        text = if (isDarkTheme)
-                            stringResource(id = R.string.light_theme)
-                        else
-                            stringResource(id = R.string.dark_theme),
-                        icon = if (isDarkTheme)
-                            Icons.Default.Brightness7 // Sole: tema chiaro
-                        else
-                            Icons.Default.Brightness4, // Luna: tema scuro
-                        onClick = { onThemeChange(!isDarkTheme) },
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = buttonFontSize,
-                        gradientColors = SettingsButtonGradient
-                    )
-
-                    GenericButton(
-                        text = stringResource(id = R.string.rules),
-                        icon = Icons.Default.History,
-                        onClick = { showRulesDialog = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = buttonFontSize,
-                        gradientColors = SettingsButtonGradient
-                    )
-
-                    TextButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.back),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = if (isDarkTheme) CardLight else CardDark
-                        )
-                    }
                 }
             }
+        }
 
-            if (showLanguageDialog) {
-                LanguageDialog(
-                    currentLanguage = settingsState.language,
-                    onSelectLanguage = { lang ->
-                        settingsState = settingsState.copy(language = lang)
-                        onLanguageChange(lang)
-                        showLanguageDialog = false
-                    },
-                    onDismiss = { showLanguageDialog = false },
-                    isDarkTheme = isDarkTheme
-                )
-            }
+        if (showLanguageDialog) {
+            LanguageDialog(
+                currentLanguage = settingsState.language,
+                onSelectLanguage = { lang ->
+                    settingsState = settingsState.copy(language = lang)
+                    onLanguageChange(lang)
+                    showLanguageDialog = false
+                },
+                onDismiss = { showLanguageDialog = false }
+            )
+        }
 
-            if (showRulesDialog) {
-                RulesDialog(onDismiss = { showRulesDialog = false }, isDarkTheme = isDarkTheme)
-            }
+        if (showRulesDialog) {
+            RulesDialog(onDismiss = { showRulesDialog = false })
         }
     }
-
+}
 
 @Composable
 fun LanguageDialog(
     currentLanguage: AppLanguage,
     onSelectLanguage: (AppLanguage) -> Unit,
-    onDismiss: () -> Unit,
-    isDarkTheme: Boolean
+    onDismiss: () -> Unit
 ) {
-    val titleColor = mainTextColor(isDarkTheme)
-    val dialogBackground = if (isDarkTheme) CardDark else CardLight
+    val colorScheme = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = dialogBackground,
+        containerColor = colorScheme.surface,
         title = {
             Text(
                 stringResource(id = R.string.select_language),
                 style = MaterialTheme.typography.headlineMedium,
-                color = titleColor
+                color = colorScheme.onSurface
             )
         },
         text = {
@@ -210,7 +202,7 @@ fun LanguageDialog(
                         .padding(8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (currentLanguage == AppLanguage.ITALIAN) FontWeight.Bold else FontWeight.Normal,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
                 Text(
                     AppLanguage.ENGLISH.displayName,
@@ -220,7 +212,7 @@ fun LanguageDialog(
                         .padding(8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (currentLanguage == AppLanguage.ENGLISH) FontWeight.Bold else FontWeight.Normal,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
             }
         },
@@ -230,19 +222,17 @@ fun LanguageDialog(
 
 @Composable
 fun RulesDialog(
-    onDismiss: () -> Unit,
-    isDarkTheme: Boolean
+    onDismiss: () -> Unit
 ) {
-    val titleColor = mainTextColor(isDarkTheme)
-    val dialogBackground = if (isDarkTheme) CardDark else CardLight
+    val colorScheme = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = dialogBackground,
+        containerColor = colorScheme.surface,
         title = {
             Text(
                 stringResource(id = R.string.rules_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = titleColor
+                color = colorScheme.onSurface
             )
         },
         text = {
@@ -250,7 +240,7 @@ fun RulesDialog(
                 Text(
                     stringResource(id = R.string.game_rules),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
             }
         },
@@ -259,7 +249,7 @@ fun RulesDialog(
                 Text(
                     stringResource(id = R.string.ok_button),
                     style = MaterialTheme.typography.labelLarge,
-                    color = titleColor
+                    color = colorScheme.onSurface
                 )
             }
         }
