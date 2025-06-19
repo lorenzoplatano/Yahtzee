@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,7 +45,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
         (screenWidth / 360.dp).coerceIn(0.85f, 1.2f)
     }
 
-    val isCompactScreen = screenHeight < 600.dp
+    val isCompactScreen = screenHeight < 700.dp
 
     val diceAreaWidth = screenWidth * 0.9f - 32.dp
     val diceSize = (diceAreaWidth / 5f).coerceAtMost(56.dp).coerceAtLeast(36.dp)
@@ -124,7 +125,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
     val titleColor = mainTextColor(isDarkTheme)
     val dividerColor = if (isDarkTheme) CardLight else CardDark
 
-    MultiPlayerTheme(isPlayerOne = state.isPlayer1Turn) {
+
         if (showResetDialog) {
             AlertDialog(
                 onDismissRequest = { showResetDialog = false },
@@ -247,7 +248,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                 // TABELLA con altezza adattiva
                 if (!state.gameEnded) {
                     val tableMaxHeight = if (isCompactScreen) {
-                        screenHeight * 0.68f
+                        screenHeight * 0.50f
                     } else {
                         screenHeight * 0.62f
                     }
@@ -255,10 +256,8 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(
-                                min = (screenHeight * 0.40f).coerceAtLeast(400.dp),
-                                max = tableMaxHeight.coerceAtMost(600.dp)
-                            )
+                            .wrapContentHeight()
+                            .heightIn(max = tableMaxHeight)
                             .padding(horizontal = (screenWidth * 0.02f).coerceAtLeast(8.dp))
                             .offset(y = (8 * scaleFactor).dp)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
@@ -276,9 +275,14 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                         brush = Brush.horizontalGradient(
                                             listOf(Color(0xFF667EEA), Color(0xFF764BA2))
                                         ),
-                                        shape = RoundedCornerShape(topStart = (14 * scaleFactor).dp, topEnd = (14 * scaleFactor).dp)
+                                        shape = RoundedCornerShape(
+                                            topStart = (if (isCompactScreen) (10 * scaleFactor) else (14 * scaleFactor)).dp,
+                                            topEnd = (if (isCompactScreen) (10 * scaleFactor) else (14 * scaleFactor)).dp
+                                        ))
+                                    .padding(
+                                        horizontal = (if (isCompactScreen) (8 * scaleFactor) else (10 * scaleFactor)).dp,
+                                        vertical = (if (isCompactScreen) (6 * scaleFactor) else (10 * scaleFactor)).dp
                                     )
-                                    .padding(horizontal = (10 * scaleFactor).dp, vertical = (10 * scaleFactor).dp)
                             ) {
                                 Row {
                                     Text(
@@ -286,7 +290,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                         modifier = Modifier.weight(2f),
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
-                                        fontSize = (13 * scaleFactor).sp,
+                                        fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                         style = Typography.titleSmall
                                     )
                                     // Player 1 header
@@ -317,7 +321,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                             textAlign = TextAlign.Center,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White,
-                                            fontSize = (13 * scaleFactor).sp,
+                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                             style = Typography.titleSmall
                                         )
                                     }
@@ -349,7 +353,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                             textAlign = TextAlign.Center,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White,
-                                            fontSize = (13 * scaleFactor).sp,
+                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                             style = Typography.titleSmall
                                         )
                                     }
@@ -377,10 +381,10 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                                 bold = true,
                                                 alternate = index % 2 == 1,
                                                 isPlayer1Turn = state.isPlayer1Turn,
-                                                fontSize = (14 * scaleFactor).sp,
-                                                compactPadding = true,
+                                                fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                                 scaleFactor = scaleFactor,
-                                                isDarkTheme = isDarkTheme
+                                                isDarkTheme = isDarkTheme,
+                                                isCompactScreen = isCompactScreen
                                             )
                                         }
                                         "Total" -> {
@@ -391,10 +395,10 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                                 bold = true,
                                                 alternate = index % 2 == 1,
                                                 isPlayer1Turn = state.isPlayer1Turn,
-                                                fontSize = (16 * scaleFactor).sp,
-                                                compactPadding = true,
+                                                fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                                 scaleFactor = scaleFactor,
-                                                isDarkTheme = isDarkTheme
+                                                isDarkTheme = isDarkTheme,
+                                                isCompactScreen = isCompactScreen
                                             )
                                         }
                                         else -> {
@@ -415,10 +419,10 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
                                                 bold = false,
                                                 alternate = index % 2 == 1,
                                                 isPlayer1Turn = state.isPlayer1Turn,
-                                                fontSize = (13 * scaleFactor).sp,
-                                                compactPadding = true,
+                                                fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                                 scaleFactor = scaleFactor,
-                                                isDarkTheme = isDarkTheme
+                                                isDarkTheme = isDarkTheme,
+                                                isCompactScreen = isCompactScreen
                                             )
                                         }
                                     }
@@ -571,7 +575,7 @@ fun MultiplayerGameScreen(navController: NavController, isDarkTheme: Boolean, sh
             }
         }
     }
-}
+
 
 @Composable
 fun MultiplayerTableRow(
@@ -584,10 +588,10 @@ fun MultiplayerTableRow(
     bold: Boolean = false,
     alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
-    fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
-    compactPadding: Boolean = false,
+    fontSize: TextUnit = 14.sp,
     scaleFactor: Float = 1f,
-    isDarkTheme: Boolean = false
+    isDarkTheme: Boolean = false,
+    isCompactScreen: Boolean = false
 ) {
     val backgroundColor = when {
         enabled -> if (isDarkTheme) Color(0xFF2C2F34) else Color(0xFFF0F9FF)
@@ -616,11 +620,7 @@ fun MultiplayerTableRow(
     }
 
     val horizontalPadding = (8 * scaleFactor).dp
-    val verticalPadding = if (compactPadding) {
-        (5.5f * scaleFactor).dp
-    } else {
-        (6f * scaleFactor).dp
-    }
+    val verticalPadding = (if (isCompactScreen) (1.5 * scaleFactor) else (5.5 * scaleFactor)).dp
 
     Card(
         modifier = Modifier
@@ -644,13 +644,14 @@ fun MultiplayerTableRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = horizontalPadding, vertical = verticalPadding)
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = combination,
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = textColor,
+                color = if (isDarkTheme) Color(0xFFE2E8F0) else Color(0xFF4A5568),
                 fontSize = fontSize,
                 style = if (bold) Typography.titleMedium else Typography.bodyMedium
             )
