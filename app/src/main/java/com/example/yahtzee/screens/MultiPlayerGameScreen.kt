@@ -1,5 +1,6 @@
 package com.example.yahtzee.screens
 
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,7 +22,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
@@ -42,7 +45,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun MultiplayerGameScreen(
     navController: NavController,
-    isDarkTheme: Boolean = false,
     shakeTrigger: Int = 0
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -184,7 +186,7 @@ fun MultiplayerGameScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
+                .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
         Box(
@@ -292,11 +294,11 @@ fun MultiplayerGameScreen(
                         ) {
                             Row {
                                 Text(
-                                    text = stringResource(id = R.string.combination),
+                                    text = stringResource(R.string.combination),
                                     modifier = Modifier.weight(2f),
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    style = Typography.titleSmall
+                                    color = colorScheme.onPrimary,
+                                    fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                 )
                                 // Player 1 header
                                 Box(
@@ -326,8 +328,8 @@ fun MultiplayerGameScreen(
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
-                                        style = Typography.titleSmall
-                                    )
+                                        fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
+                                        )
                                 }
                                 // Player 2 header
                                 Box(
@@ -357,8 +359,8 @@ fun MultiplayerGameScreen(
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
-                                        style = Typography.titleSmall
-                                    )
+                                        fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
+                                        )
                                 }
                             }
                         }
@@ -376,9 +378,8 @@ fun MultiplayerGameScreen(
                                             player1Score = bonus1,
                                             player2Score = bonus2,
                                             bold = true,
-                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = Typography.bodyMedium.fontSize,
+                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                             scaleFactor = scaleFactor,
                                             isCompactScreen = isCompactScreen,
                                             colorScheme = colorScheme
@@ -390,9 +391,8 @@ fun MultiplayerGameScreen(
                                             player1Score = totalScore1,
                                             player2Score = totalScore2,
                                             bold = true,
-                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = Typography.bodyMedium.fontSize,
+                                            fontSize = (if (isCompactScreen) (12 * scaleFactor) else (14 * scaleFactor)).sp,
                                             scaleFactor = scaleFactor,
                                             isCompactScreen = isCompactScreen,
                                             colorScheme = colorScheme
@@ -414,9 +414,8 @@ fun MultiplayerGameScreen(
                                             enabled = isEnabled,
                                             onClick = { if (isEnabled) viewModel.selectScore(combination) },
                                             bold = false,
-                                            alternate = false,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = Typography.bodyMedium.fontSize,
+                                            fontSize = (if (isCompactScreen) (10 * scaleFactor) else (12 * scaleFactor)).sp,
                                             scaleFactor = scaleFactor,
                                             isCompactScreen = isCompactScreen,
                                             colorScheme = colorScheme
@@ -580,9 +579,8 @@ fun MultiplayerTableRow(
     enabled: Boolean = false,
     onClick: () -> Unit = {},
     bold: Boolean = false,
-    alternate: Boolean = false,
     isPlayer1Turn: Boolean = true,
-    fontSize: androidx.compose.ui.unit.TextUnit = Typography.bodyMedium.fontSize,
+    fontSize: TextUnit,
     scaleFactor: Float = 1f,
     isCompactScreen: Boolean = false,
     colorScheme: ColorScheme = MaterialTheme.colorScheme
@@ -611,7 +609,7 @@ fun MultiplayerTableRow(
     }
 
     val horizontalPadding = (8 * scaleFactor).dp
-    val verticalPadding = (if (isCompactScreen) (1.5 * scaleFactor) else (5.5 * scaleFactor)).dp
+    val verticalPadding = (if (isCompactScreen) (2.5 * scaleFactor) else (5.5 * scaleFactor)).dp
 
     Card(
         modifier = Modifier
@@ -643,7 +641,7 @@ fun MultiplayerTableRow(
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = colorScheme.onSurface,
-                style = if (bold) Typography.titleMedium else Typography.bodyMedium
+                fontSize = fontSize
             )
             Text(
                 text = player1Score?.toString() ?: previewScore.takeIf { isPlayer1Turn }?.toString()
@@ -652,7 +650,7 @@ fun MultiplayerTableRow(
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player1TextColor,
-                style = Typography.bodyMedium
+                fontSize = fontSize
             )
             Text(
                 text = player2Score?.toString() ?: previewScore.takeIf { !isPlayer1Turn }
@@ -661,7 +659,7 @@ fun MultiplayerTableRow(
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player2TextColor,
-                style = Typography.bodyMedium
+                fontSize = fontSize
             )
         }
     }
