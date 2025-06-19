@@ -13,7 +13,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -31,8 +30,7 @@ import com.example.yahtzee.util.ShakeDetector
 class MainActivity : ComponentActivity() {
     companion object {
         private var localizationManager = LocalizationManager()
-        // Rimuovi questa variabile statica
-        // private var isShakeEnabled by mutableStateOf(true)
+
         fun getLocalizationManager(): LocalizationManager {
             return localizationManager
         }
@@ -47,15 +45,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Stato globale per il tema (chiaro/scuro)
+        var isDarkTheme by mutableStateOf(false)
+        var isShakeEnabled by mutableStateOf(true)
+
         setContent {
-            // Stato globale per il tema (chiaro/scuro)
-            var isDarkTheme by rememberSaveable { mutableStateOf(false) }
-
-            // Stato globale per lo shake - con persistenza
-            var isShakeEnabled by rememberSaveable {
-                mutableStateOf(loadShakePreference())
-            }
-
             CompositionLocalProvider(LocalLocalizationManager provides getLocalizationManager()) {
                 YahtzeeTheme(darkTheme = isDarkTheme) {
                     Surface(
@@ -70,10 +64,7 @@ class MainActivity : ComponentActivity() {
                                 recreateActivity()
                             },
                             isShakeEnabled = isShakeEnabled,
-                            onShakeToggle = { enabled ->
-                                isShakeEnabled = enabled
-                                saveShakePreference(enabled)
-                            }
+                            onShakeToggle = { isShakeEnabled = it }
                         )
                     }
                 }
@@ -83,19 +74,6 @@ class MainActivity : ComponentActivity() {
 
     private fun recreateActivity() {
         recreate()
-    }
-
-    // Funzioni per salvare/caricare le preferenze shake
-    private fun saveShakePreference(enabled: Boolean) {
-        getSharedPreferences("yahtzee_settings", Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean("shake_enabled", enabled)
-            .apply()
-    }
-
-    private fun loadShakePreference(): Boolean {
-        return getSharedPreferences("yahtzee_settings", Context.MODE_PRIVATE)
-            .getBoolean("shake_enabled", true) // default true
     }
 
     @Composable
@@ -109,62 +87,59 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         val context = this
 
-        // Stato persistente per controllare se mostrare la selezione modalità
         var showModeSelection by rememberSaveable { mutableStateOf(false) }
-
-        // Stato per triggerare lo shake nelle schermate di gioco
         var singlePlayerShakeTrigger by remember { mutableStateOf(0) }
         var multiPlayerShakeTrigger by remember { mutableStateOf(0) }
 
+        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val shakeDetector = remember {
             ShakeDetector {
-                // Controlla se lo shake è abilitato prima di eseguire l'azione
-                if (isShakeEnabled) {
-                    val currentRoute = navController.currentBackStackEntry?.destination?.route
-                    when (currentRoute) {
-                        "game" -> singlePlayerShakeTrigger++
-                        "game_1vs1" -> multiPlayerShakeTrigger++
-                    }
+                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                when (currentRoute) {
+                    "game" -> singlePlayerShakeTrigger++
+                    "game_1vs1" -> multiPlayerShakeTrigger++
                 }
             }
         }
 
-        // Setup ShakeDetector solo quando serve (cioè quando siamo in una schermata di gioco)
-        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-
-        // Registra/deregistra il listener in base al ciclo di vita della composable
-        LaunchedEffect(navController) {
-            val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
-                when (destination.route) {
-                    "game", "game_1vs1" -> {
-                        // Registra il listener solo se lo shake è abilitato
-                        if (isShakeEnabled) {
-                            shakeDetector.register(sensorManager)
-                        }
-                    }
-                    else -> {
-                        shakeDetector.unregister(sensorManager)
-                    }
-                }
-            }
-            navController.addOnDestinationChangedListener(listener)
-        }
-
-        // Aggiorna la registrazione del shake detector quando cambia isShakeEnabled
-        LaunchedEffect(isShakeEnabled) {
-            val currentRoute = navController.currentBackStackEntry?.destination?.route
-            if (currentRoute == "game" || currentRoute == "game_1vs1") {
-                if (isShakeEnabled) {
+        // Listener per la navigazione e per l'attivazione shake
+        DisposableEffect(isShakeEnabled, navController) {
+            val listener = androidx.navigation.NavController.OnDestinationChangedListener { _, destination, _ ->
+                val isGameScreen = destination.route == "game" || destination.route == "game_1vs1"
+                if (isGameScreen && isShakeEnabled) {
                     shakeDetector.register(sensorManager)
                 } else {
                     shakeDetector.unregister(sensorManager)
                 }
             }
+            navController.addOnDestinationChangedListener(listener)
+
+            onDispose {
+                navController.removeOnDestinationChangedListener(listener)
+                shakeDetector.unregister(sensorManager)
+            }
+        }
+
+        // Aggiorna la registrazione del shake detector quando cambia isShakeEnabled
+        LaunchedEffect(isShakeEnabled) {
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            val isGameScreen = currentRoute == "game" || currentRoute == "game_1vs1"
+            if (isGameScreen && isShakeEnabled) {
+                shakeDetector.register(sensorManager)
+            } else {
+                shakeDetector.unregister(sensorManager)
+            }
         }
 
         NavHost(navController = navController, startDestination = "homepage") {
-            // ... altre composable routes ...
-
+            composable("homepage") {
+                Homepage(
+                    navController = navController,
+                    showModeSelection = showModeSelection,
+                    onModeSelectionChanged = { showModeSelection = it }
+                )
+            }
+            composable("history") { HistoryScreen(navController) }
             composable("settings") {
                 Settings(
                     navController = navController,
@@ -175,22 +150,18 @@ class MainActivity : ComponentActivity() {
                     onShakeToggle = onShakeToggle
                 )
             }
-
-            composable("game") {
-                SinglePlayerGameScreen(
-                    navController = navController,
-                    shakeTrigger = singlePlayerShakeTrigger
-                )
-            }
-
             composable("game_1vs1") {
                 MultiplayerGameScreen(
                     navController = navController,
                     shakeTrigger = multiPlayerShakeTrigger
                 )
             }
-
-
+            composable("game") {
+                SinglePlayerGameScreen(
+                    navController = navController,
+                    shakeTrigger = singlePlayerShakeTrigger
+                )
+            }
         }
     }
 }
