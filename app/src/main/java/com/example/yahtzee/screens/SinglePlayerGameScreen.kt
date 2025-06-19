@@ -187,7 +187,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Sfondo
+        // Sfondociao
         Image(
             painter = painterResource(id = R.drawable.sfondo_generale),
             contentDescription = null,
