@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,11 +48,13 @@ import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 
 private val initialSettings = SettingsState(
-    language = AppLanguage.ITALIAN
+    language = AppLanguage.ITALIAN,
+    isShakeEnabled = true
 )
 
 data class SettingsState(
-    val language: AppLanguage
+    val language: AppLanguage,
+    val isShakeEnabled: Boolean
 )
 
 @Composable
@@ -59,11 +62,16 @@ fun Settings(
     navController: NavController,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    onLanguageChange: (AppLanguage) -> Unit
+    onLanguageChange: (AppLanguage) -> Unit,
+    isShakeEnabled: Boolean = true,
+    onShakeToggle: (Boolean) -> Unit = {}
 ) {
     val localizationManager = LocalLocalizationManager.current
     var settingsState by remember {
-        mutableStateOf(SettingsState(language = localizationManager.getCurrentLanguage()))
+        mutableStateOf(SettingsState(
+            language = localizationManager.getCurrentLanguage(),
+            isShakeEnabled = isShakeEnabled
+        ))
     }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showRulesDialog by remember { mutableStateOf(false) }
@@ -124,14 +132,30 @@ fun Settings(
 
                 GenericButton(
                     text = if (isDarkTheme)
-                        stringResource(id = R.string.light_theme)
+                        stringResource(id =R.string.dark_theme)
                     else
-                        stringResource(id = R.string.dark_theme),
+                        stringResource(id = R.string.light_theme),
                     icon = if (isDarkTheme)
                         Icons.Default.Brightness7
                     else
                         Icons.Default.Brightness4,
                     onClick = { onThemeChange(!isDarkTheme) },
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = buttonFontSize,
+                    gradientColors = SettingsButtonGradient
+                )
+
+                GenericButton(
+                    text = if (settingsState.isShakeEnabled)
+                        stringResource(id = R.string.shake_enabled)
+                    else
+                        stringResource(id = R.string.shake_disabled),
+                    icon = Icons.Default.Vibration,
+                    onClick = {
+                        val newShakeState = !settingsState.isShakeEnabled
+                        settingsState = settingsState.copy(isShakeEnabled = newShakeState)
+                        onShakeToggle(newShakeState)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = buttonFontSize,
                     gradientColors = SettingsButtonGradient

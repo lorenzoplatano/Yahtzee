@@ -30,7 +30,7 @@ import com.example.yahtzee.util.ShakeDetector
 class MainActivity : ComponentActivity() {
     companion object {
         private var localizationManager = LocalizationManager()
-
+        private var isShakeEnabled by mutableStateOf(true)
         fun getLocalizationManager(): LocalizationManager {
             return localizationManager
         }
@@ -90,19 +90,21 @@ class MainActivity : ComponentActivity() {
         // Stato per triggerare lo shake nelle schermate di gioco
         var singlePlayerShakeTrigger by remember { mutableStateOf(0) }
         var multiPlayerShakeTrigger by remember { mutableStateOf(0) }
-
-        // Setup ShakeDetector solo quando serve (cioè quando siamo in una schermata di gioco)
-        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val shakeDetector = remember {
             ShakeDetector {
-                // Determina quale schermata di gioco è attiva e triggera il relativo stato
-                val currentRoute = navController.currentBackStackEntry?.destination?.route
-                when (currentRoute) {
-                    "game" -> singlePlayerShakeTrigger++
-                    "game_1vs1" -> multiPlayerShakeTrigger++
+                // Controlla se lo shake è abilitato prima di eseguire l'azione
+                if (isShakeEnabled) {
+                    val currentRoute = navController.currentBackStackEntry?.destination?.route
+                    when (currentRoute) {
+                        "game" -> singlePlayerShakeTrigger++
+                        "game_1vs1" -> multiPlayerShakeTrigger++
+                    }
                 }
             }
         }
+        // Setup ShakeDetector solo quando serve (cioè quando siamo in una schermata di gioco)
+        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
 
         // Registra/deregistra il listener in base al ciclo di vita della composable
         DisposableEffect(Unit) {
