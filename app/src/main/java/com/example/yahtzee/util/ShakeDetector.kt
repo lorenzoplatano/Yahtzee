@@ -1,4 +1,4 @@
-package com.example.yahtzee.util//ciao
+package com.example.yahtzee.util
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -13,6 +13,7 @@ class ShakeDetector(
     private var lastShakeTime: Long = 0
     private val shakeThresholdGravity = 3f
     private val shakeSlopTimeMs = 2500
+    private var isRegistered = false
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event == null) return
@@ -39,4 +40,21 @@ class ShakeDetector(
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+    fun register(sensorManager: SensorManager) {
+        if (!isRegistered) {
+            val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+            if (accelerometer != null) {
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
+                isRegistered = true
+            }
+        }
+    }
+
+    fun unregister(sensorManager: SensorManager) {
+        if (isRegistered) {
+            sensorManager.unregisterListener(this)
+            isRegistered = false
+        }
+    }
 }
