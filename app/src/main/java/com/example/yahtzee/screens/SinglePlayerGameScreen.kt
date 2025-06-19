@@ -40,6 +40,12 @@ import com.example.yahtzee.screens.components.Dice
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
+import com.example.yahtzee.ui.theme.violaceo
+import com.example.yahtzee.ui.theme.blu_chiaro
+import com.example.yahtzee.ui.theme.arancio_rosso
+import com.example.yahtzee.ui.theme.arancione
+import com.example.yahtzee.ui.theme.verde_acqua
+import com.example.yahtzee.ui.theme.verde_azzurro
 
 @Composable
 fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) {
@@ -236,7 +242,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                         .padding(horizontal = (4 * scaleFactor).dp)
                         .offset(y = (8 * scaleFactor).dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = colorScheme.secondaryContainer // Uniforma al colore della tabella
+                        containerColor = colorScheme.surface // Updated to match multiplayer
                     ),
                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -277,18 +283,18 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
 
                     colors = CardDefaults.cardColors(
-                        containerColor = colorScheme.secondaryContainer
+                        containerColor = colorScheme.surface // Updated to match multiplayer
                     ),
                     shape = RoundedCornerShape((14 * scaleFactor).dp)
                 ) {
                     Column {
-                        // Header tabella
+                        // Header tabella - Updated with home button colors
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
                                     brush = Brush.horizontalGradient(
-                                        listOf(colorScheme.primary, colorScheme.secondary)
+                                        listOf(violaceo, blu_chiaro)
                                     ),
                                     shape = RoundedCornerShape(
                                         topStart = (if (isCompactScreen) (10 * scaleFactor) else (14 * scaleFactor)).dp,
@@ -304,7 +310,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                     text = stringResource(R.string.combination),
                                     modifier = Modifier.weight(2f),
                                     fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onPrimary,
+                                    color = Color.White,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                     fontFamily = fontFamily
                                 )
@@ -313,7 +319,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                     modifier = Modifier.weight(1f),
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onPrimary,
+                                    color = Color.White,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                     fontFamily = fontFamily
                                 )
@@ -353,7 +359,8 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                     selected = currentScore != null,
                                     scaleFactor = scaleFactor,
                                     fontFamily = fontFamily,
-                                    isCompactScreen = isCompactScreen
+                                    isCompactScreen = isCompactScreen,
+                                    colorScheme = colorScheme
                                 )
                             }
 
@@ -370,7 +377,8 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                 alternate = false,
                                 fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
-                                fontFamily = fontFamily
+                                fontFamily = fontFamily,
+                                colorScheme = colorScheme
                             )
 
                             HorizontalDivider(
@@ -386,7 +394,8 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
                                 alternate = false,
                                 fontSize = (if (isCompactScreen) (12 * scaleFactor) else (14 * scaleFactor)).sp,
                                 scaleFactor = scaleFactor,
-                                fontFamily = fontFamily
+                                fontFamily = fontFamily,
+                                colorScheme = colorScheme
                             )
                         }
                     }
@@ -530,17 +539,24 @@ fun SinglePlayerTableRow(
     selected: Boolean = false,
     scaleFactor: Float = 1f,
     fontFamily: FontFamily? = null,
-    isCompactScreen: Boolean = false
+    isCompactScreen: Boolean = false,
+    colorScheme: ColorScheme = MaterialTheme.colorScheme
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    // Usa sempre colorScheme.secondaryContainer come background per tutte le righe (come la Card della tabella)
-    val backgroundColor = colorScheme.secondaryContainer
+    // Updated to match multiplayer behavior
+    val backgroundColor = colorScheme.surface
 
     val textColor = when {
         enabled -> colorScheme.primary
         bold -> colorScheme.onSurface
-        score != null -> colorScheme.primary
+        else -> colorScheme.onSurfaceVariant
+    }
+
+    // Updated score colors to match multiplayer - preview scores use standard text color
+    val scoreColor = when {
+        enabled -> colorScheme.primary
+        bold -> colorScheme.onSurface
+        score != null -> verde_azzurro
+        previewScore != null -> textColor // Updated: preview scores use standard text color like multiplayer
         else -> colorScheme.onSurfaceVariant
     }
 
@@ -576,7 +592,7 @@ fun SinglePlayerTableRow(
                 text = combination,
                 modifier = Modifier.weight(2f),
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = colorScheme.onSurface,
+                color = textColor,
                 fontSize = fontSize,
                 fontFamily = fontFamily
             )
@@ -585,7 +601,7 @@ fun SinglePlayerTableRow(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
-                color = textColor,
+                color = scoreColor,
                 fontSize = fontSize,
                 fontFamily = fontFamily
             )
