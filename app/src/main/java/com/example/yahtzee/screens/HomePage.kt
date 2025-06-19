@@ -212,7 +212,7 @@ fun Homepage(
                             Text(
                                 stringResource(R.string.back),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = colorScheme.primary
+                                color = colorScheme.onSurface
                             )
                         }
                     }

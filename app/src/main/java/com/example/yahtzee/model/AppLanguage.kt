@@ -2,9 +2,9 @@ package com.example.yahtzee.model
 
 import java.util.Locale
 
-enum class AppLanguage(val code: String, val displayName: String) {
-    ITALIAN("it", "Italiano"),
-    ENGLISH("en", "English");
+enum class AppLanguage(val code: String) {
+    ITALIAN("it"),
+    ENGLISH("en");
 
     fun getLocalizedName(): String {
         return when (this) {

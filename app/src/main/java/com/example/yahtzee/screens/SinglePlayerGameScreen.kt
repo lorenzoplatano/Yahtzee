@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -26,19 +25,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
-import com.example.yahtzee.db.AppDatabase
-import com.example.yahtzee.repository.GameHistoryRepository
 import com.example.yahtzee.viewmodel.SinglePlayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
+import com.example.yahtzee.ui.theme.NewSingleGameButtonGradient
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
 import com.example.yahtzee.ui.theme.verde_azzurro
@@ -49,7 +44,6 @@ fun SinglePlayerGameScreen(
     shakeTrigger: Int,
     viewModel: SinglePlayerGameViewModel  // ✅ Aggiungi questo parametro
 ){
-    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
@@ -150,10 +144,10 @@ fun SinglePlayerGameScreen(
                 TextButton(onClick = {
                     viewModel.resetGame()
                     showResetDialog = false
-                }) { Text(stringResource(R.string.confirm), color = colorScheme.primary, fontFamily = fontFamily) }
+                }) { Text(stringResource(R.string.confirm), color = colorScheme.onSurface, fontFamily = fontFamily) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel), color = colorScheme.primary, fontFamily = fontFamily) }
+                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel), color = colorScheme.onSurface, fontFamily = fontFamily) }
             },
             containerColor = colorScheme.surface
         )
@@ -435,7 +429,7 @@ fun SinglePlayerGameScreen(
                                 text = stringResource(R.string.final_score, totalScore),
                                 fontSize = (22 * scaleFactor).sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorScheme.primary,
+                                color = colorScheme.onSurface,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
                                 fontFamily = fontFamily
@@ -476,7 +470,7 @@ fun SinglePlayerGameScreen(
                                             .fillMaxSize()
                                             .background(
                                                 brush = Brush.horizontalGradient(
-                                                    listOf(colorScheme.primary, colorScheme.secondary),
+                                                    NewSingleGameButtonGradient,
                                                     startX = 0f,
                                                     endX = Float.POSITIVE_INFINITY
                                                 ),
@@ -550,17 +544,17 @@ fun SinglePlayerTableRow(
     val backgroundColor = colorScheme.surface
 
     val textColor = when {
-        enabled -> colorScheme.primary
+        enabled -> colorScheme.onSurface
         bold -> colorScheme.onSurface
         else -> colorScheme.onSurfaceVariant
     }
 
     // Updated score colors to match multiplayer - preview scores use standard text color
     val scoreColor = when {
-        enabled -> colorScheme.primary
+        enabled -> colorScheme.onSurface
         bold -> colorScheme.onSurface
         score != null -> verde_azzurro
-        previewScore != null -> textColor // Updated: preview scores use standard text color like multiplayer
+        previewScore != null -> colorScheme.onSurface // Updated: preview scores use standard text color like multiplayer
         else -> colorScheme.onSurfaceVariant
     }
 

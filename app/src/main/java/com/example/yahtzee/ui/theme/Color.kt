@@ -23,6 +23,7 @@ val MultiPlayerGradient = listOf(MultiPlayerStart, MultiPlayerEnd)
 val SettingsGradient = listOf(SettingsStart, SettingsEnd)
 val HistoryGradient = listOf(HistoryStart, HistoryEnd)
 val SettingsButtonGradient = listOf(SettingsButtonStart, SettingsButtonEnd)
+val NewSingleGameButtonGradient = listOf(HomeButtonStart, HomeButtonEnd)
 
 
 

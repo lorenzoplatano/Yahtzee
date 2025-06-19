@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Brightness3
-import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Vibration
@@ -156,7 +155,7 @@ fun Settings(
                     Text(
                         text = stringResource(id = R.string.back),
                         style = MaterialTheme.typography.labelLarge,
-                        color = colorScheme.primary
+                        color = colorScheme.onSurface
                     )
                 }
             }

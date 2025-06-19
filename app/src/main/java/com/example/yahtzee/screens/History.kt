@@ -21,25 +21,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
-import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.model.*
-import com.example.yahtzee.repository.GameHistoryRepository
 import com.example.yahtzee.viewmodel.HistoryViewModel
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
 import com.example.yahtzee.screens.components.GenericButton
-import com.example.yahtzee.viewmodel.HistoryViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -48,8 +41,6 @@ fun HistoryScreen(
     navController: NavController,
     viewModel: HistoryViewModel  // ✅ Aggiungi questo parametro
 ) {
-    val context = LocalContext.current
-    val db = remember { AppDatabase.getDatabase(context) }
 
     val uiState by viewModel.uiState
 

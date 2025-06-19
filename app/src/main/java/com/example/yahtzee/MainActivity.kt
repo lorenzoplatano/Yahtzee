@@ -78,38 +78,39 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-    // ✅ Accesso diretto allo stato del ViewModel
-    val uiState = settingsViewModel.uiState
-    val isDarkTheme = uiState.isDarkTheme
-    val isShakeEnabled = uiState.isShakeEnabled
-    val currentLanguage = uiState.currentLanguage
+            // ✅ Accesso diretto allo stato del ViewModel
+            val uiState = settingsViewModel.uiState
+            val isDarkTheme = uiState.isDarkTheme
+            val isShakeEnabled = uiState.isShakeEnabled
+            val currentLanguage = uiState.currentLanguage
 
-    // Aggiorna il LocalizationManager solo se cambia la lingua
-    LaunchedEffect(currentLanguage) {
-        localizationManager.setLanguage(currentLanguage)
-    }
+            // Aggiorna il LocalizationManager solo se cambia la lingua
+            LaunchedEffect(currentLanguage) {
+                localizationManager.setLanguage(currentLanguage)
+            }
 
-    CompositionLocalProvider(LocalLocalizationManager provides localizationManager) {
-        YahtzeeTheme(darkTheme = isDarkTheme) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                YahtzeeApp(
-                    isShakeEnabled = isShakeEnabled,
-                    settingsViewModel = settingsViewModel,
-                    onLanguageChange = { language ->
-                        lifecycleScope.launch {
-                            settingsRepository.setLanguage(language)
-                            localizationManager.setLanguage(language)
-                            recreateActivity()
-                        }
+            CompositionLocalProvider(LocalLocalizationManager provides localizationManager) {
+                YahtzeeTheme(darkTheme = isDarkTheme) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        // ✅ CHIAMA YahtzeeApp qui!
+                        YahtzeeApp(
+                            isShakeEnabled = isShakeEnabled,
+                            settingsViewModel = settingsViewModel,
+                            onLanguageChange = { language ->
+                                lifecycleScope.launch {
+                                    settingsRepository.setLanguage(language)
+                                    localizationManager.setLanguage(language)
+                                    recreateActivity()
+                                }
+                            }
+                        )
                     }
-                )
+                }
             }
         }
-    }
-}
     }
 
     private fun recreateActivity() {

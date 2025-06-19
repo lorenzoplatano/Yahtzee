@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.GameControlButtons
@@ -309,7 +308,7 @@ fun MultiplayerGameScreen(
                                     text = stringResource(R.string.combination),
                                     modifier = Modifier.weight(2f),
                                     fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onPrimary,
+                                    color = Color.White,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                 )
                                 // Player 1 header
@@ -600,7 +599,7 @@ fun MultiplayerTableRow(
     val backgroundColor = colorScheme.surface
 
     val textColor = when {
-        enabled -> colorScheme.primary
+        enabled -> colorScheme.onSurface
         bold -> colorScheme.onSurface
         else -> colorScheme.onSurfaceVariant
     }
