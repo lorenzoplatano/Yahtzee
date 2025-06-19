@@ -1,0 +1,51 @@
+package com.example.yahtzee.util
+
+import android.content.Context
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+private val Context.dataStore by preferencesDataStore("settings")
+
+class SettingsManager(private val context: Context) {
+
+    companion object {
+        // Chiavi per i dati
+        private val IS_DARK_THEME = booleanPreferencesKey("is_dark_theme")
+        private val IS_SHAKE_ENABLED = booleanPreferencesKey("is_shake_enabled")
+        private val LANGUAGE_CODE = stringPreferencesKey("language_code")
+    }
+
+    // Getter come flussi che emettono i valori
+    val isDarkThemeFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[IS_DARK_THEME] ?: false }
+
+    val isShakeEnabledFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[IS_SHAKE_ENABLED] ?: true }
+
+    val languageFlow: Flow<AppLanguage> = context.dataStore.data
+        .map { preferences ->
+            val code = preferences[LANGUAGE_CODE] ?: AppLanguage.ITALIAN.code
+            AppLanguage.values().find { it.code == code } ?: AppLanguage.ITALIAN
+        }
+
+    // Setter per salvare le impostazioni
+    suspend fun setDarkTheme(isDarkTheme: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[IS_DARK_THEME] = isDarkTheme
+        }
+    }
+
+    suspend fun setShakeEnabled(isEnabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[IS_SHAKE_ENABLED] = isEnabled
+        }
+    }
+
+    suspend fun setLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            preferences[LANGUAGE_CODE] = language.code
+        }
+    }
+}

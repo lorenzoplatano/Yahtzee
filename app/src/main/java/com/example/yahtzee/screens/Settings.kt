@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
@@ -42,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yahtzee.R
-import com.example.yahtzee.localization.AppLanguage
-import com.example.yahtzee.localization.LocalLocalizationManager
+import com.example.yahtzee.util.AppLanguage
+import com.example.yahtzee.util.LocalLocalizationManager
 import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 
@@ -122,7 +121,7 @@ fun Settings(
                 )
 
                 GenericButton(
-                    text = stringResource(id = R.string.language) + ": ${settingsState.language.displayName}",
+                    text = stringResource(id = R.string.language) + ": " + settingsState.language.getLocalizedName(),
                     icon = Icons.Default.Person,
                     onClick = { showLanguageDialog = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -220,7 +219,7 @@ fun LanguageDialog(
         text = {
             Column {
                 Text(
-                    AppLanguage.ITALIAN.displayName,
+                    AppLanguage.ITALIAN.getLocalizedName(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onSelectLanguage(AppLanguage.ITALIAN) }
@@ -230,7 +229,7 @@ fun LanguageDialog(
                     color = colorScheme.onSurface
                 )
                 Text(
-                    AppLanguage.ENGLISH.displayName,
+                    AppLanguage.ENGLISH.getLocalizedName(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onSelectLanguage(AppLanguage.ENGLISH) }
