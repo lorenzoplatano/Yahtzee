@@ -1,7 +1,6 @@
 package com.example.yahtzee
 
 import android.content.Context
-import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,21 +12,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yahtzee.localization.AppLanguage
-import com.example.yahtzee.localization.LocalLocalizationManager
-import com.example.yahtzee.localization.LocalizationManager
-import com.example.yahtzee.screens.HistoryScreen
-import com.example.yahtzee.screens.Homepage
-import com.example.yahtzee.screens.MultiplayerGameScreen
-import com.example.yahtzee.screens.Settings
-import com.example.yahtzee.screens.SinglePlayerGameScreen
+import com.example.yahtzee.util.AppLanguage
+import com.example.yahtzee.util.LocalLocalizationManager
+import com.example.yahtzee.util.LocalizationManager
+import com.example.yahtzee.util.SettingsManager
+import com.example.yahtzee.screens.*
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 import com.example.yahtzee.util.ShakeDetector
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
+    private lateinit var settingsManager: SettingsManager
+    private var savedLanguage: AppLanguage? = null
+
     companion object {
         private var localizationManager = LocalizationManager()
 
@@ -37,6 +40,16 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
+        // Carica la lingua salvata dalle preferenze PRIMA di creare il contesto
+        if (!::settingsManager.isInitialized) {
+            settingsManager = SettingsManager(newBase.applicationContext)
+        }
+        // Carica la lingua in modo sincrono
+        val language = runBlocking {
+            settingsManager.languageFlow.first()
+        }
+        savedLanguage = language
+        localizationManager.setLanguage(language)
         val context = getLocalizationManager().applyLanguage(newBase)
         super.attachBaseContext(context)
     }
@@ -45,12 +58,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Stato globale per il tema (chiaro/scuro)
-        var isDarkTheme by mutableStateOf(false)
-        var isShakeEnabled by mutableStateOf(true)
-
         setContent {
-            CompositionLocalProvider(LocalLocalizationManager provides getLocalizationManager()) {
+            // Raccoglie i flussi delle impostazioni come stati in Compose
+            val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = false)
+            val isShakeEnabled by settingsManager.isShakeEnabledFlow.collectAsState(initial = true)
+            val currentLanguage by settingsManager.languageFlow.collectAsState(initial = savedLanguage ?: AppLanguage.ITALIAN)
+
+            // Aggiorna il LocalizationManager solo se cambia la lingua
+            LaunchedEffect(currentLanguage) {
+                localizationManager.setLanguage(currentLanguage)
+            }
+
+            CompositionLocalProvider(LocalLocalizationManager provides localizationManager) {
                 YahtzeeTheme(darkTheme = isDarkTheme) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -58,13 +77,24 @@ class MainActivity : ComponentActivity() {
                     ) {
                         YahtzeeApp(
                             isDarkTheme = isDarkTheme,
-                            onThemeChange = { isDarkTheme = it },
+                            onThemeChange = { newValue ->
+                                lifecycleScope.launch {
+                                    settingsManager.setDarkTheme(newValue)
+                                }
+                            },
                             onLanguageChange = { language ->
-                                getLocalizationManager().setLanguage(language)
-                                recreateActivity()
+                                lifecycleScope.launch {
+                                    settingsManager.setLanguage(language)
+                                    localizationManager.setLanguage(language)
+                                    recreateActivity()
+                                }
                             },
                             isShakeEnabled = isShakeEnabled,
-                            onShakeToggle = { isShakeEnabled = it }
+                            onShakeToggle = { newValue ->
+                                lifecycleScope.launch {
+                                    settingsManager.setShakeEnabled(newValue)
+                                }
+                            }
                         )
                     }
                 }
@@ -84,6 +114,7 @@ class MainActivity : ComponentActivity() {
         isShakeEnabled: Boolean,
         onShakeToggle: (Boolean) -> Unit
     ) {
+        // Il resto del codice di YahtzeeApp rimane invariato
         val navController = rememberNavController()
         val context = this
 

@@ -1,4 +1,4 @@
-package com.example.yahtzee.localization
+package com.example.yahtzee.util
 
 import android.content.Context
 import android.content.res.Configuration
@@ -7,7 +7,14 @@ import java.util.Locale
 
 enum class AppLanguage(val code: String, val displayName: String) {
     ITALIAN("it", "Italiano"),
-    ENGLISH("en", "English")
+    ENGLISH("en", "English");
+
+    fun getLocalizedName(): String {
+        return when (this) {
+            ITALIAN -> if (Locale.getDefault().language == "en") "Italian" else "Italiano"
+            ENGLISH -> if (Locale.getDefault().language == "it") "Inglese" else "English"
+        }
+    }
 }
 
 class LocalizationManager(private var currentLanguage: AppLanguage = AppLanguage.ITALIAN) {
