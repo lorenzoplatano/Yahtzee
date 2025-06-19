@@ -12,8 +12,8 @@
     <string name="light_theme">Chiaro</string>
     <string name="language">Lingua</string>
     <string name="rules">Regole</string>
-    <string name="shake_enabled">Shake per lanciare: Attivo</string>
-    <string name="shake_disabled">Shake per lanciare: Disattivo</string>
+    <string name="shake_enabled">Shake per lanciare: Sì</string>
+    <string name="shake_disabled">Shake per lanciare: No</string>
 
     <!-- Pulsanti e azioni -->
     <string name="ok_button">OK</string>
