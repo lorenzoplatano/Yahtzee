@@ -116,6 +116,9 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
     var animationDone by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
+    // Track the initial shakeTrigger value to prevent auto-roll on screen load
+    var previousShakeTrigger by remember { mutableStateOf(shakeTrigger) }
+
     fun rollDiceWithAnimation() {
         if (state.remainingRolls > 0 && !state.gameEnded && !allDiceHeld) {
             coroutineScope.launch {
@@ -135,9 +138,12 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
     fun startNewGameDirectly() {
         viewModel.resetGame()
     }
+
+    // Fixed: Only trigger roll when shakeTrigger actually changes, not on initial load
     LaunchedEffect(shakeTrigger) {
-        if (shakeTrigger > 0) {
+        if (shakeTrigger > 0 && shakeTrigger != previousShakeTrigger) {
             rollDiceWithAnimation()
+            previousShakeTrigger = shakeTrigger
         }
     }
 
@@ -187,7 +193,7 @@ fun SinglePlayerGameScreen(navController: NavController, shakeTrigger: Int = 0) 
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Sfondociao
+        // Sfondo
         Image(
             painter = painterResource(id = R.drawable.sfondo_generale),
             contentDescription = null,
