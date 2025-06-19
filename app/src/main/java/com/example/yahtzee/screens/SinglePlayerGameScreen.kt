@@ -161,16 +161,17 @@ fun SinglePlayerGameScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showHomeDialog = false
+                    viewModel.resetGame()
                     navController.navigate("homepage") {
                         popUpTo(0) { inclusive = true }
                     }
                 }) {
-                    Text(stringResource(id = R.string.confirm), color = colorScheme.primary, fontFamily = fontFamily)
+                    Text(stringResource(id = R.string.confirm), color = colorScheme.onSurface, fontFamily = fontFamily)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showHomeDialog = false }) {
-                    Text(stringResource(id = R.string.cancel), color = colorScheme.primary, fontFamily = fontFamily)
+                    Text(stringResource(id = R.string.cancel), color = colorScheme.onSurface, fontFamily = fontFamily)
                 }
             },
             containerColor = colorScheme.surface
@@ -571,7 +572,7 @@ fun SinglePlayerTableRow(
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
                         .border(
                             (1 * scaleFactor).dp,
-                            colorScheme.primary,
+                            violaceo,
                             RoundedCornerShape((6 * scaleFactor).dp)
                         )
                 } else Modifier

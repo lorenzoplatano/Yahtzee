@@ -156,6 +156,7 @@ fun MultiplayerGameScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showHomeDialog = false
+                    viewModel.resetGame()
                     navController.navigate("homepage") {
                         popUpTo(0) { inclusive = true }
                     }
@@ -632,7 +633,7 @@ fun MultiplayerTableRow(
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape((6 * scaleFactor).dp))
                         .border(
                             (1 * scaleFactor).dp,
-                            colorScheme.primary,
+                            if (isPlayer1Turn) player1Color else player2Color,
                             RoundedCornerShape((6 * scaleFactor).dp)
                         )
                 } else Modifier
