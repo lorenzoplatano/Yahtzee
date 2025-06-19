@@ -379,7 +379,7 @@ fun MultiplayerGameScreen(
                                             player2Score = bonus2,
                                             bold = true,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (14 * scaleFactor)).sp,
+                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                             scaleFactor = scaleFactor,
                                             isCompactScreen = isCompactScreen,
                                             colorScheme = colorScheme
@@ -392,7 +392,7 @@ fun MultiplayerGameScreen(
                                             player2Score = totalScore2,
                                             bold = true,
                                             isPlayer1Turn = state.isPlayer1Turn,
-                                            fontSize = (if (isCompactScreen) (12 * scaleFactor) else (14 * scaleFactor)).sp,
+                                            fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                             scaleFactor = scaleFactor,
                                             isCompactScreen = isCompactScreen,
                                             colorScheme = colorScheme
