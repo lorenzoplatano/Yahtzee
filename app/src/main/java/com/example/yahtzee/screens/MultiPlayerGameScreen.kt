@@ -156,7 +156,6 @@ fun MultiplayerGameScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showHomeDialog = false
-                    viewModel.resetGame()
                     navController.navigate("homepage") {
                         popUpTo(0) { inclusive = true }
                     }

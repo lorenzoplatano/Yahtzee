@@ -105,13 +105,11 @@ fun Homepage(
             alignment = Alignment.Center
         )
 
-        // Overlay scuro/chiaro in base al tema
-        val isDarkTheme = colorScheme.background.luminance() < 0.5f
-        val overlayAlpha = if (isDarkTheme) 0.5f else 0.3f
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorScheme.background.copy(alpha = overlayAlpha))
+                .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
         Box(

@@ -70,7 +70,7 @@ fun HistoryScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorScheme.background.copy(alpha = 0.4f))
+                .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
         // Home icon (top-left) con GenericButton

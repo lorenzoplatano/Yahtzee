@@ -78,7 +78,7 @@ fun Settings(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorScheme.background.copy(alpha = 0.18f))
+                .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
         Card(
