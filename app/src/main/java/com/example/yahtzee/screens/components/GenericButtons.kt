@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yahtzee.ui.theme.indigo
@@ -40,7 +41,7 @@ fun GenericButton(
         indigo, viola
     ),
     enabled: Boolean = true,
-    fontSize: androidx.compose.ui.unit.TextUnit = 18.sp,
+    fontSize: TextUnit = 18.sp,
     showTextOnly: Boolean = false,
     showIconOnly: Boolean = false
 ) {

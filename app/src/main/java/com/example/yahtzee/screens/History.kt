@@ -37,6 +37,9 @@ import com.example.yahtzee.db.AppDatabase
 import com.example.yahtzee.model.*
 import com.example.yahtzee.viewmodel.HistoryViewModel
 import com.example.yahtzee.ui.theme.HomeButtonGradient
+import com.example.yahtzee.ui.theme.violaceo
+import com.example.yahtzee.ui.theme.blu_chiaro
+import com.example.yahtzee.screens.components.GenericButton
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -85,76 +88,40 @@ fun HistoryScreen(
                 .background(colorScheme.background.copy(alpha = 0.4f))
         )
 
-        // Home icon (top-left)
-        Card(
+        // Home icon (top-left) con GenericButton
+        Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(
                     top = headerPadding.coerceAtLeast(32.dp).coerceAtMost(60.dp),
                     start = (screenWidth * 0.03f).coerceAtLeast(8.dp).coerceAtMost(16.dp)
                 )
-                .size((40 * scaleFactor).dp.coerceAtLeast(36.dp).coerceAtMost(48.dp))
-                .shadow(
-                    elevation = 6.dp,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .zIndex(1f)
-                .clickable { navController.navigate("homepage") },
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            shape = RoundedCornerShape(10.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(HomeButtonGradient),
-                        shape = RoundedCornerShape(10.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Home",
-                    tint = Color.White,
-                    modifier = Modifier.size((20 * scaleFactor).dp.coerceAtLeast(18.dp).coerceAtMost(24.dp))
-                )
-            }
+            GenericButton(
+                text = "",
+                icon = Icons.Default.Home,
+                onClick = { navController.navigate("homepage") },
+                modifier = Modifier.size(48.dp),
+                showIconOnly = true
+            )
         }
 
-        // Settings icon (top-right)
-        Card(
+        // Settings icon (top-right) con GenericButton
+        Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(
                     top = headerPadding.coerceAtLeast(32.dp).coerceAtMost(60.dp),
                     end = (screenWidth * 0.03f).coerceAtLeast(8.dp).coerceAtMost(16.dp)
                 )
-                .size((40 * scaleFactor).dp.coerceAtLeast(36.dp).coerceAtMost(48.dp))
-                .shadow(
-                    elevation = 6.dp,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .zIndex(1f)
-                .clickable { navController.navigate("settings") },
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            shape = RoundedCornerShape(10.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(HomeButtonGradient),
-                        shape = RoundedCornerShape(10.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings_title),
-                    tint = Color.White,
-                    modifier = Modifier.size((20 * scaleFactor).dp.coerceAtLeast(18.dp).coerceAtMost(24.dp))
-                )
-            }
+            GenericButton(
+                text = "",
+                icon = Icons.Default.Settings,
+                onClick = { navController.navigate("settings") },
+                modifier = Modifier.size(48.dp),
+                showIconOnly = true
+            )
         }
 
         // History card - responsive positioning
@@ -177,36 +144,74 @@ fun HistoryScreen(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.history),
-                    style = if (isCompactHeight)
-                        MaterialTheme.typography.headlineMedium
-                    else
-                        MaterialTheme.typography.displaySmall,
-                    color = colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // Header con gradiente come singleplayer
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.horizontalGradient(listOf(violaceo, blu_chiaro)),
+                            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        )
+                        .padding(vertical = 10.dp, horizontal = 8.dp)
                 ) {
-                    SortableColumnHeader(
-                        title = stringResource(R.string.date),
-                        isSorted = uiState.sortColumn == SortColumn.DATE,
-                        ascending = uiState.sortOrder == SortOrder.ASC,
-                        onClick = { viewModel.onSortChange(SortColumn.DATE) }
-                    )
-                    SortableColumnHeader(
-                        title = stringResource(R.string.score_label),
-                        isSorted = uiState.sortColumn == SortColumn.SCORE,
-                        ascending = uiState.sortOrder == SortOrder.ASC,
-                        onClick = { viewModel.onSortChange(SortColumn.SCORE) }
+                    Text(
+                        text = stringResource(R.string.history),
+                        style = if (isCompactHeight)
+                            MaterialTheme.typography.headlineMedium
+                        else
+                            MaterialTheme.typography.displaySmall,
+                        color = Color.White,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
                 }
 
-                // History list with height constraints for smaller screens
+                // Header della tabella con gradiente e bordi smussati
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.horizontalGradient(listOf(violaceo, blu_chiaro)),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(vertical = 6.dp, horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SortableColumnHeader(
+                            title = stringResource(R.string.date),
+                            isSorted = uiState.sortColumn == SortColumn.DATE,
+                            ascending = uiState.sortOrder == SortOrder.ASC,
+                            onClick = { viewModel.onSortChange(SortColumn.DATE) },
+                            headerColor = Color.White
+                        )
+                    }
+                    VerticalDivider(
+                        color = Color.White.copy(alpha = 0.5f),
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .height(24.dp)
+                            .padding(horizontal = 2.dp)
+                    )
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SortableColumnHeader(
+                            title = stringResource(R.string.score_label),
+                            isSorted = uiState.sortColumn == SortColumn.SCORE,
+                            ascending = uiState.sortOrder == SortOrder.ASC,
+                            onClick = { viewModel.onSortChange(SortColumn.SCORE) },
+                            headerColor = Color.White
+                        )
+                    }
+                }
+
+                // History list con divider tra le entry
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -219,6 +224,11 @@ fun HistoryScreen(
                 ) {
                     items(uiState.history) { entry ->
                         HistoryRow(entry)
+                        HorizontalDivider(
+                            thickness = 0.7.dp,
+                            color = colorScheme.outlineVariant,
+                            modifier = Modifier.padding(horizontal = 2.dp)
+                        )
                     }
                 }
             }
@@ -232,6 +242,7 @@ fun SortableColumnHeader(
     isSorted: Boolean,
     ascending: Boolean,
     onClick: () -> Unit,
+    headerColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Row(
         modifier = Modifier.clickable { onClick() },
@@ -240,14 +251,14 @@ fun SortableColumnHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = headerColor
         )
         if (isSorted) {
             Icon(
                 imageVector = if (ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = headerColor
             )
         }
     }
