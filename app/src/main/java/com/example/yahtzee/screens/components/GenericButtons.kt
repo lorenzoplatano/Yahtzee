@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.yahtzee.ui.theme.indigo
+import com.example.yahtzee.ui.theme.viola
 
 @Composable
 fun GenericButton(
@@ -35,8 +37,7 @@ fun GenericButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     gradientColors: List<Color> = listOf(
-        Color(0xFF6366F1), // Indigo
-        Color(0xFF8B5CF6)  // Purple
+        indigo, viola
     ),
     enabled: Boolean = true,
     fontSize: androidx.compose.ui.unit.TextUnit = 18.sp,

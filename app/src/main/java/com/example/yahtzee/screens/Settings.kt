@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.History
@@ -138,7 +139,7 @@ fun Settings(
 
                 GenericButton(
                     text = stringResource(id = R.string.rules),
-                    icon = Icons.Default.History,
+                    icon = Icons.Default.Book,
                     onClick = { showRulesDialog = true },
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = buttonFontSize,

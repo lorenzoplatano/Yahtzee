@@ -49,9 +49,9 @@ class MainActivity : ComponentActivity() {
             // Stato globale per il tema (chiaro/scuro)
             var isDarkTheme by rememberSaveable { mutableStateOf(false) }
 
-            // Fornisci il LocalizationManager a tutta l'app
+
             CompositionLocalProvider(LocalLocalizationManager provides getLocalizationManager()) {
-                // Applica il tema UNA SOLA VOLTA globalmente
+
                 YahtzeeTheme(darkTheme = isDarkTheme) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
