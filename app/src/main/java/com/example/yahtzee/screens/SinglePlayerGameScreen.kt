@@ -21,8 +21,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -538,11 +540,11 @@ fun SinglePlayerTableRow(
     onClick: () -> Unit = {},
     bold: Boolean = false,
     alternate: Boolean = false,
-    fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
+    fontSize: TextUnit = 14.sp,
     selected: Boolean = false,
     scaleFactor: Float = 1f,
     isDarkTheme: Boolean = false,
-    fontFamily: androidx.compose.ui.text.font.FontFamily? = null,
+    fontFamily: FontFamily? = null,
     isCompactScreen: Boolean = false
 ) {
     val backgroundColor = when {
