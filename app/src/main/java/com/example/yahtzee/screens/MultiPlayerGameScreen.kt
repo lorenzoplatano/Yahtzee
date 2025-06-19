@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -191,10 +192,10 @@ fun MultiplayerGameScreen(
 
         Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopStart)
                 .padding(
-                    top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
-                    end = (screenWidth * 0.04f).coerceAtLeast(12.dp)
+                    top = headerPadding.coerceAtLeast(12.dp).coerceAtMost(40.dp),
+                    start = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
             HomeButton(
@@ -208,7 +209,19 @@ fun MultiplayerGameScreen(
                 scaleFactor = scaleFactor
             )
         }
-
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(
+                    top = headerPadding.coerceAtLeast(16.dp).coerceAtMost(40.dp),
+                    end = (screenWidth * 0.05f).coerceAtLeast(16.dp)
+                )
+        ) {
+            SettingsButton(
+                onClick = { navController.navigate("settings") },
+                scaleFactor = scaleFactor
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -660,6 +673,42 @@ fun MultiplayerTableRow(
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player2TextColor,
                 fontSize = fontSize
+            )
+        }
+    }
+}
+@Composable
+fun SettingsButton(
+    onClick: () -> Unit,
+    scaleFactor: Float,
+) {
+    Card(
+        modifier = Modifier
+            .size((44 * scaleFactor).dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(violaceo, blu_chiaro)
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .size((44 * scaleFactor).dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings",
+                tint = Color.White,
+                modifier = Modifier.size((22 * scaleFactor).dp)
             )
         }
     }
