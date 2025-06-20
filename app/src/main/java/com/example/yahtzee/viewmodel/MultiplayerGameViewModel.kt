@@ -39,10 +39,14 @@ class MultiplayerGameViewModel(
                         isPlayer1Turn = savedGame.isPlayer1Turn,
                         gameEnded = savedGame.gameEnded
                     )
+                } else {
+                    // Inizializza un nuovo gioco quando non c'è uno stato salvato
+                    resetGame()
                 }
             } catch (_: Exception) {
                 // If loading fails, clear corrupted save and start fresh
                 gameSaveRepository.clearSavedMultiplayerGame()
+                resetGame()
             }
         }
     }

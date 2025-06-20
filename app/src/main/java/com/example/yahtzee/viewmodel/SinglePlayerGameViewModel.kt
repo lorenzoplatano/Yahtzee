@@ -33,7 +33,6 @@ class SinglePlayerGameViewModel(
             try {
                 val savedGame = gameSaveRepository.loadSavedSinglePlayerGame()
                 if (savedGame != null) {
-
                     state = GameState(
                         diceValues = savedGame.diceValues,
                         scoreMap = savedGame.scoreMap.toMutableMap(),
@@ -42,10 +41,16 @@ class SinglePlayerGameViewModel(
                         heldDice = savedGame.heldDice,
                         gameEnded = savedGame.gameEnded
                     )
+                } else {
+                    // Reset esplicito quando non ci sono partite salvate
+                    state = gameService.resetGame()
+                    isNewHighScore = false
                 }
             } catch (_: Exception) {
-
                 gameSaveRepository.clearSavedSinglePlayerGame()
+                // Reset anche in caso di errore
+                state = gameService.resetGame()
+                isNewHighScore = false
             }
         }
     }
