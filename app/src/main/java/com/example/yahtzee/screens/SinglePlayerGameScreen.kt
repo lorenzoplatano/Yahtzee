@@ -44,6 +44,10 @@ fun SinglePlayerGameScreen(
     shakeTrigger: Int,
     viewModel: SinglePlayerGameViewModel  // ✅ Aggiungi questo parametro
 ){
+    LaunchedEffect(Unit) {
+        viewModel.loadSavedGameIfExists()
+    }
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
@@ -162,7 +166,7 @@ fun SinglePlayerGameScreen(
                 TextButton(onClick = {
                     showHomeDialog = false
                     navController.navigate("homepage") {
-                        popUpTo(0) { inclusive = true }
+                        navController.popBackStack("homepage", inclusive = false)
                     }
                 }) {
                     Text(stringResource(id = R.string.confirm), color = colorScheme.onSurface, fontFamily = fontFamily)

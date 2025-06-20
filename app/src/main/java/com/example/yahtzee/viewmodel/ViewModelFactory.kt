@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.yahtzee.service.GameService
 import com.example.yahtzee.repository.GameHistoryRepository
+import com.example.yahtzee.repository.GameSaveRepository
 import com.example.yahtzee.repository.SettingsRepository
 
 /**
@@ -29,13 +30,18 @@ class HistoryViewModelFactory(
  */
 class SinglePlayerGameViewModelFactory(
     private val gameHistoryRepository: GameHistoryRepository,
-    private val gameService: GameService = GameService()  // ✅ Aggiungi GameService
+    private val gameSaveRepository: GameSaveRepository,
+    private val gameService: GameService = GameService()
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SinglePlayerGameViewModel::class.java)) {
-            return SinglePlayerGameViewModel(gameHistoryRepository, gameService) as T  // ✅ Passa entrambi
+            return SinglePlayerGameViewModel(
+                gameHistoryRepository = gameHistoryRepository,
+                gameSaveRepository = gameSaveRepository,
+                gameService = gameService
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
@@ -59,13 +65,17 @@ class SettingsViewModelFactory(
 }
 
 class MultiplayerGameViewModelFactory(
-    private val gameService: GameService = GameService()  // ✅ Aggiungi GameService
+    private val gameSaveRepository: GameSaveRepository,
+    private val gameService: GameService = GameService()
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MultiplayerGameViewModel::class.java)) {
-            return MultiplayerGameViewModel(gameService) as T
+            return MultiplayerGameViewModel(
+                gameSaveRepository = gameSaveRepository,
+                gameService = gameService
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

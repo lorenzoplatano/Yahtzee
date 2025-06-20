@@ -23,7 +23,7 @@
 
     <!-- Dialog  -->
     <string name="dialog_title">Sei sicuro?</string>
-    <string name="dialog_home_text">Vuoi davvero tornare alla home? I progressi attuali andranno persi.</string>
+    <string name="dialog_home_text">Vuoi davvero tornare alla home? Potrai continuare la partita in ogni momento.</string>
     <string name="confirm">Conferma</string>
     <string name="cancel">Annulla</string>
     <string name="dialog_reset_text">Vuoi davvero ricominciare la partita? I progressi attuali andranno persi.</string>
@@ -58,6 +58,8 @@
     <string name="singleplayer">GIOCATORE SINGOLO</string>
     <string name="multiplayer">MULTIPLAYER</string>
     <string name="back">Indietro</string>
+
+
 
     <!-- Multiplayer -->
     <string name="win_message">%1$s vince %2$d-%3$d!</string>

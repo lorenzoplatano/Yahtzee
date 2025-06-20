@@ -7,23 +7,50 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yahtzee.service.GameService
 import com.example.yahtzee.db.GameHistoryEntity
+import com.example.yahtzee.model.GameState
+import com.example.yahtzee.model.SavedSinglePlayerGame
 import com.example.yahtzee.repository.GameHistoryRepository
+import com.example.yahtzee.repository.GameSaveRepository
 import kotlinx.coroutines.launch
 
 class SinglePlayerGameViewModel(
     private val gameHistoryRepository: GameHistoryRepository,
-    private val gameService: GameService = GameService()  // ✅ Aggiungi GameService
+    private val gameSaveRepository: GameSaveRepository,
+    private val gameService: GameService = GameService()
 ) : ViewModel() {
-
 
     var state by mutableStateOf(gameService.resetGame())
         private set
 
-    // Stato per tenere traccia se è stato battuto il record
     var isNewHighScore by mutableStateOf(false)
         private set
 
     val combinations = GameService.combinations
+
+    /**
+     * Load saved game if exists using the new GameSaveRepository
+     */
+    fun loadSavedGameIfExists() {
+        viewModelScope.launch {
+            try {
+                val savedGame = gameSaveRepository.loadSavedSinglePlayerGame()
+                if (savedGame != null) {
+                    // Convert SavedSinglePlayerGame to GameState
+                    state = GameState(
+                        diceValues = savedGame.diceValues,
+                        scoreMap = savedGame.scoreMap.toMutableMap(),
+                        remainingRolls = savedGame.remainingRolls,
+                        canSelectScore = savedGame.canSelectScore,
+                        heldDice = savedGame.heldDice,
+                        gameEnded = savedGame.gameEnded
+                    )
+                }
+            } catch (_: Exception) {
+                // If loading fails, clear corrupted save and start fresh
+                gameSaveRepository.clearSavedSinglePlayerGame()
+            }
+        }
+    }
 
     fun rollDice() {
         if (state.remainingRolls > 0 && !state.gameEnded) {
@@ -32,14 +59,17 @@ class SinglePlayerGameViewModel(
                 remainingRolls = state.remainingRolls - 1,
                 canSelectScore = true
             )
+            // Save state after each action
+            saveCurrentState()
         }
     }
 
     fun toggleHold(index: Int) {
-        // Un dado può essere bloccato solo se ha un valore (non è null) e dopo almeno un lancio
         if (state.remainingRolls < 3 && !state.gameEnded && state.diceValues[index] != null) {
             val newHeld = state.heldDice.toMutableList().also { it[index] = !it[index] }
             state = state.copy(heldDice = newHeld)
+            // Save state after each action
+            saveCurrentState()
         }
     }
 
@@ -57,11 +87,20 @@ class SinglePlayerGameViewModel(
             )
             if (ended) {
                 saveGameResult()
+                // Clear saved game when finished
+                clearSavedState()
+            } else {
+                // Save state after each action
+                saveCurrentState()
             }
         }
     }
 
     fun resetGame() {
+        // Clear saved state first
+        clearSavedState()
+
+        // Then reset game state
         state = gameService.resetGame()
         isNewHighScore = false
     }
@@ -76,6 +115,9 @@ class SinglePlayerGameViewModel(
         } else emptyMap()
     }
 
+    /**
+     * Save game result to history (using GameHistoryRepository)
+     */
     private fun saveGameResult() {
         val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
         val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
@@ -93,6 +135,48 @@ class SinglePlayerGameViewModel(
                     score = totalScore
                 )
             )
+        }
+    }
+
+    /**
+     * Save current game state (using GameSaveRepository)
+     */
+    private fun saveCurrentState() {
+        if (shouldSaveState()) {
+            viewModelScope.launch {
+                val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
+                val upperSum = upper.mapNotNull { state.scoreMap[it] }.sum()
+                val bonus = if (upperSum >= 63) 35 else 0
+                val currentScore = state.scoreMap.values.filterNotNull().sum() + bonus
+
+                val savedGame = SavedSinglePlayerGame(
+                    diceValues = state.diceValues,
+                    scoreMap = state.scoreMap,
+                    remainingRolls = state.remainingRolls,
+                    canSelectScore = state.canSelectScore,
+                    heldDice = state.heldDice,
+                    gameEnded = state.gameEnded,
+                    currentScore = currentScore
+                )
+
+                gameSaveRepository.saveSinglePlayerGame(savedGame)
+            }
+        }
+    }
+
+    /**
+     * Check if state should be saved (only if game has started)
+     */
+    private fun shouldSaveState(): Boolean {
+        return state.remainingRolls < 3 || state.scoreMap.values.any { it != null }
+    }
+
+    /**
+     * Clear saved state
+     */
+    private fun clearSavedState() {
+        viewModelScope.launch {
+            gameSaveRepository.clearSavedSinglePlayerGame()
         }
     }
 }

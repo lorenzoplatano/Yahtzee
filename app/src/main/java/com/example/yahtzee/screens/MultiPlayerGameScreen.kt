@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
@@ -47,6 +48,10 @@ fun MultiplayerGameScreen(
     shakeTrigger: Int = 0,
     viewModel: MultiplayerGameViewModel  // ✅ Aggiungi questo parametro
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.loadSavedGameIfExists()
+    }
+
     val colorScheme = MaterialTheme.colorScheme
 
     val configuration = LocalConfiguration.current
@@ -157,8 +162,11 @@ fun MultiplayerGameScreen(
                 TextButton(onClick = {
                     showHomeDialog = false
                     navController.navigate("homepage") {
-                        popUpTo(0) { inclusive = true }
-                    }
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                        }
                 }) {
                     Text(stringResource(id = R.string.confirm), color = colorScheme.onSurface, style = Typography.labelLarge)
                 }

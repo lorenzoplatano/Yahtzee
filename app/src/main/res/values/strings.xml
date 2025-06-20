@@ -23,7 +23,7 @@
 
     <!-- Dialog Home -->
     <string name="dialog_title">Are you sure?</string>
-    <string name="dialog_home_text">Do you really want to return to the home? Current progress will be lost.</string>
+    <string name="dialog_home_text">Do you really want to return to the home? You will be able to resume anytime.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="dialog_reset_text">Do you really want to restart the game? Current progress will be lost.</string>
@@ -58,6 +58,7 @@
     <string name="singleplayer">SINGLEPLAYER</string>
     <string name="multiplayer">MULTIPLAYER</string>
     <string name="back">Back</string>
+
 
     <!-- Multiplayer -->
     <string name="win_message">%1$s wins %2$d-%3$d!</string>

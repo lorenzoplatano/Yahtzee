@@ -26,6 +26,7 @@ import com.example.yahtzee.repository.SettingsRepository
 import com.example.yahtzee.screens.*
 import com.example.yahtzee.ui.theme.YahtzeeTheme
 import com.example.yahtzee.model.AppLanguage
+import com.example.yahtzee.repository.GameSaveRepository
 import com.example.yahtzee.util.LocalLocalizationManager
 import com.example.yahtzee.util.LocalizationManager
 import com.example.yahtzee.util.ShakeDetector
@@ -128,14 +129,24 @@ class MainActivity : ComponentActivity() {
 
         // ✅ Crea Repository e ViewModel nel Composable
         val db = remember { AppDatabase.getDatabase(context) }
-        val gameHistoryRepository = remember { GameHistoryRepository(db.gameHistoryDao()) }
+
+        val gameHistoryRepository = remember {
+            GameHistoryRepository(db.gameHistoryDao())  // ✅ Aggiungi Context
+        }
+
+        val gameSaveRepository = remember {
+            GameSaveRepository(context)
+        }
 
         val singlePlayerGameViewModel: SinglePlayerGameViewModel = viewModel(
-            factory = SinglePlayerGameViewModelFactory(gameHistoryRepository)
+            factory = SinglePlayerGameViewModelFactory(
+                gameHistoryRepository = gameHistoryRepository,
+                gameSaveRepository = gameSaveRepository
+            )
         )
 
         val multiplayerGameViewModel: MultiplayerGameViewModel = viewModel(
-            factory = MultiplayerGameViewModelFactory()
+            factory = MultiplayerGameViewModelFactory(gameSaveRepository)  // ✅ Aggiungi Repository
         )
 
         val historyViewModel: HistoryViewModel = viewModel(

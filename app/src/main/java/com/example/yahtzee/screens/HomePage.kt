@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +53,7 @@ fun Homepage(
         showExitDialog = true
     }
 
+    // Exit Dialog
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -96,7 +96,6 @@ fun Homepage(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         Image(
             painter = painterResource(id = backgroundRes),
             contentDescription = stringResource(R.string.app_name),
@@ -104,7 +103,6 @@ fun Homepage(
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center
         )
-
 
         Box(
             modifier = Modifier
@@ -160,19 +158,25 @@ fun Homepage(
                             textAlign = TextAlign.Center
                         )
 
+                        // ✅ SEMPLIFICATO: Single Player Button
                         GenericButton(
                             text = stringResource(R.string.singleplayer),
                             icon = Icons.Default.Person,
-                            onClick = { navController.navigate("game") },
+                            onClick = {
+                                navController.navigate("game")
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = buttonTextSize,
                             gradientColors = SinglePlayerGradient
                         )
 
+                        // ✅ SEMPLIFICATO: Multiplayer Button
                         GenericButton(
                             text = stringResource(R.string.multiplayer),
                             icon = Icons.Default.Groups,
-                            onClick = { navController.navigate("game_1vs1") },
+                            onClick = {
+                                navController.navigate("game_1vs1")
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = buttonTextSize,
                             gradientColors = MultiPlayerGradient
