@@ -51,15 +51,15 @@ fun Homepage(
 
     BackHandler {
         if (showModeSelection) {
-            // Se è mostrata la selezione modalità, torna a "tocca per continuare"
+
             onModeSelectionChanged(false)
         } else {
-            // Se è mostrato "tocca per continuare", mostra dialog di uscita
+
             showExitDialog = true
         }
     }
 
-    // Exit Dialog
+
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -164,7 +164,7 @@ fun Homepage(
                             textAlign = TextAlign.Center
                         )
 
-                        // ✅ SEMPLIFICATO: Single Player Button
+
                         GenericButton(
                             text = stringResource(R.string.singleplayer),
                             icon = Icons.Default.Person,
@@ -176,7 +176,7 @@ fun Homepage(
                             gradientColors = SinglePlayerGradient
                         )
 
-                        // ✅ SEMPLIFICATO: Multiplayer Button
+
                         GenericButton(
                             text = stringResource(R.string.multiplayer),
                             icon = Icons.Default.Groups,

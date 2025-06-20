@@ -14,13 +14,12 @@ private val Context.dataStore by preferencesDataStore("settings")
 class SettingsRepository(private val context: Context) {
 
     companion object {
-        // Chiavi per i dati
+
         private val IS_DARK_THEME = booleanPreferencesKey("is_dark_theme")
         private val IS_SHAKE_ENABLED = booleanPreferencesKey("is_shake_enabled")
         private val LANGUAGE_CODE = stringPreferencesKey("language_code")
     }
 
-    // Getter come flussi che emettono i valori
     val isDarkThemeFlow: Flow<Boolean> = context.dataStore.data
         .map { preferences -> preferences[IS_DARK_THEME] ?: false }
 
@@ -33,7 +32,7 @@ class SettingsRepository(private val context: Context) {
             AppLanguage.values().find { it.code == code } ?: AppLanguage.ITALIAN
         }
 
-    // Setter per salvare le impostazioni
+
     suspend fun setDarkTheme(isDarkTheme: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[IS_DARK_THEME] = isDarkTheme
