@@ -34,11 +34,13 @@ import kotlinx.coroutines.launch
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
+import com.example.yahtzee.screens.components.SettingsButton
 import com.example.yahtzee.ui.theme.NewSingleGameButtonGradient
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
 import com.example.yahtzee.ui.theme.verde_azzurro
 
+// Composable per la schermata del gioco singolo
 @Composable
 fun SinglePlayerGameScreen(
     navController: NavController,
@@ -146,6 +148,7 @@ fun SinglePlayerGameScreen(
         }
     }
 
+    // Dialog per la conferma del reset del gioco
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -164,6 +167,7 @@ fun SinglePlayerGameScreen(
         )
     }
 
+    // Dialog per la conferma del ritorno alla home
     if (showHomeDialog) {
         AlertDialog(
             onDismissRequest = { showHomeDialog = false },
@@ -209,6 +213,8 @@ fun SinglePlayerGameScreen(
                     start = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
+
+            // Pulsante per tornare alla home
             HomeButton(
                 onClick = {
                     if (state.gameEnded) {
@@ -228,6 +234,7 @@ fun SinglePlayerGameScreen(
                     end = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
+            // Pulsante per le impostazioni
             SettingsButton(
                 onClick = { navController.navigate("settings") },
                 scaleFactor = scaleFactor
@@ -247,6 +254,8 @@ fun SinglePlayerGameScreen(
             verticalArrangement = Arrangement.Top
         ) {
             if (!state.gameEnded) {
+
+                // Card per i dadi
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
@@ -259,6 +268,8 @@ fun SinglePlayerGameScreen(
                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                 ) {
+
+                    // Riga dei dadi
                     MultiDiceRow(
                         diceValues = state.diceValues.map { it ?: 1 },
                         heldDice = state.heldDice,
@@ -284,6 +295,7 @@ fun SinglePlayerGameScreen(
                     screenHeight * 0.62f
                 }
 
+                // Card per la tabella dei punteggi
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -300,6 +312,7 @@ fun SinglePlayerGameScreen(
                 ) {
                     Column {
 
+                        // Intestazione della tabella
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -337,6 +350,7 @@ fun SinglePlayerGameScreen(
                             }
                         }
 
+                        // Tabella dei punteggi
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -357,6 +371,7 @@ fun SinglePlayerGameScreen(
                                         !state.gameEnded &&
                                         animationDone
 
+                                // Riga della tabella per la combinazione corrente
                                 SinglePlayerTableRow(
                                     combination = combinationLabels[combination] ?: combination,
                                     score = currentScore,
@@ -377,6 +392,7 @@ fun SinglePlayerGameScreen(
                                 color = colorScheme.outlineVariant
                             )
 
+                            // Riga per il bonus
                             SinglePlayerTableRow(
                                 combination = stringResource(R.string.bonus) + " ($progressBonusText)",
                                 score = bonus,
@@ -392,6 +408,7 @@ fun SinglePlayerGameScreen(
                                 color = colorScheme.outlineVariant
                             )
 
+                            // Riga per il punteggio totale
                             SinglePlayerTableRow(
                                 combination = stringResource(R.string.total_score).uppercase(),
                                 score = totalScore,
@@ -412,6 +429,8 @@ fun SinglePlayerGameScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+
+                    // Card per il punteggio finale
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
@@ -428,6 +447,8 @@ fun SinglePlayerGameScreen(
                                 .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
+                            // Punteggio finale
                             Text(
                                 text = stringResource(R.string.final_score, totalScore),
                                 fontSize = (22 * scaleFactor).sp,
@@ -438,6 +459,7 @@ fun SinglePlayerGameScreen(
                                 fontFamily = fontFamily
                             )
 
+                            // Eventuale messaggio di nuovo record
                             if (viewModel.isNewHighScore) {
                                 Spacer(modifier = Modifier.height((12 * scaleFactor).dp))
                                 Text(
@@ -457,6 +479,8 @@ fun SinglePlayerGameScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
+
+                                // Pulsante per iniziare una nuova partita
                                 Button(
                                     onClick = { startNewGameDirectly() },
                                     modifier = Modifier
@@ -513,6 +537,8 @@ fun SinglePlayerGameScreen(
             Box(
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
+
+                // Pulsanti di controllo del gioco: lancio dei dadi e reset partita
                 GameControlButtons(
                     onRollClick = { rollDiceWithAnimation() },
                     onResetClick = { showResetDialog = true },
@@ -528,6 +554,7 @@ fun SinglePlayerGameScreen(
     }
 }
 
+// Composable per una singola riga della tabella dei punteggi in modalità singleplayer
 @Composable
 fun SinglePlayerTableRow(
     combination: String,

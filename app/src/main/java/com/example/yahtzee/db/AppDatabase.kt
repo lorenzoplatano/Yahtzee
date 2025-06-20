@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+// Database Room per la cronologia delle partite singleplayer
 @Database(entities = [GameHistoryEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun gameHistoryDao(): GameHistoryDao

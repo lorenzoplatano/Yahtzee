@@ -12,7 +12,7 @@ import com.example.yahtzee.model.SavedMultiplayerGame
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.first
 
-
+// Repository per gestire lo stato dei giochi salvati
 class GameSaveRepository(
     private val context: Context
 ) {
@@ -23,6 +23,7 @@ class GameSaveRepository(
 
     private val Context.gameStateDataStore: DataStore<Preferences> by preferencesDataStore("game_saves")
 
+    // Salva lo stato di un gioco in modalità singola
     suspend fun saveSinglePlayerGame(gameState: SavedSinglePlayerGame) {
         val currentContainer = loadSavedGamesContainer()
         val updatedContainer = currentContainer.copy(
@@ -33,6 +34,7 @@ class GameSaveRepository(
     }
 
 
+    // Salva lo stato di un gioco in modalità multiplayer
     suspend fun saveMultiplayerGame(gameState: SavedMultiplayerGame) {
         val currentContainer = loadSavedGamesContainer()
         val updatedContainer = currentContainer.copy(
@@ -42,16 +44,19 @@ class GameSaveRepository(
         saveSavedGamesContainer(updatedContainer)
     }
 
+    // Carica lo stato del gioco salvato in modalità singola
     suspend fun loadSavedSinglePlayerGame(): SavedSinglePlayerGame? {
         return loadSavedGamesContainer().singlePlayerGame
     }
 
 
+    // Carica lo stato del gioco salvato in modalità multiplayer
     suspend fun loadSavedMultiplayerGame(): SavedMultiplayerGame? {
         return loadSavedGamesContainer().multiplayerGame
     }
 
 
+    // Cancella lo stato del gioco salvato in modalità singola
     suspend fun clearSavedSinglePlayerGame() {
         val currentContainer = loadSavedGamesContainer()
         val updatedContainer = currentContainer.copy(
@@ -62,6 +67,7 @@ class GameSaveRepository(
     }
 
 
+    // Cancella lo stato del gioco salvato in modalità multiplayer
     suspend fun clearSavedMultiplayerGame() {
         val currentContainer = loadSavedGamesContainer()
         val updatedContainer = currentContainer.copy(
@@ -72,6 +78,7 @@ class GameSaveRepository(
     }
 
 
+    // Salva il contenitore dei giochi salvati nel DataStore
     private suspend fun saveSavedGamesContainer(container: SavedGamesContainer) {
         val json = gson.toJson(container)
         context.gameStateDataStore.edit { preferences ->
@@ -79,6 +86,7 @@ class GameSaveRepository(
         }
     }
 
+    // Carica il contenitore dei giochi salvati dal DataStore
     private suspend fun loadSavedGamesContainer(): SavedGamesContainer {
         return try {
             val preferences = context.gameStateDataStore.data.first()

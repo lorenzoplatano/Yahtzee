@@ -46,7 +46,7 @@ import com.example.yahtzee.viewmodel.SettingsViewModel
 import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.SettingsButtonGradient
 
-
+// Composable per la schermata delle impostazioni
 @Composable
 fun Settings(
     navController: NavController,
@@ -81,6 +81,7 @@ fun Settings(
                 .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
+        // Card che contiene le impostazioni
         Card(
             modifier = Modifier
                 .widthIn(max = 450.dp)
@@ -104,6 +105,7 @@ fun Settings(
                     textAlign = TextAlign.Center
                 )
 
+                // Pulsanti per la selezione della lingua
                 GenericButton(
                     text = stringResource(id = R.string.language) + ": " + uiState.currentLanguage.getLocalizedName(),
                     icon = Icons.Default.Person,
@@ -113,6 +115,7 @@ fun Settings(
                     gradientColors = SettingsButtonGradient
                 )
 
+                // Pulsante per la selezione del tema
                 GenericButton(
                     text = if (uiState.isDarkTheme)
                         stringResource(id = R.string.dark_theme)
@@ -128,6 +131,7 @@ fun Settings(
                     gradientColors = SettingsButtonGradient
                 )
 
+                // Pulsante per abilitare/disabilitare il lancio dei dadi tramite shake
                 GenericButton(
                     text = if (uiState.isShakeEnabled)
                         stringResource(id = R.string.shake_enabled)
@@ -140,6 +144,7 @@ fun Settings(
                     gradientColors = SettingsButtonGradient
                 )
 
+                // Pulsante per visualizzare le regole del gioco
                 GenericButton(
                     text = stringResource(id = R.string.rules),
                     icon = Icons.Default.Book,
@@ -149,6 +154,7 @@ fun Settings(
                     gradientColors = SettingsButtonGradient
                 )
 
+                // Pulsante per tornare indietro
                 TextButton(
                     onClick = { navController.popBackStack() }
                 ) {
@@ -161,6 +167,7 @@ fun Settings(
             }
         }
 
+        // Dialog per la selezione della lingua
         if (showLanguageDialog) {
             LanguageDialog(
                 currentLanguage = uiState.currentLanguage,
@@ -173,12 +180,14 @@ fun Settings(
             )
         }
 
+        // Dialog per le regole del gioco
         if (showRulesDialog) {
             RulesDialog(onDismiss = { showRulesDialog = false })
         }
     }
 }
 
+// Composable per il dialog di selezione della lingua
 @Composable
 fun LanguageDialog(
     currentLanguage: AppLanguage,
@@ -224,6 +233,7 @@ fun LanguageDialog(
     )
 }
 
+// Composable per il dialog delle regole del gioco
 @Composable
 fun RulesDialog(
     onDismiss: () -> Unit

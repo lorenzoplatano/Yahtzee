@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +41,10 @@ import com.example.yahtzee.ui.theme.verde_acqua
 import com.example.yahtzee.ui.theme.verde_azzurro
 import com.example.yahtzee.ui.theme.violaceo
 
+
+// Composable condivise tra singleplayer e multiplayer per disegnare i dadi e i pulsanti di controllo del gioco
+
+// Composable per disegnare un dado
 @Composable
 fun Dice(
     value: Int,
@@ -201,6 +206,7 @@ fun Dice(
     }
 }
 
+// Composable per disegnare una riga di dadi
 @Composable
 fun MultiDiceRow(
     diceValues: List<Int>,
@@ -339,7 +345,7 @@ fun MultiDiceRow(
     }
 }
 
-
+// Composable per il pulsante Home
 @Composable
 fun HomeButton(
     onClick: () -> Unit,
@@ -378,7 +384,7 @@ fun HomeButton(
     }
 }
 
-
+// Composable per i pulsanti di controllo del gioco: lancio dei dadi e reset del gioco
 @Composable
 fun GameControlButtons(
     onRollClick: () -> Unit,
@@ -421,6 +427,7 @@ fun GameControlButtons(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
 
+                // Pulsante per il lancio dei dadi
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -473,7 +480,7 @@ fun GameControlButtons(
 
                 Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
 
-
+                // Pulsante per il reset del gioco
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -521,6 +528,45 @@ fun GameControlButtons(
                     }
                 }
             }
+        }
+    }
+}
+
+
+// Composable per il pulsante delle impostazioni
+@Composable
+fun SettingsButton(
+    onClick: () -> Unit,
+    scaleFactor: Float,
+) {
+    Card(
+        modifier = Modifier
+            .size((44 * scaleFactor).dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(violaceo, blu_chiaro)
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .size((44 * scaleFactor).dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings",
+                tint = Color.White,
+                modifier = Modifier.size((22 * scaleFactor).dp)
+            )
         }
     }
 }

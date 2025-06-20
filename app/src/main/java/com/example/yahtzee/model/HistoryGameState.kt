@@ -2,6 +2,7 @@ package com.example.yahtzee.model
 
 import java.util.Date
 
+// Model per la cronologia delle partite singleplayer
 data class GameHistoryEntry(
     val date: Date,
     val score: Int

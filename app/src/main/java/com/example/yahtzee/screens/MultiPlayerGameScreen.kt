@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +30,7 @@ import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
 import com.example.yahtzee.screens.components.MultiDiceRow
+import com.example.yahtzee.screens.components.SettingsButton
 import com.example.yahtzee.ui.theme.Typography
 import com.example.yahtzee.ui.theme.violaceo
 import com.example.yahtzee.ui.theme.blu_chiaro
@@ -42,6 +42,7 @@ import com.example.yahtzee.viewmodel.MultiplayerGameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// Composable per la schermata del gioco multiplayer
 @Composable
 fun MultiplayerGameScreen(
     navController: NavController,
@@ -143,6 +144,7 @@ fun MultiplayerGameScreen(
         }
     }
 
+    // Dialog per la conferma del reset del gioco
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -161,6 +163,7 @@ fun MultiplayerGameScreen(
         )
     }
 
+    // Dialog per la conferma del ritorno alla home
     if (showHomeDialog) {
         AlertDialog(
             onDismissRequest = { showHomeDialog = false },
@@ -210,6 +213,8 @@ fun MultiplayerGameScreen(
                     start = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
+
+            // Pulsante per tornare alla home
             HomeButton(
                 onClick = {
                     if (state.gameEnded) {
@@ -229,6 +234,8 @@ fun MultiplayerGameScreen(
                     end = (screenWidth * 0.05f).coerceAtLeast(16.dp)
                 )
         ) {
+
+            // Pulsante per le impostazioni
             SettingsButton(
                 onClick = { navController.navigate("settings") },
                 scaleFactor = scaleFactor
@@ -248,6 +255,8 @@ fun MultiplayerGameScreen(
         ) {
 
             if (!state.gameEnded) {
+
+                // Card per i dadi
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
@@ -260,6 +269,7 @@ fun MultiplayerGameScreen(
                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                 ) {
+                    // Riga dei dadi
                     MultiDiceRow(
                         diceValues = state.diceValues,
                         heldDice = state.heldDice,
@@ -285,6 +295,7 @@ fun MultiplayerGameScreen(
                     screenHeight * 0.62f
                 }
 
+                // Card per la tabella dei punteggi
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -300,6 +311,7 @@ fun MultiplayerGameScreen(
                 ) {
                     Column {
 
+                        // Intestazione della tabella
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -388,6 +400,8 @@ fun MultiplayerGameScreen(
                                 }
                             }
                         }
+
+                        // Tabella dei punteggi
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -397,6 +411,8 @@ fun MultiplayerGameScreen(
                             allRows.forEachIndexed { index, combination ->
                                 when (combination) {
                                     "Bonus" -> {
+                                        
+                                        // Riga per il bonus
                                         MultiplayerTableRow(
                                             combination = stringResource(id = R.string.bonus) + " ($progressBonusText1 | $progressBonusText2)",
                                             player1Score = bonus1,
@@ -410,6 +426,8 @@ fun MultiplayerGameScreen(
                                         )
                                     }
                                     "Total" -> {
+                                        
+                                        // Riga per il punteggio totale
                                         MultiplayerTableRow(
                                             combination = stringResource(id = R.string.total_score),
                                             player1Score = totalScore1,
@@ -430,6 +448,8 @@ fun MultiplayerGameScreen(
                                                 state.hasRolledAtLeastOnce &&
                                                 showPreviews && animationDone &&
                                                 ((state.isPlayer1Turn && player1Score == null) || (!state.isPlayer1Turn && player2Score == null))
+
+                                        // Riga della tabella per la combinazione corrente
                                         MultiplayerTableRow(
                                             combination = combinationLabels[combination] ?: combination,
                                             player1Score = player1Score,
@@ -459,6 +479,8 @@ fun MultiplayerGameScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+
+                    // Card per il messaggio di fine partita con vincitore (o pareggio)
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
@@ -486,6 +508,8 @@ fun MultiplayerGameScreen(
                                 else -> violaceo
                             }
                             if (winner != null) {
+
+                                //Messaggio di vittoria
                                 Text(
                                     text = stringResource(
                                         id = R.string.win_message,
@@ -500,6 +524,8 @@ fun MultiplayerGameScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                             } else {
+
+                                //Messaggio di pareggio
                                 Text(
                                     text = stringResource(
                                         id = R.string.pareggio,
@@ -518,6 +544,8 @@ fun MultiplayerGameScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
+
+                                // Pulsante per iniziare una nuova partita
                                 Button(
                                     onClick = {
                                         viewModel.resetGame()
@@ -579,6 +607,8 @@ fun MultiplayerGameScreen(
             Box(
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
+
+                // Pulsanti di controllo del gioco: lancio dei dadi e reset partita
                 GameControlButtons(
                     onRollClick = { rollDiceWithAnimation() },
                     onResetClick = { showResetDialog = true },
@@ -594,6 +624,7 @@ fun MultiplayerGameScreen(
     }
 }
 
+// Composable per una singola riga della tabella dei punteggi in modalità multiplayer
 @Composable
 fun MultiplayerTableRow(
     combination: String,
@@ -683,42 +714,6 @@ fun MultiplayerTableRow(
                 fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 color = player2TextColor,
                 fontSize = fontSize
-            )
-        }
-    }
-}
-@Composable
-fun SettingsButton(
-    onClick: () -> Unit,
-    scaleFactor: Float,
-) {
-    Card(
-        modifier = Modifier
-            .size((44 * scaleFactor).dp)
-            .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(violaceo, blu_chiaro)
-                    ),
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .size((44 * scaleFactor).dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
-                tint = Color.White,
-                modifier = Modifier.size((22 * scaleFactor).dp)
             )
         }
     }

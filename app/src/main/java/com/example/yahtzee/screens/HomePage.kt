@@ -30,6 +30,7 @@ import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.GenericButton
 import com.example.yahtzee.ui.theme.*
 
+// Composable per l'homepage dell'app
 @Composable
 fun Homepage(
     navController: NavController,
@@ -59,7 +60,7 @@ fun Homepage(
         }
     }
 
-
+    // Dialog per confermare l'uscita dall'app
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -129,6 +130,8 @@ fun Homepage(
                         .offset(y = (screenHeight * 0.20f)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    // Bottone per selezionare la modalità di gioco
                     GenericButton(
                         text = stringResource(R.string.touch_to_continue),
                         icon = Icons.Default.PlayArrow,
@@ -139,6 +142,8 @@ fun Homepage(
                     )
                 }
             } else {
+
+                // Card che mostra le opzioni di gioco
                 Card(
                     modifier = Modifier
                         .widthIn(max = 450.dp)
@@ -164,7 +169,7 @@ fun Homepage(
                             textAlign = TextAlign.Center
                         )
 
-
+                        // Bottone per selezionare la modalità di gioco singolo
                         GenericButton(
                             text = stringResource(R.string.singleplayer),
                             icon = Icons.Default.Person,
@@ -176,7 +181,7 @@ fun Homepage(
                             gradientColors = SinglePlayerGradient
                         )
 
-
+                        // Bottone per selezionare la modalità di gioco multiplayer
                         GenericButton(
                             text = stringResource(R.string.multiplayer),
                             icon = Icons.Default.Groups,
@@ -194,6 +199,8 @@ fun Homepage(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
                         ) {
+
+                            // Bottone per accedere alle impostazioni
                             GenericButton(
                                 text = stringResource(R.string.settings_title),
                                 icon = Icons.Default.Settings,
@@ -203,6 +210,7 @@ fun Homepage(
                                 gradientColors = SettingsGradient
                             )
 
+                            // Bottone per accedere alla cronologia delle partite
                             GenericButton(
                                 text = stringResource(R.string.history),
                                 icon = Icons.Default.History,
@@ -213,6 +221,7 @@ fun Homepage(
                             )
                         }
 
+                        // Bottone per tornare indietro alla schermata principale
                         TextButton(
                             onClick = { onModeSelectionChanged(false) },
                             modifier = Modifier.padding(top = 8.dp)

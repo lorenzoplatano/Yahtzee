@@ -36,6 +36,7 @@ import com.example.yahtzee.screens.components.GenericButton
 import java.text.SimpleDateFormat
 import java.util.*
 
+// Composable per la schermata della cronologia dei giochi
 @Composable
 fun HistoryScreen(
     navController: NavController,
@@ -86,6 +87,8 @@ fun HistoryScreen(
                     start = (screenWidth * 0.03f).coerceAtLeast(8.dp).coerceAtMost(16.dp)
                 )
         ) {
+
+            // Pulsante per tornare alla homepage
             GenericButton(
                 text = "",
                 icon = Icons.Default.Home,
@@ -104,6 +107,8 @@ fun HistoryScreen(
                     end = (screenWidth * 0.03f).coerceAtLeast(8.dp).coerceAtMost(16.dp)
                 )
         ) {
+
+            // Pulsante per le impostazioni
             GenericButton(
                 text = "",
                 icon = Icons.Default.Settings,
@@ -114,6 +119,7 @@ fun HistoryScreen(
         }
 
 
+        // Card principale che contiene la cronologia dei giochi
         Card(
             modifier = Modifier
                 .widthIn(max = 450.dp)
@@ -171,6 +177,8 @@ fun HistoryScreen(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
+
+                        // Intestazione della colonna per la data
                         SortableColumnHeader(
                             title = stringResource(R.string.date),
                             isSorted = uiState.sortColumn == SortColumn.DATE,
@@ -190,6 +198,8 @@ fun HistoryScreen(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
+
+                        // Intestazione della colonna per il punteggio
                         SortableColumnHeader(
                             title = stringResource(R.string.score_label),
                             isSorted = uiState.sortColumn == SortColumn.SCORE,
@@ -201,6 +211,7 @@ fun HistoryScreen(
                 }
 
 
+                // Lista dei giochi nella cronologia
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -212,6 +223,8 @@ fun HistoryScreen(
                         )
                 ) {
                     items(uiState.history) { entry ->
+
+                        // Righe della cronologia dei giochi
                         HistoryRow(entry)
                         HorizontalDivider(
                             thickness = 0.7.dp,
@@ -225,6 +238,7 @@ fun HistoryScreen(
     }
 }
 
+// Composable per l'intestazione della colonna con ordinamento
 @Composable
 fun SortableColumnHeader(
     title: String,
@@ -253,6 +267,7 @@ fun SortableColumnHeader(
     }
 }
 
+// Composable per una singola riga della cronologia dei giochi
 @Composable
 fun HistoryRow(entry: GameHistoryEntry) {
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }

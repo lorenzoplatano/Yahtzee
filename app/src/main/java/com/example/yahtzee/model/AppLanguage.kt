@@ -2,6 +2,7 @@ package com.example.yahtzee.model
 
 import java.util.Locale
 
+// Enum per le lingue dell'app
 enum class AppLanguage(val code: String) {
     ITALIAN("it"),
     ENGLISH("en");

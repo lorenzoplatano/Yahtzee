@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore("settings")
 
+// Repository per gestire le impostazioni dell'applicazione
 class SettingsRepository(private val context: Context) {
 
     companion object {
@@ -33,18 +34,23 @@ class SettingsRepository(private val context: Context) {
         }
 
 
+    // Funzioni per modificare le impostazioni
+
+    // Imposta il tema
     suspend fun setDarkTheme(isDarkTheme: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[IS_DARK_THEME] = isDarkTheme
         }
     }
 
+    // Abilita o disabilita il shake per lanciare i dadi
     suspend fun setShakeEnabled(isEnabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[IS_SHAKE_ENABLED] = isEnabled
         }
     }
 
+    // Imposta la lingua dell'app
     suspend fun setLanguage(language: AppLanguage) {
         context.dataStore.edit { preferences ->
             preferences[LANGUAGE_CODE] = language.code

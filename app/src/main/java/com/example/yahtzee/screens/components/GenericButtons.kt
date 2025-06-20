@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.example.yahtzee.ui.theme.indigo
 import com.example.yahtzee.ui.theme.viola
 
+// Composable per un pulsante generico
 @Composable
 fun GenericButton(
     text: String,

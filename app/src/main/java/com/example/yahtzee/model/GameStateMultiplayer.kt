@@ -1,5 +1,6 @@
 package com.example.yahtzee.model
 
+// Model per i giochi multiplayer
 data class GameStateMultiplayer(
     val diceValues: List<Int> = List(5) { 1 },
     val heldDice: List<Boolean> = List(5) { false },

@@ -1,5 +1,7 @@
 package com.example.yahtzee.model
 
+// Model per i giochi salvati
+
 data class SavedGamesContainer(
     val singlePlayerGame: SavedSinglePlayerGame? = null,
     val multiplayerGame: SavedMultiplayerGame? = null,
