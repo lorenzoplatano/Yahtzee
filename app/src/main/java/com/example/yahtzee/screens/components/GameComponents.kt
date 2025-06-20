@@ -223,17 +223,17 @@ fun MultiDiceRow(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val diceAnimations = List(diceValues.size) { index ->
-            // Rotazione più casuale e variabile per ogni dado
+
             val randomEndRotation = remember(isRolling) {
                 (-540..720).random().toFloat() + (index * 45f)
             }
 
-            // Aggiungiamo una rotazione basata sul valore del dado per più varietà
+
             val valueBasedRotation = remember(diceValues[index], isRolling) {
                 diceValues[index] * 60f
             }
 
-            // Animazione di rotazione più fluida con effetto di rimbalzo
+
             val rotation by animateFloatAsState(
                 targetValue = if (isRolling && !heldDice[index]) randomEndRotation + valueBasedRotation else 0f,
                 animationSpec = tween(
@@ -243,7 +243,7 @@ fun MultiDiceRow(
                 label = "diceRotation"
             )
 
-            // Animazione di scala che simula un lancio più naturale
+
             val scale by animateFloatAsState(
                 targetValue = if (isRolling && !heldDice[index]) 0.85f else 1f,
                 animationSpec = keyframes {
@@ -256,7 +256,7 @@ fun MultiDiceRow(
                 label = "diceScale"
             )
 
-            // Offset orizzontale per aggiungere movimento laterale
+
             val offsetX by animateFloatAsState(
                 targetValue = if (isRolling && !heldDice[index]) 0f else 0f,
                 animationSpec = keyframes {
@@ -291,14 +291,14 @@ fun MultiDiceRow(
                         .fillMaxSize()
                         .background(
                             brush = if (heldDice[index]) {
-                                // In modalità giocatore singolo o se è il turno del giocatore 1 in multiplayer,
-                                // usa sempre il gradiente per il giocatore 1
+
+
                                 if (isSinglePlayer || isPlayer1Turn) {
                                     Brush.linearGradient(
                                         listOf(verde_acqua, verde_azzurro)
                                     )
                                 } else {
-                                    // Solo in modalità multiplayer quando è il turno del giocatore 2
+
                                     Brush.linearGradient(
                                         listOf(arancio_rosso, arancione)
                                     )
@@ -420,7 +420,7 @@ fun GameControlButtons(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Pulsante "Roll"
+
                 Card(
                     modifier = Modifier
                         .weight(1f)
@@ -473,7 +473,7 @@ fun GameControlButtons(
 
                 Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
 
-                // Pulsante "Reset"
+
                 Card(
                     modifier = Modifier
                         .weight(1f)
