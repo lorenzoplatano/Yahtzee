@@ -43,10 +43,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
+
+    // Inizializzazione delle configurazioni per selezione lingua e impostazioni prima del lancio dell'app
+
     private lateinit var settingsRepository: SettingsRepository
     private var savedLanguage: AppLanguage? = null
 
-    // ✅ SettingsViewModel creato nella MainActivity con Factory
     private val settingsViewModel: SettingsViewModel by viewModels {
         SettingsViewModelFactory(settingsRepository)
     }
@@ -60,11 +62,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        // Carica la lingua salvata dalle preferenze PRIMA di creare il contesto
         if (!::settingsRepository.isInitialized) {
             settingsRepository = SettingsRepository(newBase.applicationContext)
         }
-        // Carica la lingua in modo sincrono
         val language = runBlocking {
             settingsRepository.languageFlow.first()
         }
@@ -79,13 +79,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // ✅ Accesso diretto allo stato del ViewModel
             val uiState = settingsViewModel.uiState
             val isDarkTheme = uiState.isDarkTheme
             val isShakeEnabled = uiState.isShakeEnabled
             val currentLanguage = uiState.currentLanguage
 
-            // Aggiorna il LocalizationManager solo se cambia la lingua
             LaunchedEffect(currentLanguage) {
                 localizationManager.setLanguage(currentLanguage)
             }
@@ -96,7 +94,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        // ✅ CHIAMA YahtzeeApp qui!
+
                         YahtzeeApp(
                             isShakeEnabled = isShakeEnabled,
                             settingsViewModel = settingsViewModel,
@@ -124,14 +122,19 @@ class MainActivity : ComponentActivity() {
         settingsViewModel: SettingsViewModel,
         onLanguageChange: (AppLanguage) -> Unit
     ) {
+
+        // 1. Inizializzazione db, repositories e viewModels
+        // 2. Definizione navigazione
+        // 3. Gestione shake detection
+
         val navController = rememberNavController()
         val context = LocalContext.current
 
-        // ✅ Crea Repository e ViewModel nel Composable
+
         val db = remember { AppDatabase.getDatabase(context) }
 
         val gameHistoryRepository = remember {
-            GameHistoryRepository(db.gameHistoryDao())  // ✅ Aggiungi Context
+            GameHistoryRepository(db.gameHistoryDao())
         }
 
         val gameSaveRepository = remember {
@@ -146,7 +149,7 @@ class MainActivity : ComponentActivity() {
         )
 
         val multiplayerGameViewModel: MultiplayerGameViewModel = viewModel(
-            factory = MultiplayerGameViewModelFactory(gameSaveRepository)  // ✅ Aggiungi Repository
+            factory = MultiplayerGameViewModelFactory(gameSaveRepository)
         )
 
         val historyViewModel: HistoryViewModel = viewModel(
@@ -168,7 +171,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Listener per la navigazione e per l'attivazione shake
         DisposableEffect(isShakeEnabled, navController) {
             val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
                 val isGameScreen = destination.route == "game" || destination.route == "game_1vs1"
@@ -186,7 +188,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Aggiorna la registrazione del shake detector quando cambia isShakeEnabled
         LaunchedEffect(isShakeEnabled) {
             val currentRoute = navController.currentBackStackEntry?.destination?.route
             val isGameScreen = currentRoute == "game" || currentRoute == "game_1vs1"
@@ -208,13 +209,13 @@ class MainActivity : ComponentActivity() {
             composable("history") {
                 HistoryScreen(
                     navController = navController,
-                    viewModel = historyViewModel  // ✅ Passa il ViewModel
+                    viewModel = historyViewModel
                 )
             }
             composable("settings") {
                 Settings(
                     navController = navController,
-                    viewModel = settingsViewModel,  // ✅ Passa il ViewModel
+                    viewModel = settingsViewModel,
                     onLanguageChange = onLanguageChange
                 )
             }
@@ -222,14 +223,14 @@ class MainActivity : ComponentActivity() {
                 MultiplayerGameScreen(
                     navController = navController,
                     shakeTrigger = multiPlayerShakeTrigger,
-                    viewModel = multiplayerGameViewModel  // ✅ Passa il ViewModel
+                    viewModel = multiplayerGameViewModel
                 )
             }
             composable("game") {
                 SinglePlayerGameScreen(
                     navController = navController,
                     shakeTrigger = singlePlayerShakeTrigger,
-                    viewModel = singlePlayerGameViewModel  // ✅ Passa il ViewModel
+                    viewModel = singlePlayerGameViewModel
                 )
             }
         }

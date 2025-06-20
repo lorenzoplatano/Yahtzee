@@ -87,8 +87,7 @@ class SinglePlayerGameViewModel(
             )
             if (ended) {
                 saveGameResult()
-                // Clear saved game when finished
-                clearSavedState()
+
             } else {
                 // Save state after each action
                 saveCurrentState()

@@ -7,10 +7,9 @@ import com.example.yahtzee.repository.GameHistoryRepository
 import com.example.yahtzee.repository.GameSaveRepository
 import com.example.yahtzee.repository.SettingsRepository
 
-/**
- * Factory per HistoryViewModel.
- * Inietta GameHistoryRepository come dipendenza.
- */
+// Factory per la creazione del ViewModel
+
+
 class HistoryViewModelFactory(
     private val gameHistoryRepository: GameHistoryRepository
 ) : ViewModelProvider.Factory {
@@ -24,10 +23,7 @@ class HistoryViewModelFactory(
     }
 }
 
-/**
- * Factory per SinglePlayerGameViewModel.
- * Inietta GameHistoryRepository come dipendenza.
- */
+
 class SinglePlayerGameViewModelFactory(
     private val gameHistoryRepository: GameHistoryRepository,
     private val gameSaveRepository: GameSaveRepository,
@@ -47,10 +43,7 @@ class SinglePlayerGameViewModelFactory(
     }
 }
 
-/**
- * Factory per SettingsViewModel.
- * Inietta SettingsRepository come dipendenza.
- */
+
 class SettingsViewModelFactory(
     private val settingsRepository: SettingsRepository
 ) : ViewModelProvider.Factory {
