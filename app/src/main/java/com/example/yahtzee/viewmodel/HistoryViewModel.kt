@@ -20,6 +20,10 @@ class HistoryViewModel(
         loadHistory()
     }
 
+    fun refreshHistory() {
+        loadHistory()
+    }
+
     private fun loadHistory() {
         viewModelScope.launch {
             val entities = gameHistoryRepository.getAllHistory()

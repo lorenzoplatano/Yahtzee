@@ -42,6 +42,10 @@ fun HistoryScreen(
     viewModel: HistoryViewModel  // ✅ Aggiungi questo parametro
 ) {
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshHistory()
+    }
+
     val uiState by viewModel.uiState
 
     // Responsive calculations
