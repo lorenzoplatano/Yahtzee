@@ -58,6 +58,7 @@
     <string name="singleplayer">GIOCATORE SINGOLO</string>
     <string name="multiplayer">MULTIPLAYER</string>
     <string name="back">Indietro</string>
+    <string name="dialog_end_text">Vuoi davvero uscire?</string>
 
 
 

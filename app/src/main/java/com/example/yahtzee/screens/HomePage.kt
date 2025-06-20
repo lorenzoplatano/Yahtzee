@@ -50,7 +50,13 @@ fun Homepage(
     val backgroundRes = if (!showModeSelection) R.drawable.chunky else R.drawable.sfondo_generale
 
     BackHandler {
-        showExitDialog = true
+        if (showModeSelection) {
+            // Se è mostrata la selezione modalità, torna a "tocca per continuare"
+            onModeSelectionChanged(false)
+        } else {
+            // Se è mostrato "tocca per continuare", mostra dialog di uscita
+            showExitDialog = true
+        }
     }
 
     // Exit Dialog
@@ -66,7 +72,7 @@ fun Homepage(
             },
             text = {
                 Text(
-                    stringResource(R.string.dialog_home_text),
+                    stringResource(R.string.dialog_end_text),
                     style = MaterialTheme.typography.bodyLarge,
                     color = colorScheme.onSurface
                 )

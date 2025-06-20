@@ -1,5 +1,6 @@
 package com.example.yahtzee.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.yahtzee.R
 import com.example.yahtzee.screens.components.GameControlButtons
 import com.example.yahtzee.screens.components.HomeButton
@@ -135,6 +135,14 @@ fun MultiplayerGameScreen(
         }
     }
 
+    BackHandler {
+        if(state.gameEnded) {
+            navController.navigate("homepage") {popUpTo(0)}
+        } else {
+            showHomeDialog = true
+        }
+    }
+
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -162,11 +170,9 @@ fun MultiplayerGameScreen(
                 TextButton(onClick = {
                     showHomeDialog = false
                     navController.navigate("homepage") {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            inclusive = true
+                        popUpTo(0)
                         }
-                        launchSingleTop = true
-                        }
+
                 }) {
                     Text(stringResource(id = R.string.confirm), color = colorScheme.onSurface, style = Typography.labelLarge)
                 }
@@ -478,7 +484,7 @@ fun MultiplayerGameScreen(
                             val winnerColor = when (winner) {
                                 stringResource(id = R.string.player1) -> verde_acqua
                                 stringResource(id = R.string.player2) -> arancio_rosso
-                                else -> colorScheme.tertiary
+                                else -> violaceo
                             }
                             if (winner != null) {
                                 Text(

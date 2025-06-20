@@ -1,5 +1,6 @@
 package com.example.yahtzee.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -138,6 +139,14 @@ fun SinglePlayerGameScreen(
 
     val colorScheme = MaterialTheme.colorScheme
     val fontFamily: FontFamily? = null
+
+    BackHandler {
+        if(state.gameEnded) {
+            navController.navigate("homepage") {popUpTo(0)}
+        } else {
+            showHomeDialog = true
+        }
+    }
 
     if (showResetDialog) {
         AlertDialog(

@@ -58,7 +58,7 @@
     <string name="singleplayer">SINGLEPLAYER</string>
     <string name="multiplayer">MULTIPLAYER</string>
     <string name="back">Back</string>
-
+    <string name="dialog_end_text">Do you really want to exit?</string>
 
     <!-- Multiplayer -->
     <string name="win_message">%1$s wins %2$d-%3$d!</string>
