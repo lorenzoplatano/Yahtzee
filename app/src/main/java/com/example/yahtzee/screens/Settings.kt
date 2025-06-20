@@ -50,7 +50,7 @@ import com.example.yahtzee.ui.theme.SettingsButtonGradient
 @Composable
 fun Settings(
     navController: NavController,
-    viewModel: SettingsViewModel,  // ✅ Riceve ViewModel invece di Repository
+    viewModel: SettingsViewModel,
     onLanguageChange: (AppLanguage) -> Unit
 ) {
 
@@ -74,7 +74,7 @@ fun Settings(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        // Overlay trasparente, alpha fisso
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

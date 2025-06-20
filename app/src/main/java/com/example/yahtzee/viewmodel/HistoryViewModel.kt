@@ -12,7 +12,6 @@ import java.util.*
 class HistoryViewModel(
     private val gameHistoryRepository: GameHistoryRepository
 ) : ViewModel() {
-    // Stato UI osservabile
     var uiState = mutableStateOf(HistoryState())
         private set
 
@@ -24,6 +23,7 @@ class HistoryViewModel(
         loadHistory()
     }
 
+    // Carica la cronologia dei giochi dal repository e aggiorna lo stato
     private fun loadHistory() {
         viewModelScope.launch {
             val entities = gameHistoryRepository.getAllHistory()
@@ -32,6 +32,7 @@ class HistoryViewModel(
         }
     }
 
+    // Modifica lo stato della UI quando viene selezionata una nuova colonna di ordinamento
     fun onSortChange(column: SortColumn) {
         val newSortOrder = if (uiState.value.sortColumn == column) {
             if (uiState.value.sortOrder == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
@@ -41,14 +42,8 @@ class HistoryViewModel(
         updateSortedHistory(uiState.value.history, column, newSortOrder)
     }
 
-    // Nuova funzione per aggiungere una partita in tempo reale
-    fun addGameToHistory(entry: GameHistoryEntry) {
-        val newHistory = uiState.value.history + entry
-        updateSortedHistory(newHistory, uiState.value.sortColumn, uiState.value.sortOrder)
-    }
-
-    // Cambia la visibilità da private a internal
-    internal fun updateSortedHistory(
+    // Modifica l'ordinamento dello storico dei giochi in base alla colonna e all'ordine selezionati
+    private fun updateSortedHistory(
         history: List<GameHistoryEntry>,
         sortColumn: SortColumn,
         sortOrder: SortOrder
@@ -69,7 +64,7 @@ class HistoryViewModel(
     }
 }
 
-// Funzione di estensione per convertire l'entity Room nel modello UI
+// Converte un GameHistoryEntity in un GameHistoryEntry
 private fun GameHistoryEntity.toGameHistoryEntry(): GameHistoryEntry {
     return GameHistoryEntry(
         date = Date(this.date),

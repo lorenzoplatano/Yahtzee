@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "game_history")
 data class GameHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val date: Long, // timestamp in millis
+    val date: Long,
     val score: Int
 )

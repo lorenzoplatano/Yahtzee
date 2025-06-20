@@ -43,7 +43,7 @@ import com.example.yahtzee.ui.theme.verde_azzurro
 fun SinglePlayerGameScreen(
     navController: NavController,
     shakeTrigger: Int,
-    viewModel: SinglePlayerGameViewModel  // ✅ Aggiungi questo parametro
+    viewModel: SinglePlayerGameViewModel
 ){
     LaunchedEffect(Unit) {
         viewModel.loadSavedGameIfExists()
@@ -106,7 +106,6 @@ fun SinglePlayerGameScreen(
     var animationDone by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Track the initial shakeTrigger value to prevent auto-roll on screen load
     var previousShakeTrigger by remember { mutableStateOf(shakeTrigger) }
 
     fun rollDiceWithAnimation() {
@@ -129,7 +128,6 @@ fun SinglePlayerGameScreen(
         viewModel.resetGame()
     }
 
-    // Fixed: Only trigger roll when shakeTrigger actually changes, not on initial load
     LaunchedEffect(shakeTrigger) {
         if (shakeTrigger > 0 && shakeTrigger != previousShakeTrigger) {
             rollDiceWithAnimation()
@@ -191,7 +189,6 @@ fun SinglePlayerGameScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Sfondo
         Image(
             painter = painterResource(id = R.drawable.sfondo_generale),
             contentDescription = null,
@@ -204,7 +201,6 @@ fun SinglePlayerGameScreen(
                 .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
-        // Home Button in alto a destra
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -250,7 +246,6 @@ fun SinglePlayerGameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Dadi
             if (!state.gameEnded) {
                 Card(
                     modifier = Modifier
@@ -259,7 +254,7 @@ fun SinglePlayerGameScreen(
                         .padding(horizontal = (4 * scaleFactor).dp)
                         .offset(y = (8 * scaleFactor).dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = colorScheme.surface // Updated to match multiplayer
+                        containerColor = colorScheme.surface
                     ),
                     shape = RoundedCornerShape((12 * scaleFactor).dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -282,7 +277,6 @@ fun SinglePlayerGameScreen(
 
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
-            // Tabella dei punteggi
             if (!state.gameEnded) {
                 val tableMaxHeight = if (isCompactScreen) {
                     screenHeight * 0.50f
@@ -300,12 +294,12 @@ fun SinglePlayerGameScreen(
                         .shadow(elevation = 8.dp, shape = RoundedCornerShape((14 * scaleFactor).dp)),
 
                     colors = CardDefaults.cardColors(
-                        containerColor = colorScheme.surface // Updated to match multiplayer
+                        containerColor = colorScheme.surface
                     ),
                     shape = RoundedCornerShape((14 * scaleFactor).dp)
                 ) {
                     Column {
-                        // Header tabella - Updated with home button colors
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -343,7 +337,6 @@ fun SinglePlayerGameScreen(
                             }
                         }
 
-                        // Righe combinazioni
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -384,7 +377,6 @@ fun SinglePlayerGameScreen(
                                 color = colorScheme.outlineVariant
                             )
 
-                            // Bonus row
                             SinglePlayerTableRow(
                                 combination = stringResource(R.string.bonus) + " ($progressBonusText)",
                                 score = bonus,
@@ -400,7 +392,6 @@ fun SinglePlayerGameScreen(
                                 color = colorScheme.outlineVariant
                             )
 
-                            // Total row
                             SinglePlayerTableRow(
                                 combination = stringResource(R.string.total_score).uppercase(),
                                 score = totalScore,
@@ -415,7 +406,6 @@ fun SinglePlayerGameScreen(
                 }
             }
 
-            // Card fine partita centrata con stile coerente
             if (state.gameEnded) {
                 Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
                 Box(
@@ -519,7 +509,6 @@ fun SinglePlayerGameScreen(
             }
         }
 
-        // Bottoni di controllo in basso
         if (!state.gameEnded) {
             Box(
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -553,7 +542,6 @@ fun SinglePlayerTableRow(
     isCompactScreen: Boolean = false,
     colorScheme: ColorScheme = MaterialTheme.colorScheme
 ) {
-    // Updated to match multiplayer behavior
     val backgroundColor = colorScheme.surface
 
     val textColor = when {
@@ -562,12 +550,11 @@ fun SinglePlayerTableRow(
         else -> colorScheme.onSurfaceVariant
     }
 
-    // Updated score colors to match multiplayer - preview scores use standard text color
     val scoreColor = when {
         enabled -> colorScheme.onSurface
         bold -> colorScheme.onSurface
         score != null -> verde_azzurro
-        previewScore != null -> colorScheme.onSurface // Updated: preview scores use standard text color like multiplayer
+        previewScore != null -> colorScheme.onSurface
         else -> colorScheme.onSurfaceVariant
     }
 

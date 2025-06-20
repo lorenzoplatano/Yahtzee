@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 fun MultiplayerGameScreen(
     navController: NavController,
     shakeTrigger: Int = 0,
-    viewModel: MultiplayerGameViewModel  // ✅ Aggiungi questo parametro
+    viewModel: MultiplayerGameViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadSavedGameIfExists()
@@ -246,7 +246,7 @@ fun MultiplayerGameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Card unica per i dadi
+
             if (!state.gameEnded) {
                 Card(
                     modifier = Modifier
@@ -278,7 +278,6 @@ fun MultiplayerGameScreen(
 
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
-            // TABELLA con altezza adattiva
             if (!state.gameEnded) {
                 val tableMaxHeight = if (isCompactScreen) {
                     screenHeight * 0.50f
@@ -300,7 +299,7 @@ fun MultiplayerGameScreen(
                     shape = RoundedCornerShape((14 * scaleFactor).dp)
                 ) {
                     Column {
-                        // HEADER con colori HomeButton
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -325,7 +324,7 @@ fun MultiplayerGameScreen(
                                     color = Color.White,
                                     fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                 )
-                                // Player 1 header
+
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
@@ -356,7 +355,7 @@ fun MultiplayerGameScreen(
                                         fontSize = (if (isCompactScreen) (11 * scaleFactor) else (13 * scaleFactor)).sp,
                                         )
                                 }
-                                // Player 2 header
+
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
@@ -453,7 +452,7 @@ fun MultiplayerGameScreen(
                 }
             }
 
-            // CARD FINE PARTITA
+
             if (state.gameEnded) {
                 Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
                 Box(
@@ -618,9 +617,8 @@ fun MultiplayerTableRow(
         else -> colorScheme.onSurfaceVariant
     }
 
-    // Colori dei punteggi come i pulsanti di controllo
-    val player1Color = verde_acqua // Colore del pulsante lancia
-    val player2Color = arancio_rosso // Colore del pulsante reset
+    val player1Color = verde_acqua
+    val player2Color = arancio_rosso
 
     val player1TextColor = when {
         player1Score != null -> player1Color

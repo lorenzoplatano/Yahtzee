@@ -2,6 +2,7 @@ package com.example.yahtzee.service
 
 import com.example.yahtzee.model.GameState
 
+// Classe Service usata dalle ViewModel SinglePlayer e Multiplayer per gestire la logica del gioco
 class GameService {
     companion object {
         val combinations = listOf(
@@ -11,21 +12,20 @@ class GameService {
         )
     }
 
+    // Funzione per lanciare i dadi
     fun rollDice(currentDice: List<Int?>, held: List<Boolean>): List<Int> {
-        // Converte la lista di dadi con possibili valori nulli in una lista di interi non-nulli
         return currentDice.mapIndexed { i, value ->
             if (held[i] && value != null) value else (1..6).random()
         }
     }
 
+    // Funzione per calcolare il punteggio in base alla combinazione scelta e ai valori dei dadi
     fun calculateScore(
         combination: String,
         diceValues: List<Int?>
     ): Int {
-        // Filtra via eventuali valori nulli prima di calcolare il punteggio
         val nonNullValues = diceValues.filterNotNull()
         
-        // Se non ci sono dadi validi, il punteggio è 0
         if (nonNullValues.isEmpty()) return 0
         
         val counts = nonNullValues.groupingBy { it }.eachCount()
@@ -60,13 +60,15 @@ class GameService {
         }
     }
 
+    // Funzione per verificare se il gioco è terminato, controllando se tutte le combinazioni hanno un punteggio
     fun isGameEnded(scoreMap: Map<String, Int?>): Boolean {
         return combinations.all { scoreMap[it] != null }
     }
 
+    // Funzione per resettare lo stato del gioco, creando un nuovo GameState inizializzato
     fun resetGame(): GameState {
         return GameState(
-            diceValues = List(5) { null },  // Inizializza i dadi con valori nulli
+            diceValues = List(5) { null },
             scoreMap = combinations.associateWith { null }.toMutableMap(),
             remainingRolls = 3,
             canSelectScore = false,

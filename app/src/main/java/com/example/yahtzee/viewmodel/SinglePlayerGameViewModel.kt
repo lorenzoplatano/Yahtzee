@@ -27,7 +27,7 @@ class SinglePlayerGameViewModel(
 
     val combinations = GameService.combinations
 
-
+    // Carica una partita salvata se esistente, altrimenti inizializza un nuovo gioco.
     fun loadSavedGameIfExists() {
         viewModelScope.launch {
             try {
@@ -42,19 +42,20 @@ class SinglePlayerGameViewModel(
                         gameEnded = savedGame.gameEnded
                     )
                 } else {
-                    // Reset esplicito quando non ci sono partite salvate
+
                     state = gameService.resetGame()
                     isNewHighScore = false
                 }
             } catch (_: Exception) {
                 gameSaveRepository.clearSavedSinglePlayerGame()
-                // Reset anche in caso di errore
+
                 state = gameService.resetGame()
                 isNewHighScore = false
             }
         }
     }
 
+    // Effettua il lancio dei dadi, aggiornando lo stato del gioco.
     fun rollDice() {
         if (state.remainingRolls > 0 && !state.gameEnded) {
             state = state.copy(
@@ -67,6 +68,7 @@ class SinglePlayerGameViewModel(
         }
     }
 
+    // Gestisce lo stato di "tenuta" dei dadi specificati dall'indice.
     fun toggleHold(index: Int) {
         if (state.remainingRolls < 3 && !state.gameEnded && state.diceValues[index] != null) {
             val newHeld = state.heldDice.toMutableList().also { it[index] = !it[index] }
@@ -76,6 +78,7 @@ class SinglePlayerGameViewModel(
         }
     }
 
+    // Seleziona un punteggio per una combinazione specifica, aggiornando lo stato del gioco.
     fun selectScore(combination: String) {
         if (state.canSelectScore && state.scoreMap[combination] == null && !state.gameEnded) {
             val newScoreMap = state.scoreMap.toMutableMap()
@@ -97,15 +100,16 @@ class SinglePlayerGameViewModel(
         }
     }
 
+    // Resetta il gioco, cancellando lo stato salvato e inizializzando un nuovo gioco.
     fun resetGame() {
 
         clearSavedState()
 
-        // Then reset game state
         state = gameService.resetGame()
         isNewHighScore = false
     }
 
+    // Anteprima dei punteggi per le combinazioni disponibili, calcolando i punteggi solo se non sono già stati selezionati.
     fun previewScores(): Map<String, Int?> {
         return if (state.canSelectScore) {
             combinations.associateWith { combination ->
@@ -116,7 +120,7 @@ class SinglePlayerGameViewModel(
         } else emptyMap()
     }
 
-
+    // Salva il risultato del gioco, calcolando il punteggio totale e verificando se è un nuovo record.
     private fun saveGameResult() {
 
         val upper = listOf("Aces", "Twos", "Threes", "Fours", "Fives", "Sixes")
@@ -144,7 +148,7 @@ class SinglePlayerGameViewModel(
         }
     }
 
-
+    // Salva lo stato corrente del gioco, calcolando il punteggio totale e verificando se è necessario salvare lo stato.
     private fun saveCurrentState() {
         if (shouldSaveState()) {
             viewModelScope.launch {
@@ -168,12 +172,12 @@ class SinglePlayerGameViewModel(
         }
     }
 
-
+    // Verifica se lo stato del gioco deve essere salvato, basandosi sul numero di lanci rimanenti e sui punteggi selezionati.
     private fun shouldSaveState(): Boolean {
         return state.remainingRolls < 3 || state.scoreMap.values.any { it != null }
     }
 
-
+    // Cancella lo stato salvato del gioco, ripristinando lo stato iniziale.
     private fun clearSavedState() {
         viewModelScope.launch {
             gameSaveRepository.clearSavedSinglePlayerGame()

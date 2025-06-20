@@ -6,15 +6,18 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlin.math.sqrt
 
+// Classe ShakeDetector per rilevare i movimenti di shake del dispositivo
 class ShakeDetector(
     private val onShake: () -> Unit
 ) : SensorEventListener {
 
     private var lastShakeTime: Long = 0
-    private val shakeThresholdGravity = 3f
-    private val shakeSlopTimeMs = 2500
+    private val shakeThresholdGravity = 3f // Soglia di gravità per considerare un movimento come shake
+    private val shakeSlopTimeMs = 2500 // Tempo minimo tra due shake consecutivi in millisecondi
     private var isRegistered = false
 
+
+    // Gestione degli eventi del sensore
     override fun onSensorChanged(event: SensorEvent?) {
         if (event == null) return
         if (event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
@@ -41,6 +44,7 @@ class ShakeDetector(
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
+    // Registra il listener per il sensore accelerometro
     fun register(sensorManager: SensorManager) {
         if (!isRegistered) {
             val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -51,6 +55,7 @@ class ShakeDetector(
         }
     }
 
+    // Deregistra il listener per il sensore accelerometro
     fun unregister(sensorManager: SensorManager) {
         if (isRegistered) {
             sensorManager.unregisterListener(this)

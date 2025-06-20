@@ -20,15 +20,12 @@ class MultiplayerGameViewModel(
     var state by mutableStateOf(GameStateMultiplayer())
         private set
 
-    /**
-     * Load saved game if exists using the new GameSaveRepository
-     */
+    // Carica una partita salvata se esistente, altrimenti inizializza un nuovo gioco.
     fun loadSavedGameIfExists() {
         viewModelScope.launch {
             try {
                 val savedGame = gameSaveRepository.loadSavedMultiplayerGame()
                 if (savedGame != null) {
-                    // Convert SavedMultiplayerGame to GameStateMultiplayer
                     state = GameStateMultiplayer(
                         diceValues = savedGame.diceValues,
                         heldDice = savedGame.heldDice,
@@ -40,17 +37,16 @@ class MultiplayerGameViewModel(
                         gameEnded = savedGame.gameEnded
                     )
                 } else {
-                    // Inizializza un nuovo gioco quando non c'è uno stato salvato
                     resetGame()
                 }
             } catch (_: Exception) {
-                // If loading fails, clear corrupted save and start fresh
                 gameSaveRepository.clearSavedMultiplayerGame()
                 resetGame()
             }
         }
     }
 
+    // Effettua il lancio dei dadi, aggiornando lo stato del gioco.
     fun rollDice() {
         if (state.remainingRolls > 0 && !state.gameEnded) {
             val newDice = gameService.rollDice(state.diceValues, state.heldDice)
@@ -59,20 +55,20 @@ class MultiplayerGameViewModel(
                 remainingRolls = state.remainingRolls - 1,
                 hasRolledAtLeastOnce = true
             )
-            // Save state after each action
             saveCurrentState()
         }
     }
 
+    // Gestisce lo stato di "tenuta" di un dado specifico.
     fun toggleHold(index: Int) {
         if (state.remainingRolls < 3 && !state.gameEnded) {
             val newHeld = state.heldDice.toMutableList().also { it[index] = !it[index] }
             state = state.copy(heldDice = newHeld)
-            // Save state after each action
             saveCurrentState()
         }
     }
 
+    // Seleziona un punteggio per una combinazione specifica, aggiornando lo stato del gioco.
     fun selectScore(combination: String) {
         if (state.gameEnded) return
         val currentScoreMap = if (state.isPlayer1Turn) state.scoreMapPlayer1 else state.scoreMapPlayer2
@@ -99,21 +95,18 @@ class MultiplayerGameViewModel(
         )
 
         if (gameEnded) {
-            // Clear saved game when finished
             clearSavedState()
         } else {
-            // Save state after each action
             saveCurrentState()
         }
     }
 
+    // Resetta il gioco, cancellando lo stato salvato e inizializzando un nuovo stato di gioco.
     fun resetGame() {
-        // Clear saved state first
         clearSavedState()
 
-        // Then reset game state
         state = GameStateMultiplayer(
-            diceValues = List(5) { 1 },  // Initial values instead of random
+            diceValues = List(5) { 1 },
             heldDice = List(5) { false },
             remainingRolls = 3,
             hasRolledAtLeastOnce = false,
@@ -124,6 +117,7 @@ class MultiplayerGameViewModel(
         )
     }
 
+    // Anteprima dei punteggi per le combinazioni disponibili, calcolando i punteggi solo se non sono già stati selezionati.
     fun previewScores(): Map<String, Int?> {
         val currentScoreMap = if (state.isPlayer1Turn) state.scoreMapPlayer1 else state.scoreMapPlayer2
         return if (state.hasRolledAtLeastOnce) {
@@ -135,9 +129,7 @@ class MultiplayerGameViewModel(
         } else emptyMap()
     }
 
-    /**
-     * Save current game state (using GameSaveRepository)
-     */
+    // Salva lo stato corrente del gioco se necessario, per poterlo ripristinare in seguito.
     private fun saveCurrentState() {
         if (shouldSaveState()) {
             viewModelScope.launch {
@@ -159,18 +151,16 @@ class MultiplayerGameViewModel(
         }
     }
 
-    /**
-     * Check if state should be saved (only if game has started)
-     */
+
+    // Controlla se lo stato corrente del gioco richiede il salvataggio, basandosi su variabili di stato.
     private fun shouldSaveState(): Boolean {
         return state.hasRolledAtLeastOnce ||
                 state.scoreMapPlayer1.values.any { it != null } ||
                 state.scoreMapPlayer2.values.any { it != null }
     }
 
-    /**
-     * Clear saved state
-     */
+
+    // Cancella lo stato salvato del gioco quando il gioco termina o viene resettato.
     private fun clearSavedState() {
         viewModelScope.launch {
             gameSaveRepository.clearSavedMultiplayerGame()

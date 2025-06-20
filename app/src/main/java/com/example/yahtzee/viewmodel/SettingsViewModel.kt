@@ -22,6 +22,7 @@ class SettingsViewModel(
         loadSettings()
     }
 
+    // Inizializza lo stato UI con i valori di default
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
@@ -41,18 +42,23 @@ class SettingsViewModel(
         }
     }
 
+    // Funzioni per modificare le impostazioni
+
+    // Funzione per alternare il tema scuro
     fun toggleTheme() {
         viewModelScope.launch {
             settingsRepository.setDarkTheme(!uiState.isDarkTheme)
         }
     }
 
+    // Funzione per alternare l'abilitazione dello shake
     fun toggleShake() {
         viewModelScope.launch {
             settingsRepository.setShakeEnabled(!uiState.isShakeEnabled)
         }
     }
 
+    // Funzione per impostare la lingua
     fun setLanguage(language: AppLanguage) {
         viewModelScope.launch {
             settingsRepository.setLanguage(language)

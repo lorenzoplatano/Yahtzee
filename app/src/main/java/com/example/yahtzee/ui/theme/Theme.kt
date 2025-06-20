@@ -6,7 +6,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Definizione degli schemi di colori usando SOLO i colori da Colors.kt
+// Definizione degli schemi di colori usando i colori da Colors.kt
+
+// Schema di colori scuro
 private val DarkColorScheme = darkColorScheme(
     primary = BothCardDark,                // colore principale scuro
     onPrimary = Color.White,               // testo su primary
@@ -20,6 +22,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color.White,               // testo su superficie
 )
 
+// Schema di colori chiaro
 private val LightColorScheme = lightColorScheme(
     primary = BothCardLight,               // colore principale chiaro
     onPrimary = HomeDialogTitle,           // testo su primary
@@ -33,6 +36,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = HomeDialogTitle,           // testo su superficie
 )
 
+// Tema per l'app Yahtzee, imposta lo schema di colori
 @Composable
 fun YahtzeeTheme(
     darkTheme: Boolean = false,
