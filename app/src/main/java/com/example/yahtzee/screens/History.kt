@@ -39,7 +39,7 @@ import java.util.*
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    viewModel: HistoryViewModel  // ✅ Aggiungi questo parametro
+    viewModel: HistoryViewModel
 ) {
 
     LaunchedEffect(Unit) {
@@ -48,7 +48,7 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState
 
-    // Responsive calculations
+
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val screenWidth = with(density) { configuration.screenWidthDp.dp }
@@ -58,11 +58,11 @@ fun HistoryScreen(
     val headerPadding = (screenHeight.value * 0.08f).dp.coerceAtLeast(32.dp).coerceAtMost(60.dp)
     val isCompactHeight = screenHeight < 700.dp
 
-    // Unica dichiarazione richiesta
+
     val colorScheme = MaterialTheme.colorScheme
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background image
+
         Image(
             painter = painterResource(id = R.drawable.sfondo_generale),
             contentDescription = null,
@@ -70,14 +70,14 @@ fun HistoryScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Semi-transparent overlay (alpha fisso)
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colorScheme.background.copy(alpha = 0.3f))
         )
 
-        // Home icon (top-left) con GenericButton
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -95,7 +95,7 @@ fun HistoryScreen(
             )
         }
 
-        // Settings icon (top-right) con GenericButton
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -113,7 +113,7 @@ fun HistoryScreen(
             )
         }
 
-        // History card - responsive positioning
+
         Card(
             modifier = Modifier
                 .widthIn(max = 450.dp)
@@ -133,7 +133,7 @@ fun HistoryScreen(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Header con gradiente come singleplayer
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -155,7 +155,7 @@ fun HistoryScreen(
                     )
                 }
 
-                // Header della tabella con gradiente e bordi smussati
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,7 +200,7 @@ fun HistoryScreen(
                     }
                 }
 
-                // History list con divider tra le entry
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
