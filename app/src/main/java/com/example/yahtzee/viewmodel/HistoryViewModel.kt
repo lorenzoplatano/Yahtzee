@@ -41,7 +41,14 @@ class HistoryViewModel(
         updateSortedHistory(uiState.value.history, column, newSortOrder)
     }
 
-    private fun updateSortedHistory(
+    // Nuova funzione per aggiungere una partita in tempo reale
+    fun addGameToHistory(entry: GameHistoryEntry) {
+        val newHistory = uiState.value.history + entry
+        updateSortedHistory(newHistory, uiState.value.sortColumn, uiState.value.sortOrder)
+    }
+
+    // Cambia la visibilità da private a internal
+    internal fun updateSortedHistory(
         history: List<GameHistoryEntry>,
         sortColumn: SortColumn,
         sortOrder: SortOrder
